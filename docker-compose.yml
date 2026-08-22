@@ -1,0 +1,202 @@
+name: ${COMPOSE_PROJECT_NAME:-marketpilot}
+
+x-python-service: &python-service
+  image: marketpilot-python:0.1.0
+  env_file: .env
+  restart: unless-stopped
+  networks: [data-plane]
+
+services:
+  kafka:
+    image: apache/kafka:3.9.0
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    volumes: [kafka-data:/var/lib/kafka/data]
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list >/dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+    networks: [data-plane]
+
+  minio:
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    command: server /data --console-address ":9001"
+    env_file: .env
+    ports: ["9001:9001"]
+    volumes: [minio-data:/data]
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+    networks: [data-plane]
+
+  mariadb:
+    image: mariadb:11.4
+    env_file: .env
+    volumes:
+      - mariadb-data:/var/lib/mysql
+      - ./db/migrations:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "healthcheck.sh --connect --innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+    networks: [data-plane, serving-plane]
+
+  spark-master:
+    image: spark:3.5.8
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master"]
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/spark-master/7077'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+    networks: [data-plane]
+
+  spark-worker:
+    image: spark:3.5.8
+    command:
+      - /opt/spark/bin/spark-class
+      - org.apache.spark.deploy.worker.Worker
+      - spark://spark-master:7077
+    environment:
+      SPARK_WORKER_MEMORY: 2G
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/8081'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+    depends_on:
+      spark-master: {condition: service_healthy}
+    networks: [data-plane]
+
+  market-producer:
+    <<: *python-service
+    command: python -m services.market_producer.main
+    depends_on:
+      platform-init: {condition: service_completed_successfully}
+
+  raw-archive-sink:
+    <<: *python-service
+    command: python -m services.raw_archive_sink.main
+    depends_on:
+      platform-init: {condition: service_completed_successfully}
+
+  platform-init:
+    <<: *python-service
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.python
+    command: python -m services.platform_init.main
+    restart: "no"
+    depends_on:
+      kafka: {condition: service_healthy}
+      minio: {condition: service_healthy}
+
+  spark-streaming:
+    image: spark:3.5.8
+    command:
+      - /opt/spark/bin/spark-submit
+      - --master
+      - spark://spark-master:7077
+      - /opt/marketpilot/spark/jobs/stream_market_bars.py
+    env_file: .env
+    restart: unless-stopped
+    volumes: [./spark:/opt/marketpilot/spark:ro, spark-checkpoints:/checkpoints]
+    depends_on:
+      kafka: {condition: service_healthy}
+      mariadb: {condition: service_healthy}
+      spark-master: {condition: service_started}
+    networks: [data-plane]
+
+  airflow-db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: ${AIRFLOW_DB_PASSWORD}
+      POSTGRES_DB: airflow
+    volumes: [airflow-db-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks: [control-plane]
+
+  airflow-scheduler:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.airflow
+    env_file: .env
+    command: scheduler
+    volumes: [./airflow/dags:/opt/airflow/dags:ro, ./spark:/opt/marketpilot/spark:ro, airflow-logs:/opt/airflow/logs]
+    depends_on:
+      airflow-init: {condition: service_completed_successfully}
+      spark-master: {condition: service_started}
+    networks: [control-plane]
+
+  airflow-api-server:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.airflow
+    env_file: .env
+    command: api-server
+    ports: ["8080:8080"]
+    volumes: [./airflow/dags:/opt/airflow/dags:ro, airflow-logs:/opt/airflow/logs]
+    depends_on:
+      airflow-init: {condition: service_completed_successfully}
+    networks: [control-plane]
+
+  airflow-init:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.airflow
+    env_file: .env
+    command:
+      - bash
+      - -c
+      - >-
+        airflow db migrate && (
+        airflow users create
+        --username "$${AIRFLOW_ADMIN_USERNAME}"
+        --password "$${AIRFLOW_ADMIN_PASSWORD}"
+        --firstname MarketPilot
+        --lastname Admin
+        --role Admin
+        --email "$${AIRFLOW_ADMIN_EMAIL}" ||
+        airflow users reset-password
+        --username "$${AIRFLOW_ADMIN_USERNAME}"
+        --password "$${AIRFLOW_ADMIN_PASSWORD}")
+    depends_on:
+      airflow-db: {condition: service_healthy}
+    networks: [control-plane]
+
+networks:
+  data-plane: {internal: true}
+  control-plane: {internal: true}
+  serving-plane: {}
+
+volumes:
+  kafka-data: {}
+  minio-data: {}
+  mariadb-data: {}
+  spark-checkpoints: {}
+  airflow-db-data: {}
+  airflow-logs: {}

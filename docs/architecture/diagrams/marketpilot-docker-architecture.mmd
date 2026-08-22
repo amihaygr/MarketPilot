@@ -1,0 +1,95 @@
+flowchart TB
+    classDef external fill:#E8F1FB,stroke:#2E74B5,color:#17365D
+    classDef service fill:#E2F0D9,stroke:#548235,color:#274E13
+    classDef platform fill:#FFF2CC,stroke:#BF9000,color:#3F2A00
+    classDef database fill:#FCE4D6,stroke:#C65911,color:#7F3000
+    classDef airflow fill:#F2F2F2,stroke:#595959,color:#262626,stroke-dasharray:5 5
+    classDef user fill:#E4DFEC,stroke:#7030A0,color:#3F1B59
+
+    alpaca["Alpaca"]
+    sec["SEC EDGAR"]
+    browser["דפדפן משתמש"]
+
+    subgraph COMPOSE["Docker Compose | MarketPilot"]
+        direction TB
+
+        subgraph INGEST["קליטה ותעבורה"]
+            direction LR
+            producer["market-producer | long-running"]
+            kafka["Kafka KRaft | broker יחיד ל-MVP"]
+            secadapter["sec-adapter | on-demand"]
+            rawsink["raw-archive-sink | long-running"]
+        end
+
+        subgraph SPARK["עיבוד Spark"]
+            direction LR
+            master["spark-master"]
+            worker["spark-worker"]
+            streaming["spark-streaming | long-running"]
+            batch["Spark Batch jobs | on-demand"]
+            master --> worker
+            master -. "הקצאת משאבים" .-> streaming
+            master -. "הקצאת משאבים" .-> batch
+        end
+
+        subgraph STORE["אחסון מתמשך"]
+            direction LR
+            minio[("MinIO | Bronze ו-Silver Parquet")]
+            mariadb[("MariaDB | Gold, היסטוריה פעילה ונתונים חיים")]
+        end
+
+        subgraph ORCH["Airflow | בקרה על עבודות תחומות בזמן"]
+            direction LR
+            scheduler["airflow-scheduler"]
+            apiserver["airflow-api-server | UI"]
+            dagprocessor["airflow-dag-processor"]
+            airflowdb[("PostgreSQL | metadata פנימי של Airflow")]
+            sparkop["SparkSubmitOperator | לוגיקה בתוך Airflow"]
+            scheduler --> sparkop
+            scheduler --> airflowdb
+            apiserver --> airflowdb
+            dagprocessor --> airflowdb
+        end
+
+        subgraph SERVE["שכבת שירות"]
+            direction LR
+            api["backend-api"]
+            web["web-app"]
+            web -->|"REST"| api
+        end
+
+        producer --> kafka
+        kafka --> streaming
+        kafka --> rawsink
+        rawsink --> minio
+        streaming --> mariadb
+        secadapter --> minio
+        batch -->|"Bronze אל Silver"| minio
+        batch -->|"Silver אל Gold"| mariadb
+        sparkop -. "spark-submit" .-> master
+        scheduler -. "Docker task או HTTP" .-> secadapter
+        api -->|"SQL"| mariadb
+    end
+
+    alpaca --> producer
+    sec --> secadapter
+    browser -->|"HTTPS"| web
+
+    volumes["Volumes: kafka-data, minio-data, mariadb-data, airflow-db-data, airflow-logs"]
+    readiness["Healthchecks ו-service_healthy לפני הפעלת תלות"]
+    volumes -.-> kafka
+    volumes -.-> minio
+    volumes -.-> mariadb
+    volumes -.-> airflowdb
+    readiness -.-> scheduler
+    readiness -.-> api
+
+    boundary["גבול אחריות: Docker מפעיל שירותים רציפים. Airflow אינו מנהל את מחזור החיים של Kafka, Spark Streaming, API או מסדי הנתונים."]
+    boundary -.-> streaming
+
+    class alpaca,sec external
+    class producer,secadapter,rawsink,streaming,batch,api,web service
+    class kafka,master,worker platform
+    class minio,mariadb,airflowdb database
+    class scheduler,apiserver,dagprocessor,sparkop,readiness,boundary,volumes airflow
+    class browser user

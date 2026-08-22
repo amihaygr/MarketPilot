@@ -1,0 +1,16 @@
+version: 1
+benchmark: SPY
+symbols:
+  - AAPL
+  - MSFT
+  - AMZN
+  - NVDA
+  - GOOGL
+  - META
+  - TSLA
+  - JPM
+  - UNH
+  - XOM
+
+# This is an initial example only.
+# Validate the final 10 to 20 symbol list before connecting the live producer.

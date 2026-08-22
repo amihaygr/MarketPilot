@@ -1,0 +1,106 @@
+# MarketPilot
+
+> Local setup note: the repository uses the Apache Kafka 3.9.0 and Apache Spark
+> 3.5.8 official images. The original Bitnami tags referenced by the generated
+> engineering bundle were removed from Docker Hub and can no longer be pulled.
+
+Phase 1 keeps the Spark master and worker on `data-plane`. Airflow integration is
+deferred to Phase 5 and must add a tested network path for bounded Spark submissions.
+
+MarketPilot is a review-ready reference architecture and implementation scaffold for a local market-data platform. It combines Kafka, Spark Structured Streaming, Spark Batch, Airflow, MinIO, MariaDB, a backend API, and a web client without confusing service supervision with workflow orchestration.
+
+## Architectural position
+
+- Docker Compose owns long-running processes and restarts them after failure.
+- Spark Structured Streaming consumes Kafka continuously and publishes provisional Gold records.
+- Airflow schedules bounded workloads only. It submits Spark Batch jobs, enforces quality gates, and publishes certified partitions.
+- Bronze and Silver live in object storage. Gold is served from MariaDB.
+- The same event can follow two valid paths: raw archival for replay and low-latency processing for application freshness.
+
+## Repository map
+
+| Path | Purpose |
+|---|---|
+| `AGENTS.md` | Binding engineering instructions for Codex |
+| `docs/architecture/` | System design, diagrams and execution semantics |
+| `docs/decisions/` | Accepted architecture decisions |
+| `docs/runbooks/` | Operational and recovery procedures |
+| `airflow/dags/` | Bounded orchestration workflows |
+| `spark/jobs/` | Streaming and batch Spark entry points |
+| `services/` | Long-running ingestion and archival adapters |
+| `src/marketpilot/contracts/` | Versioned event contracts |
+| `db/migrations/` | MariaDB Gold DDL |
+| `infrastructure/` | Container build assets |
+| `tests/` | Unit, contract and integration tests |
+
+## Quick start for Codex in VS Code
+
+1. Extract this repository and open its root folder in VS Code.
+2. Run `git init` and make an initial checkpoint commit.
+3. Copy `.env.example` to `.env` and replace placeholders locally.
+4. Open `docs/prompts/codex-first-run.md` and give Prompt 1 to Codex.
+5. Require Codex to read `AGENTS.md` and accepted ADRs before editing.
+
+## Local quality gate
+
+```bash
+python -m venv .venv
+.venv/bin/pip install -e '.[dev]'
+make lint
+make test
+cp .env.example .env
+make compose-config
+```
+
+On Windows PowerShell use `.venv\\Scripts\\python.exe` and run the equivalent commands directly if `make` is unavailable.
+
+## Phase 1 on Windows
+
+The repository has a single Compose file. The explicit `-f` flag below keeps the
+commands clear and easy to reuse from scripts or another working directory.
+
+```powershell
+Copy-Item .env.example .env  # first run only; .env is ignored by Git
+docker compose -f .\docker-compose.yml --env-file .\.env config
+docker compose -f .\docker-compose.yml --env-file .\.env up -d kafka minio mariadb spark-master spark-worker
+docker compose -f .\docker-compose.yml --env-file .\.env ps
+docker compose -f .\docker-compose.yml --env-file .\.env logs --tail=200 kafka minio mariadb spark-master spark-worker
+```
+
+The MinIO console is available at <http://localhost:9001>. Kafka and MariaDB are
+intentionally reachable only from the internal Docker network during Phase 1.
+
+## Phase 2 synthetic raw path
+
+Phase 2 adds an idempotent initialization job, a deterministic synthetic producer,
+and a raw archive consumer:
+
+```text
+Synthetic MarketBarV1 -> Kafka -> raw-archive-sink -> MinIO Bronze
+                                      |
+                                      +-> MinIO quarantine (invalid events)
+```
+
+Start the Phase 2 services:
+
+```powershell
+docker compose -f .\docker-compose.yml --env-file .\.env up -d --build platform-init market-producer raw-archive-sink
+docker compose -f .\docker-compose.yml --env-file .\.env logs --tail=100 platform-init market-producer raw-archive-sink
+```
+
+`platform-init` exits with code zero after creating the required Kafka topics and
+MinIO buckets. This is expected. The producer and sink remain long-running. Bronze
+object names include Kafka topic, partition, and offset so retrying the same Kafka
+record overwrites the same immutable logical object before its offset is committed.
+
+## Delivery maturity
+
+This repository is an implementation scaffold, not a falsely advertised finished trading product. Contracts, DDL, orchestration boundaries, CI, diagrams and initial tests are concrete. External API integration, JDBC sink behavior, object-store commit semantics, authentication and the user interface remain implementation milestones tracked in `docs/implementation-plan.md`.
+
+## Non-goals
+
+- Automated trading or order execution
+- Financial advice
+- Exactly-once claims across Kafka, Spark and MariaDB without measured proof
+- Airflow supervision of permanent streaming processes
+- Automatic deletion of MariaDB history after archival

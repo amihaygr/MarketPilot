@@ -1,0 +1,58 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# Runtime data
+data/
+volumes/
+checkpoints/
+logs/
+tmp/
+
+# Data files
+*.parquet
+*.avro
+*.orc
+*.db
+*.sqlite
+*.csv
+*.jsonl
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+dist/
+build/
+*.egg-info/
+
+# IDE and OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/settings.local.json
+
+# Local source bundles and extraction staging
+.marketpilot-staging/
+MarketPilot_Engineering_Repository.zip
+
+# Spark and Airflow local state
+spark-warehouse/
+metastore_db/
+airflow/logs/
+airflow/airflow.db
+
+# Frontend
+node_modules/
+.next/
+coverage/

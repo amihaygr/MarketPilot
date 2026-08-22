@@ -1,0 +1,1 @@
+"""Alpaca to Kafka producer."""

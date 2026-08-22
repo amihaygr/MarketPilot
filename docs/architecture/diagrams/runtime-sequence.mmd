@@ -1,0 +1,15 @@
+sequenceDiagram
+    autonumber
+    participant Source as Alpaca
+    participant Producer as Market Producer
+    participant Kafka
+    participant Stream as Spark Streaming
+    participant Gold as MariaDB Gold
+
+    Source->>Producer: Market bar
+    Producer->>Kafka: Publish keyed event
+    Kafka-->>Producer: Offset acknowledged
+    Kafka->>Stream: Consume event
+    Stream->>Stream: Validate and deduplicate
+    Stream->>Gold: Idempotent provisional upsert
+    Gold-->>Stream: Commit acknowledged

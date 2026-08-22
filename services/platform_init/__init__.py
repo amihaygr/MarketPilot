@@ -1,0 +1,1 @@
+"""Idempotent local-platform initialization."""

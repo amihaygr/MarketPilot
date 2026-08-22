@@ -1,0 +1,19 @@
+sequenceDiagram
+    autonumber
+    participant Airflow
+    participant Spark as Spark Batch
+    participant Bronze
+    participant Silver
+    participant Gold as MariaDB Gold
+
+    Airflow->>Airflow: Validate trading session
+    Airflow->>Spark: Submit Bronze to Silver
+    Spark->>Bronze: Read immutable partition
+    Spark->>Silver: Write normalized partition
+    Spark-->>Airflow: Finite job succeeded
+    Airflow->>Airflow: Execute Silver quality gate
+    Airflow->>Spark: Submit Silver to Gold
+    Spark->>Silver: Read validated partition
+    Spark->>Gold: Idempotent certified upsert
+    Spark-->>Airflow: Finite job succeeded
+    Airflow->>Gold: Advance publication watermark

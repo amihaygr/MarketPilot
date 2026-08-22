@@ -1,0 +1,16 @@
+.git
+.github
+.vscode
+.env
+.venv
+__pycache__
+.pytest_cache
+.ruff_cache
+airflow
+api
+docs
+spark
+tests
+web
+*.pdf
+*.zip

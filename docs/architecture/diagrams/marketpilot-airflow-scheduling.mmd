@@ -1,0 +1,79 @@
+flowchart TB
+    classDef clock fill:#E8F1FB,stroke:#2E74B5,color:#17365D
+    classDef dag fill:#F2F2F2,stroke:#595959,color:#262626,stroke-dasharray:5 5
+    classDef task fill:#E2F0D9,stroke:#548235,color:#274E13
+    classDef store fill:#FCE4D6,stroke:#C65911,color:#7F3000
+    classDef continuous fill:#FFF2CC,stroke:#BF9000,color:#3F2A00
+
+    timezone["Timezone לכל ה-DAGs: America/New_York | Airflow שומר זמנים פנימית ב-UTC"]
+
+    subgraph ALWAYS["שירותים רציפים | מופעלים על ידי Docker Compose ולא על ידי Airflow"]
+        direction LR
+        producer["market-producer | שעות מסחר"]
+        kafka["Kafka | רציף"]
+        streaming["Spark Streaming | micro-batch של 30 עד 60 שניות"]
+        livegold[("MariaDB Gold | עדכון כמעט בזמן אמת")]
+        producer --> kafka --> streaming --> livegold
+    end
+
+    subgraph AIRFLOW["קטלוג תזמוני Airflow"]
+        direction TB
+
+        secclock["כל 15 דקות | ימי חול | 06:00 עד 22:00 ET"]
+        secdag["sec_polling_dag | catchup=False | max_active_runs=1"]
+        sectask["בדיקת SEC והורדת accession חדשים בלבד"]
+        bronze[("Bronze | SEC raw JSON")]
+        secclock --> secdag --> sectask --> bronze
+
+        closeclock["16:30 ET | שני עד שישי"]
+        dailydag["daily_market_close_dag | max_active_runs=1"]
+        watermark["בדיקת watermark ושלמות קליטה"]
+        b2s["SparkSubmitOperator | Bronze אל Silver"]
+        dqs["בדיקות איכות Silver"]
+        s2g["SparkSubmitOperator | Silver אל Gold"]
+        publish["בדיקות Gold, פרסום watermark ועדכון backtest"]
+        closeclock --> dailydag --> watermark --> b2s --> dqs --> s2g --> publish
+
+        weekclock["שבת 06:00 ET"]
+        weeklydag["weekly_compaction_dag"]
+        compact["איחוד קובצי Parquet קטנים, manifest ובדיקת checksum"]
+        weekclock --> weeklydag --> compact
+
+        yearclock["10 בינואר 02:00 ET"]
+        annualdag["annual_archive_dag | השנה הקודמת בלבד"]
+        export["ייצוא מחיצות MariaDB סגורות ל-Parquet"]
+        verify["השוואת שורות, checksum ושאילתות מדגם"]
+        register["רישום manifest | ללא מחיקה אוטומטית ב-MVP"]
+        yearclock --> annualdag --> export --> verify --> register
+
+        manual["הפעלה ידנית עם טווח תאריכים וסימולים"]
+        backfilldag["backfill_replay_dag | max_active_runs=1"]
+        replay["קריאה חוזרת מ-Bronze והרצת Spark idempotent"]
+        manual --> backfilldag --> replay
+    end
+
+    controls["בקרות משותפות: retries עם backoff, execution_timeout, pools, UPSERT idempotent, התראות ולוגים"]
+    pools["Pools: sec_api_pool=1 | spark_batch_pool=1"]
+    timezone -.-> secdag
+    timezone -.-> dailydag
+    timezone -.-> weeklydag
+    timezone -.-> annualdag
+    controls -.-> secdag
+    controls -.-> dailydag
+    controls -.-> weeklydag
+    controls -.-> annualdag
+    controls -.-> backfilldag
+    pools -.-> secdag
+    pools -.-> dailydag
+    pools -.-> backfilldag
+
+    note["אין חץ מ-Airflow אל Spark Streaming: זהו שירות ארוך חיים. Airflow שולח רק עבודות Spark Batch תחומות בזמן אל Spark Master."]
+    note -.-> streaming
+    note -.-> b2s
+    note -.-> s2g
+
+    class timezone,secclock,closeclock,weekclock,yearclock,manual clock
+    class secdag,dailydag,weeklydag,annualdag,backfilldag,controls,pools,note dag
+    class sectask,watermark,b2s,dqs,s2g,publish,compact,export,verify,register,replay task
+    class bronze,livegold store
+    class producer,kafka,streaming continuous

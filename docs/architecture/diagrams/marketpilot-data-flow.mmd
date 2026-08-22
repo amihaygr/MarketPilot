@@ -1,0 +1,59 @@
+flowchart TB
+    classDef source fill:#E8F1FB,stroke:#2E74B5,color:#17365D,stroke-width:1px
+    classDef transport fill:#FFF2CC,stroke:#BF9000,color:#3F2A00,stroke-width:1px
+    classDef compute fill:#E2F0D9,stroke:#548235,color:#274E13,stroke-width:1px
+    classDef storage fill:#FCE4D6,stroke:#C65911,color:#7F3000,stroke-width:1px
+    classDef serving fill:#E4DFEC,stroke:#7030A0,color:#3F1B59,stroke-width:1px
+    classDef control fill:#F2F2F2,stroke:#595959,color:#262626,stroke-width:1px,stroke-dasharray:5 5
+
+    subgraph LIVE["מסלול חי ומתמשך"]
+        direction TB
+        alpaca["Alpaca Market Data | נרות OHLCV של דקה"]
+        producer["market-producer | שירות Docker רציף"]
+        kafka["Kafka | אירועי שוק"]
+        stream["Spark Structured Streaming | שירות Docker רציף"]
+        rawsink["raw-archive-sink | כתיבת אירועים גולמיים"]
+        alpaca -->|"WebSocket או API"| producer
+        producer -->|"אירוע לכל סימול ודקה"| kafka
+        kafka -->|"צריכת micro-batch"| stream
+        kafka -->|"עותק גולמי בלתי משתנה"| rawsink
+    end
+
+    subgraph MEDALLION["שכבות הנתונים"]
+        direction LR
+        bronze[("Bronze | MinIO כיום, S3 בעתיד | Raw immutable")]
+        b2sjob["Spark Batch job | bronze_to_silver"]
+        silver[("Silver | Parquet מנוקה, מתוקנן ומחולק למחיצות")]
+        s2gjob["Spark Batch job | silver_to_gold"]
+        gold[("Gold | MariaDB | טבלאות שירות, מדדים ואותות")]
+        bronze -->|"תיקוף, ניקוי ונרמול"| b2sjob --> silver
+        silver -->|"העשרה, צבירה ומידול"| s2gjob --> gold
+    end
+
+    rawsink --> bronze
+    stream -->|"UPSERT idempotent | עדכון כמעט בזמן אמת"| gold
+
+    sec["SEC EDGAR | submissions ו-XBRL JSON"]
+    secjob["sec-adapter | משימת Docker קצרת חיים"]
+    sec -->|"HTTP עם User-Agent והגבלת קצב"| secjob
+    secjob -->|"מטא-דאטה וקובצי JSON גולמיים"| bronze
+
+    airflow["Airflow | תזמון ובקרה של עבודות תחומות בזמן"]
+    airflow -. "כל 15 דקות" .-> secjob
+    airflow -. "SparkSubmitOperator" .-> b2sjob
+    airflow -. "SparkSubmitOperator" .-> s2gjob
+
+    api["Backend API"]
+    web["Web App"]
+    gold -->|"SQL בלבד"| api
+    api -->|"HTTPS או REST"| web
+
+    note["Airflow אינו מפעיל את Kafka, את market-producer או את Spark Streaming. Docker Compose שומר אותם כשירותים רציפים."]
+    note -.-> stream
+
+    class alpaca,sec source
+    class kafka transport
+    class producer,stream,rawsink,secjob,b2sjob,s2gjob compute
+    class bronze,silver,gold storage
+    class api,web serving
+    class airflow,note control
