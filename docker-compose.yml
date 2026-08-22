@@ -34,7 +34,7 @@ services:
     image: minio/minio:RELEASE.2025-04-22T22-12-26Z
     command: server /data --console-address ":9001"
     env_file: .env
-    ports: ["9001:9001"]
+    ports: ["127.0.0.1:9001:9001"]
     volumes: [minio-data:/data]
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
@@ -42,7 +42,7 @@ services:
       timeout: 5s
       retries: 12
     restart: unless-stopped
-    networks: [data-plane]
+    networks: [data-plane, serving-plane]
 
   mariadb:
     image: mariadb:11.4
@@ -86,6 +86,56 @@ services:
     depends_on:
       spark-master: {condition: service_healthy}
     networks: [data-plane]
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:v0.7.2
+    environment:
+      KAFKA_CLUSTERS_0_NAME: marketpilot-local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      DYNAMIC_CONFIG_ENABLED: "false"
+    ports: ["127.0.0.1:8085:8080"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+    depends_on:
+      kafka: {condition: service_healthy}
+    networks: [data-plane, serving-plane]
+
+  spark-ui-proxy:
+    image: nginx:1.27.5-alpine
+    ports:
+      - "127.0.0.1:18080:18080"
+      - "127.0.0.1:18081:18081"
+    volumes:
+      - ./infrastructure/nginx/spark-ui.conf:/etc/nginx/conf.d/default.conf:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:18080/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+    depends_on:
+      spark-master: {condition: service_healthy}
+      spark-worker: {condition: service_healthy}
+    networks: [data-plane, serving-plane]
+
+  adminer:
+    image: adminer:5.5.1-standalone
+    environment:
+      ADMINER_DEFAULT_SERVER: mariadb
+    ports: ["127.0.0.1:8086:8080"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8080/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+    depends_on:
+      mariadb: {condition: service_healthy}
+    networks: [serving-plane]
 
   market-producer:
     <<: *python-service

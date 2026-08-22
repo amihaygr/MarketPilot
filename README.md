@@ -93,6 +93,22 @@ MinIO buckets. This is expected. The producer and sink remain long-running. Bron
 object names include Kafka topic, partition, and offset so retrying the same Kafka
 record overwrites the same immutable logical object before its offset is committed.
 
+## Local developer UIs
+
+The management interfaces bind to `127.0.0.1` only. Kafka and MariaDB remain on
+internal Docker networks and are not published directly to the host.
+
+| Interface | URL | Purpose |
+|---|---|---|
+| MinIO Console | <http://localhost:9001> | Browse Bronze, Silver, checkpoints, and quarantine objects |
+| Kafka UI | <http://localhost:8085> | Inspect topics, messages, partitions, and consumer lag |
+| Adminer | <http://localhost:8086> | Inspect MariaDB schemas and tables |
+| Spark Master | <http://localhost:18080> | Inspect cluster workers and submitted applications |
+| Spark Worker | <http://localhost:18081> | Inspect worker resources and executors |
+
+For Adminer, select `MySQL`, use server `mariadb`, database `marketpilot`, and
+credentials from your local `.env`. MinIO also uses the credentials from `.env`.
+
 ## Delivery maturity
 
 This repository is an implementation scaffold, not a falsely advertised finished trading product. Contracts, DDL, orchestration boundaries, CI, diagrams and initial tests are concrete. External API integration, JDBC sink behavior, object-store commit semantics, authentication and the user interface remain implementation milestones tracked in `docs/implementation-plan.md`.
