@@ -2,8 +2,9 @@
 
 Verified locally on 2026-08-26 with Docker Compose, the official Alpaca Python
 SDK 0.44.0, a deterministic local SEC fixture, Airflow 3.0.3, MinIO, and MariaDB.
-Alpaca authentication and its IEX websocket were verified with local secrets. No
-request was sent to `sec.gov`; SEC verification used the local fixture only.
+Alpaca authentication and its IEX websocket were verified with local secrets. SEC
+polling was first verified with the local fixture and then activated against
+`sec.gov` with an operator-supplied contact identity.
 
 ## Implemented boundaries
 
@@ -91,7 +92,27 @@ The stored accessions were one 10-Q and one 8-K. The watermark
 
 An Airflow `dags test` with `force=true` and the same local fixture completed both
 `polling_enabled_and_in_window` and `poll_sec_submissions` successfully. Live SEC
-polling remained disabled afterward, and the temporary HTTP container was removed.
+polling remained disabled until the later reviewed activation, and the temporary
+HTTP container was removed.
+
+### Live SEC activation
+
+- A reviewed Airflow test polled all 11 configured CIKs from `sec.gov` at the
+  configured five-requests-per-second limit.
+- The first live run archived 11 raw submissions payloads, discovered 930 matching
+  filings, and inserted 930 accession-keyed Gold records.
+- A second live run discovered the same 930 filings, inserted zero new records,
+  and performed 930 idempotent updates.
+- MariaDB contained 932 rows with 932 distinct accession numbers: 930 live records
+  plus the two retained local fixture records.
+- The SEC Bronze prefix contained 12 objects before and after the second run: 11
+  live payloads plus the one retained fixture payload.
+- The `sec-filings-poll/latest` watermark was `PUBLISHED` after both runs.
+- After these checks, `sec_polling` was unpaused. The daily certification and
+  backfill DAGs remained paused.
+- The first two automatic scheduled runs, for 22:30 and 22:45 UTC, both completed
+  successfully through `LocalExecutor` and `sec_api_pool`; each inserted zero
+  duplicate accessions.
 
 ## Safety and restart behavior
 
@@ -101,9 +122,9 @@ polling remained disabled afterward, and the temporary HTTP container was remove
   Kafka and MariaDB business keys preserve idempotency.
 - Secrets are read only from the ignored `.env`; tracked configuration contains
   placeholders.
-- Alpaca activation followed the reviewed steps in
-  `docs/runbooks/external-source-activation.md`; SEC activation remains gated on a
-  real monitored contact identity.
+- Alpaca and SEC activation followed the reviewed steps in
+  `docs/runbooks/external-source-activation.md`. The tracked `.env.example` keeps
+  both external sources disabled or placeholder-based for safe new installations.
 
 ## Quality gates
 

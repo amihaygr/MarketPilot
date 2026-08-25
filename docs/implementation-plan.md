@@ -144,8 +144,8 @@ Status: completed and locally verified on 2026-08-25. See
 
 Status: completed and locally verified on 2026-08-26. See
 `docs/phase6-verification.md` for runtime evidence. Alpaca authentication and the
-IEX websocket were activated locally on 2026-08-26. Live SEC polling remains
-disabled until an identifiable User-Agent is supplied locally and approved.
+IEX websocket were activated locally on 2026-08-26. Live SEC polling was then
+verified for idempotency and enabled with an identifiable local User-Agent.
 
 ### Alpaca scope
 

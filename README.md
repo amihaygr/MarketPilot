@@ -188,9 +188,9 @@ internal Docker networks and are not published directly to the host.
 For Adminer, select `MySQL`, use server `mariadb`, database `marketpilot`, and
 credentials from your local `.env`. MinIO also uses the credentials from `.env`.
 Airflow uses `AIRFLOW_ADMIN_USERNAME` and `AIRFLOW_ADMIN_PASSWORD` from the same
-ignored local file. All DAGs remain paused until they are deliberately enabled.
-The SEC DAG also has an environment gate and is disabled in the default local
-configuration.
+ignored local file. On the verified workstation, `sec_polling` is enabled after a
+successful live idempotency check; `daily_market_close` and `backfill_replay`
+remain paused. The tracked default still keeps the SEC environment gate disabled.
 
 ## Phase 6 external sources
 
@@ -214,10 +214,10 @@ either external connection.
 ## Delivery maturity
 
 This repository is an incremental implementation, not a finished trading product.
-The raw, streaming, batch Medallion, Airflow orchestration, and external-adapter
-boundaries are concrete and locally verified. Real external traffic remains an
-operator-controlled activation step; the serving layer, authentication, and
-archive operations remain milestones tracked in `docs/implementation-plan.md`.
+The raw, streaming, batch Medallion, Airflow orchestration, and external-source
+boundaries are concrete and locally verified, including Alpaca IEX and SEC EDGAR
+traffic. The serving layer, authentication, and archive operations remain
+milestones tracked in `docs/implementation-plan.md`.
 
 ## Non-goals
 

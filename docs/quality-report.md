@@ -32,14 +32,18 @@
 - A local SEC fixture was archived once in MinIO and published twice without
   duplicate accession rows; the second run inserted zero new rows.
 - The SEC DAG completed successfully against the local fixture, with its production
-  external-source gate disabled afterward.
+  external-source gate disabled during fixture verification.
+- The real Alpaca IEX websocket authenticated and subscribed to all 11 configured
+  symbols; a bounded smoke check archived 10 eligible regular-session bars.
+- Live SEC polling archived 11 company payloads and published 930 filing records.
+  A repeat run inserted zero rows, retained 932 distinct accessions including two
+  fixture rows, and did not create duplicate Bronze objects.
 
 ## Deliberately deferred
 
-- A real Alpaca websocket session remains an operator activation step because no
-  API credentials were supplied.
-- A live SEC request remains an operator activation step because a real monitored
-  contact identity was not supplied.
+- Live Alpaca-to-Gold observation remains pending the next regular market session;
+  the after-hours historical smoke bars were correctly older than the existing
+  streaming watermark.
 - Backend API and Web App integration remain Phase 7 work.
 
 The Docker-backed recovery test is opt-in because it restarts a running service:
