@@ -1,0 +1,35 @@
+{
+  "cik": "320193",
+  "entityType": "operating",
+  "sic": "3571",
+  "name": "Apple Inc.",
+  "tickers": ["AAPL"],
+  "exchanges": ["Nasdaq"],
+  "filings": {
+    "recent": {
+      "accessionNumber": [
+        "0000320193-26-000079",
+        "0000320193-26-000070",
+        "0000320193-26-000060"
+      ],
+      "filingDate": ["2026-07-31", "2026-07-15", "2026-07-01"],
+      "reportDate": ["2026-06-27", "2026-07-15", "2026-06-30"],
+      "acceptanceDateTime": [
+        "2026-07-31T20:01:10.000Z",
+        "2026-07-15T12:30:00.000Z",
+        "2026-07-01T16:00:00.000Z"
+      ],
+      "act": ["34", "34", "34"],
+      "form": ["10-Q", "8-K", "4"],
+      "fileNumber": ["001-36743", "001-36743", "001-36743"],
+      "filmNumber": ["261234567", "261234568", "261234569"],
+      "items": ["", "2.02,9.01", ""],
+      "size": [1234567, 234567, 34567],
+      "isXBRL": [1, 1, 0],
+      "isInlineXBRL": [1, 1, 0],
+      "primaryDocument": ["aapl-20260627.htm", "aapl-20260715.htm", "xslF345X05/form4.xml"],
+      "primaryDocDescription": ["10-Q", "8-K", "FORM 4"]
+    },
+    "files": []
+  }
+}

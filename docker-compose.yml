@@ -179,14 +179,36 @@ services:
   market-producer:
     <<: *python-service
     command: python -m services.market_producer.main
+    healthcheck:
+      test: ["CMD-SHELL", "grep -aq 'services.market_producer.main' /proc/1/cmdline"]
+      interval: 15s
+      timeout: 5s
+      retries: 6
+    stop_grace_period: 30s
     depends_on:
       platform-init: {condition: service_completed_successfully}
+    networks: [data-plane, serving-plane]
 
   raw-archive-sink:
     <<: *python-service
     command: python -m services.raw_archive_sink.main
+    healthcheck:
+      test: ["CMD-SHELL", "grep -aq 'services.raw_archive_sink.main' /proc/1/cmdline"]
+      interval: 15s
+      timeout: 5s
+      retries: 6
     depends_on:
       platform-init: {condition: service_completed_successfully}
+
+  sec-adapter:
+    <<: *python-service
+    profiles: [jobs]
+    command: python -m marketpilot.sec.polling
+    restart: "no"
+    depends_on:
+      platform-init: {condition: service_completed_successfully}
+      mariadb: {condition: service_healthy}
+    networks: [data-plane, serving-plane]
 
   platform-init:
     <<: *python-service
@@ -282,7 +304,7 @@ services:
       mariadb: {condition: service_healthy}
       spark-master: {condition: service_healthy}
       spark-worker: {condition: service_healthy}
-    networks: [control-plane, data-plane]
+    networks: [control-plane, data-plane, serving-plane]
 
   airflow-dag-processor:
     <<: *airflow-common
@@ -325,6 +347,8 @@ services:
         runuser -u airflow -- airflow db migrate &&
         runuser -u airflow -- airflow pools set spark_batch_pool 1
         "Serialize local Spark Batch work" &&
+        runuser -u airflow -- airflow pools set sec_api_pool 1
+        "Serialize SEC API access below the shared rate limit" &&
         (runuser -u airflow -- airflow connections delete spark_standalone || true) &&
         runuser -u airflow -- airflow connections add spark_standalone
         --conn-type spark --conn-host "spark://spark-master" --conn-port 7077

@@ -16,7 +16,7 @@ dependencies = [
 
 [project.optional-dependencies]
 external = [
-  "alpaca-py>=0.42",
+  "alpaca-py==0.44.0",
 ]
 dev = [
   "pytest>=8.0",

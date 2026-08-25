@@ -188,15 +188,36 @@ internal Docker networks and are not published directly to the host.
 For Adminer, select `MySQL`, use server `mariadb`, database `marketpilot`, and
 credentials from your local `.env`. MinIO also uses the credentials from `.env`.
 Airflow uses `AIRFLOW_ADMIN_USERNAME` and `AIRFLOW_ADMIN_PASSWORD` from the same
-ignored local file. Both Phase 5 DAGs remain paused until they are deliberately
-enabled after the Phase 6 source integration.
+ignored local file. All DAGs remain paused until they are deliberately enabled.
+The SEC DAG also has an environment gate and is disabled in the default local
+configuration.
+
+## Phase 6 external sources
+
+Phase 6 adds two independently controlled flows while preserving the existing
+synthetic path:
+
+```text
+Alpaca WebSocket -> market-producer -> Kafka -> existing Bronze and live Gold paths
+
+Airflow sec_polling -> SEC submissions JSON -> MinIO Bronze
+                                      \-> MariaDB fact_sec_filing
+```
+
+`MARKET_DATA_SOURCE=synthetic` and `SEC_POLL_ENABLED=false` are the safe defaults.
+The Alpaca adapter uses `MarketBarV1`, filters to regular XNYS minutes, and
+reconnects with capped exponential backoff. SEC polling is bounded, rate-limited,
+archives raw JSON before publication, and uses accession number as its idempotent
+business key. Follow `docs/runbooks/external-source-activation.md` before enabling
+either external connection.
 
 ## Delivery maturity
 
 This repository is an incremental implementation, not a finished trading product.
-The raw, streaming, batch Medallion, and Airflow orchestration paths are concrete
-and locally verified. External API integration, the serving layer, authentication,
-and archive operations remain milestones tracked in `docs/implementation-plan.md`.
+The raw, streaming, batch Medallion, Airflow orchestration, and external-adapter
+boundaries are concrete and locally verified. Real external traffic remains an
+operator-controlled activation step; the serving layer, authentication, and
+archive operations remain milestones tracked in `docs/implementation-plan.md`.
 
 ## Non-goals
 

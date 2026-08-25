@@ -13,9 +13,13 @@ database, Scheduler, API Server and DAG Processor. The UI is exposed locally at
 - `backfill_replay`: manual only. It validates a maximum 31-calendar-day range and a
   subset of `MARKET_SYMBOLS`, skips closed sessions, and dynamically maps the same
   three bounded Spark jobs for each eligible date.
+- `sec_polling`: every 15 minutes on weekdays within the configured
+  06:00-22:00 `America/New_York` window. A gate skips the bounded poll while
+  `SEC_POLL_ENABLED=false`; `force=true` exists only for reviewed manual runs.
 
-`spark_batch_pool` has one slot, and both mutating DAGs use `max_active_runs=1`.
-This deliberately serializes local publication work.
+`spark_batch_pool` and `sec_api_pool` each have one slot. All mutating DAGs use
+`max_active_runs=1`; SEC polling also uses `catchup=False`. This serializes local
+publication work and prevents overlapping SEC requests.
 
 ## Synthetic weekend verification
 

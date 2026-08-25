@@ -16,3 +16,8 @@ Phase 4 uses `stg_market_bar_1m` as a transient run-scoped boundary. The publish
 identity can mutate only the Gold publication tables, staging, DQ results, and
 watermarks. A validated watermark is checked before staging and locked/rechecked
 inside the certified publication transaction.
+
+Phase 6 adds `fact_sec_filing`, keyed by SEC accession number. It retains the
+Bronze object URI and SHA-256 digest together with run, code, and schema lineage.
+The separate `marketpilot_sec` identity has only the read/write grants required to
+resolve symbols, upsert filings, and publish its watermark.

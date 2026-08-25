@@ -5,5 +5,5 @@ WORKDIR /opt/marketpilot
 COPY pyproject.toml README.md ./
 COPY src ./src
 COPY services ./services
-RUN pip install --no-cache-dir .
+RUN pip install --no-cache-dir '.[external]'
 USER 65532:65532

@@ -31,4 +31,5 @@ RUN pip install --no-cache-dir \
     apache-airflow-providers-apache-spark==5.3.3 \
     pyspark==3.5.8 \
     exchange-calendars==4.13.2 \
+    'boto3>=1.35,<2' \
     PyMySQL==1.2.0

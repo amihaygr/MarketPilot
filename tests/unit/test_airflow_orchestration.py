@@ -79,3 +79,11 @@ def test_airflow_dags_never_launch_or_reference_streaming_application() -> None:
     assert "stream_market_bars.py" not in dag_sources
     assert "docker compose" not in dag_sources.lower()
     assert "docker.sock" not in dag_sources.lower()
+
+
+def test_sec_dag_is_bounded_and_rate_limited_by_pool() -> None:
+    source = (ROOT / "airflow" / "dags" / "sec_polling.py").read_text(encoding="utf-8")
+    assert 'schedule="*/15 6-22 * * 1-5"' in source
+    assert "catchup=False" in source
+    assert "max_active_runs=1" in source
+    assert 'pool="sec_api_pool"' in source
