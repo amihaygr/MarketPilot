@@ -36,8 +36,10 @@
 - The real Alpaca IEX websocket authenticated and subscribed to all 11 configured
   symbols; a bounded smoke check archived 10 eligible regular-session bars.
 - Live SEC polling archived 11 company payloads and published 930 filing records.
-  A repeat run inserted zero rows, retained 932 distinct accessions including two
-  fixture rows, and did not create duplicate Bronze objects.
+  A repeat run inserted zero rows and did not create duplicate Bronze objects.
+  After verification, the two exact fixture rows were removed from Gold with
+  operator approval, leaving 930 live rows and 930 distinct accessions. The raw
+  fixture object remains in immutable Bronze for lineage.
 
 ## Deliberately deferred
 

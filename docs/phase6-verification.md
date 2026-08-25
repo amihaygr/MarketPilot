@@ -103,10 +103,13 @@ HTTP container was removed.
   filings, and inserted 930 accession-keyed Gold records.
 - A second live run discovered the same 930 filings, inserted zero new records,
   and performed 930 idempotent updates.
-- MariaDB contained 932 rows with 932 distinct accession numbers: 930 live records
-  plus the two retained local fixture records.
+- MariaDB initially contained 932 rows with 932 distinct accession numbers: 930
+  live records plus two local fixture records. After verification, the two exact
+  fixture rows were deleted from Gold with operator approval; 930 live rows and
+  930 distinct accessions remain.
 - The SEC Bronze prefix contained 12 objects before and after the second run: 11
-  live payloads plus the one retained fixture payload.
+  live payloads plus one fixture payload. The fixture Bronze object remains because
+  Bronze is immutable; deleting derived test rows does not delete raw lineage.
 - The `sec-filings-poll/latest` watermark was `PUBLISHED` after both runs.
 - After these checks, `sec_polling` was unpaused. The daily certification and
   backfill DAGs remained paused.
