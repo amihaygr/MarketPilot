@@ -37,6 +37,11 @@ The daily path is explicitly:
 
 `Bronze -> Spark Batch -> Silver -> quality gate -> Spark Batch -> Gold certified -> publication watermark`
 
+The local Phase 4 implementation uses an ephemeral `spark-batch` Compose container
+as the submission client. It reads and writes MinIO through the validated Hadoop
+S3A connector. Phase 5 replaces only the submission client with Airflow's
+`SparkSubmitOperator`; the bounded Spark applications remain the same.
+
 The live path is explicitly:
 
 `Alpaca -> producer -> Kafka -> Spark Structured Streaming -> Gold provisional`

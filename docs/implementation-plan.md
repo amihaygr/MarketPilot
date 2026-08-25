@@ -98,6 +98,9 @@ Status: completed and locally verified on 2026-08-25. See
 
 ## Phase 4 - Batch Medallion pipeline
 
+Status: completed and locally verified on 2026-08-25. See
+`docs/phase4-verification.md` for runtime evidence.
+
 ### Scope
 
 - Implement Bronze to Silver Spark Batch.

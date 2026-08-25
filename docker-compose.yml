@@ -8,6 +8,9 @@ x-python-service: &python-service
 
 x-spark-image: &spark-image
   image: marketpilot-spark:3.5.8
+  build:
+    context: .
+    dockerfile: infrastructure/docker/Dockerfile.spark
 
 services:
   kafka:
@@ -66,9 +69,6 @@ services:
 
   spark-master:
     <<: *spark-image
-    build:
-      context: .
-      dockerfile: infrastructure/docker/Dockerfile.spark
     command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master"]
     environment:
       SPARK_MASTER_WEBUI_PORT: 18080
@@ -203,6 +203,23 @@ services:
     depends_on:
       platform-init: {condition: service_completed_successfully}
       kafka: {condition: service_healthy}
+      mariadb: {condition: service_healthy}
+      spark-master: {condition: service_healthy}
+      spark-worker: {condition: service_healthy}
+    networks: [data-plane]
+
+  spark-batch:
+    <<: *spark-image
+    profiles: [batch]
+    env_file: .env
+    command: ["/bin/true"]
+    restart: "no"
+    volumes:
+      - ./spark:/opt/marketpilot/spark:ro
+      - ./src:/opt/marketpilot/src:ro
+    depends_on:
+      platform-init: {condition: service_completed_successfully}
+      minio: {condition: service_healthy}
       mariadb: {condition: service_healthy}
       spark-master: {condition: service_healthy}
       spark-worker: {condition: service_healthy}

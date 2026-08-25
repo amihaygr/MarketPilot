@@ -133,6 +133,44 @@ Fresh MariaDB volumes apply both migrations automatically. The ingestion identit
 requires only `SELECT`, `INSERT`, and `UPDATE` on `dim_symbol` and
 `fact_market_bar_1m`.
 
+## Phase 4 Batch Medallion pipeline
+
+Phase 4 adds bounded, independently runnable Spark applications:
+
+```text
+MinIO Bronze -> Bronze-to-Silver -> partitioned Silver Parquet
+                                      |
+                                      v
+                                blocking DQ gate
+                                      |
+                                      v
+MariaDB staging -> atomic transaction -> Gold CERTIFIED + publication watermark
+```
+
+Create one run ID and submit all three steps with the same logical date and run ID:
+
+```powershell
+$runId = [guid]::NewGuid().ToString()
+$logicalDate = "2026-08-22"
+
+docker compose build spark-master
+docker compose run --rm --no-deps spark-batch /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/marketpilot/spark/jobs/bronze_to_silver.py --logical-date $logicalDate --run-id $runId
+docker compose run --rm --no-deps spark-batch /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/marketpilot/spark/jobs/validate_silver.py --logical-date $logicalDate --run-id $runId --expected-bars-per-symbol 171
+docker compose run --rm --no-deps spark-batch /opt/spark/bin/spark-submit --master spark://spark-master:7077 /opt/marketpilot/spark/jobs/silver_to_gold.py --logical-date $logicalDate --run-id $runId
+```
+
+Normally `validate_silver.py` derives expected one-minute bars from the `XNYS`
+exchange calendar, including holidays and early closes. The explicit
+`--expected-bars-per-symbol` override above exists for synthetic fixtures; the sample
+date is a weekend because the Phase 2 synthetic producer is intentionally not yet
+market-session-aware.
+
+The Silver layout is
+`dataset=market_bars_1m/year=YYYY/month=MM/day=DD/symbol=SYMBOL`. Each row contains
+event and dataset schema versions plus source object, Kafka position, run, code, and
+data lineage. A failed gate records `FAILED` and exits non-zero. The Gold publisher
+checks the gate before staging and again inside the publication transaction.
+
 ## Local developer UIs
 
 The management interfaces bind to `127.0.0.1` only. Kafka and MariaDB remain on
@@ -151,7 +189,10 @@ credentials from your local `.env`. MinIO also uses the credentials from `.env`.
 
 ## Delivery maturity
 
-This repository is an implementation scaffold, not a falsely advertised finished trading product. Contracts, DDL, orchestration boundaries, CI, diagrams and initial tests are concrete. External API integration, JDBC sink behavior, object-store commit semantics, authentication and the user interface remain implementation milestones tracked in `docs/implementation-plan.md`.
+This repository is an incremental implementation, not a finished trading product.
+The raw, streaming, and batch Medallion paths are concrete and locally verified.
+Airflow orchestration, external API integration, the serving layer, authentication,
+and archive operations remain milestones tracked in `docs/implementation-plan.md`.
 
 ## Non-goals
 
