@@ -120,14 +120,17 @@ Status: completed and locally verified on 2026-08-25. See
 
 ## Phase 5 - Airflow orchestration
 
+Status: completed and locally verified on 2026-08-25. See
+`docs/phase5-verification.md` for runtime evidence.
+
 ### Scope
 
 - Add Airflow PostgreSQL metadata database.
 - Add Scheduler, API Server or UI, and DAG Processor.
 - Use LocalExecutor.
 - Configure Spark connection.
-- Implement `daily_market_close_dag`.
-- Implement manual `backfill_replay_dag`.
+- Implement `daily_market_close`.
+- Implement manual `backfill_replay`.
 
 ### Acceptance criteria
 

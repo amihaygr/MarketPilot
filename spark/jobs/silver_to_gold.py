@@ -5,17 +5,16 @@ import json
 import logging
 import os
 from datetime import date
-from functools import partial
 from uuid import UUID
 
-from pyspark.sql.functions import lit
+from pyspark.sql.functions import col, lit
 
 from marketpilot.batch.mariadb import (
     assert_quality_gate_validated,
     clear_staging_run,
     publish_certified_partition,
     publisher_config_from_env,
-    stage_market_bar_partition,
+    stage_market_bar_batches,
 )
 from marketpilot.batch.quality import QUALITY_CHECK_NAMES
 from marketpilot.batch.spark_support import build_batch_spark_session
@@ -27,9 +26,24 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--logical-date", required=True)
     parser.add_argument("--run-id", required=True)
+    parser.add_argument("--symbols-json")
+    parser.add_argument("--partition-key")
     args = parser.parse_args()
     logical_date = date.fromisoformat(args.logical_date)
     UUID(args.run_id)
+    selected_symbols = None
+    if args.symbols_json:
+        selected_symbols = tuple(
+            sorted(
+                {
+                    str(symbol).strip().upper()
+                    for symbol in json.loads(args.symbols_json)
+                    if str(symbol).strip()
+                }
+            )
+        )
+        if not selected_symbols:
+            raise ValueError("symbols-json must contain at least one symbol")
 
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     spark = build_batch_spark_session("marketpilot-silver-to-gold")
@@ -45,10 +59,13 @@ def main() -> None:
             args.run_id,
             logical_date,
             QUALITY_CHECK_NAMES,
+            partition_key=args.partition_key,
         )
+        frame = spark.read.parquet(source)
+        if selected_symbols is not None:
+            frame = frame.filter(col("symbol").isin(*selected_symbols))
         frame = (
-            spark.read.parquet(source)
-            .withColumn("pipeline_run_id", lit(args.run_id))
+            frame.withColumn("pipeline_run_id", lit(args.run_id))
             .withColumn("logical_date", lit(logical_date.isoformat()))
             .withColumn(
                 "code_version",
@@ -57,12 +74,15 @@ def main() -> None:
             .withColumn("data_version", lit("market-bars-certified-v1"))
         )
         clear_staging_run(database, args.run_id)
-        frame.foreachPartition(partial(stage_market_bar_partition, config=database))
+        # Spark performs transformations on the cluster. The bounded result is
+        # streamed through the driver because publication is one DB transaction.
+        stage_market_bar_batches(frame.toLocalIterator(), database)
         summary = publish_certified_partition(
             database,
             args.run_id,
             logical_date,
             QUALITY_CHECK_NAMES,
+            partition_key=args.partition_key,
         )
         logger.info(
             json.dumps(

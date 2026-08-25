@@ -5,6 +5,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from decimal import Decimal
+from itertools import islice
 from typing import Any
 
 import pymysql
@@ -84,6 +85,21 @@ def stage_market_bar_partition(rows: Iterable[Any], config: MariaDbConfig) -> No
         connection.close()
 
 
+def stage_market_bar_batches(
+    rows: Iterable[Any],
+    config: MariaDbConfig,
+    *,
+    batch_size: int = 1_000,
+) -> None:
+    """Stage a bounded driver-side stream without materializing the whole dataset."""
+    if batch_size < 1:
+        raise ValueError("batch_size must be positive")
+
+    iterator = iter(rows)
+    while batch := list(islice(iterator, batch_size)):
+        stage_market_bar_partition(batch, config)
+
+
 def clear_staging_run(config: MariaDbConfig, run_id: str) -> None:
     connection = _connect(config)
     try:
@@ -102,9 +118,12 @@ def record_quality_gate(
     run_id: str,
     logical_date: date,
     results: tuple[QualityResult, ...],
+    *,
+    partition_key: str | None = None,
 ) -> None:
     """Persist one idempotent DQ result set and its blocking watermark."""
     passed = quality_gate_passed(results)
+    resolved_partition_key = partition_key or logical_date.isoformat()
     connection = _connect(config)
     try:
         with connection.cursor() as cursor:
@@ -124,7 +143,7 @@ def record_quality_gate(
                     (
                         run_id,
                         SILVER_DATASET,
-                        logical_date.isoformat(),
+                        resolved_partition_key,
                         result.check_name,
                         result.status,
                         result.observed_value,
@@ -145,7 +164,7 @@ def record_quality_gate(
                 """,
                 (
                     SILVER_DQ_PIPELINE,
-                    logical_date.isoformat(),
+                    resolved_partition_key,
                     datetime.combine(logical_date, datetime.max.time()),
                     "VALIDATED" if passed else "FAILED",
                     run_id,
@@ -164,6 +183,8 @@ def assert_quality_gate_validated(
     run_id: str,
     logical_date: date,
     required_quality_checks: tuple[str, ...],
+    *,
+    partition_key: str | None = None,
 ) -> None:
     """Fail before staging unless every required DQ result belongs to this run and passed."""
     connection = _connect(config)
@@ -172,7 +193,7 @@ def assert_quality_gate_validated(
             _assert_quality_gate(
                 cursor,
                 run_id,
-                logical_date.isoformat(),
+                partition_key or logical_date.isoformat(),
                 required_quality_checks,
                 lock_watermark=False,
             )
@@ -185,16 +206,18 @@ def publish_certified_partition(
     run_id: str,
     logical_date: date,
     required_quality_checks: tuple[str, ...],
+    *,
+    partition_key: str | None = None,
 ) -> PublicationSummary:
-    """Atomically replace one date partition after locking and rechecking its DQ gate."""
-    partition_key = logical_date.isoformat()
+    """Atomically replace the staged symbol scope after rechecking its DQ gate."""
+    resolved_partition_key = partition_key or logical_date.isoformat()
     connection = _connect(config)
     try:
         with connection.cursor() as cursor:
             _assert_quality_gate(
                 cursor,
                 run_id,
-                partition_key,
+                resolved_partition_key,
                 required_quality_checks,
                 lock_watermark=True,
             )
@@ -209,12 +232,27 @@ def publish_certified_partition(
 
             cursor.execute(
                 """
-                SELECT COUNT(*)
-                FROM fact_market_bar_1m
-                WHERE event_time_utc >= %s
-                  AND event_time_utc < DATE_ADD(%s, INTERVAL 1 DAY)
+                INSERT IGNORE INTO dim_symbol (symbol)
+                SELECT DISTINCT symbol
+                FROM stg_market_bar_1m
+                WHERE run_id = %s AND logical_date = %s
                 """,
-                (logical_date, logical_date),
+                (run_id, logical_date),
+            )
+            cursor.execute(
+                """
+                SELECT COUNT(*)
+                FROM fact_market_bar_1m f
+                JOIN dim_symbol d ON d.symbol_id = f.symbol_id
+                JOIN (
+                    SELECT DISTINCT symbol
+                    FROM stg_market_bar_1m
+                    WHERE run_id = %s AND logical_date = %s
+                ) scope ON scope.symbol = d.symbol
+                WHERE f.event_time_utc >= %s
+                  AND f.event_time_utc < DATE_ADD(%s, INTERVAL 1 DAY)
+                """,
+                (run_id, logical_date, logical_date, logical_date),
             )
             previous_rows = int(cursor.fetchone()[0])
             cursor.execute(
@@ -242,18 +280,14 @@ def publish_certified_partition(
 
             cursor.execute(
                 """
-                INSERT IGNORE INTO dim_symbol (symbol)
-                SELECT DISTINCT symbol
-                FROM stg_market_bar_1m
-                WHERE run_id = %s AND logical_date = %s
-                """,
-                (run_id, logical_date),
-            )
-            cursor.execute(
-                """
                 DELETE f
                 FROM fact_market_bar_1m f
-                LEFT JOIN dim_symbol d ON d.symbol_id = f.symbol_id
+                JOIN dim_symbol d ON d.symbol_id = f.symbol_id
+                JOIN (
+                    SELECT DISTINCT symbol
+                    FROM stg_market_bar_1m
+                    WHERE run_id = %s AND logical_date = %s
+                ) scope ON scope.symbol = d.symbol
                 LEFT JOIN stg_market_bar_1m s
                   ON s.run_id = %s
                  AND s.logical_date = %s
@@ -264,7 +298,7 @@ def publish_certified_partition(
                   AND f.event_time_utc < DATE_ADD(%s, INTERVAL 1 DAY)
                   AND s.run_id IS NULL
                 """,
-                (run_id, logical_date, logical_date, logical_date),
+                (run_id, logical_date, run_id, logical_date, logical_date, logical_date),
             )
             cursor.execute(
                 """
@@ -319,7 +353,7 @@ def publish_certified_partition(
                 """,
                 (
                     run_id,
-                    partition_key,
+                    resolved_partition_key,
                     "PASS" if matched_keys == staged_rows else "WARN",
                     f"matched={matched_keys};staged={staged_rows};changed={changed_keys}",
                 ),
@@ -336,7 +370,7 @@ def publish_certified_partition(
                 """,
                 (
                     CERTIFIED_PUBLICATION_PIPELINE,
-                    partition_key,
+                    resolved_partition_key,
                     datetime.combine(logical_date, datetime.max.time()),
                     run_id,
                 ),

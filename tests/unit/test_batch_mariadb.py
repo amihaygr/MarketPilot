@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 
-from marketpilot.batch.mariadb import publish_certified_partition
+from marketpilot.batch.mariadb import publish_certified_partition, stage_market_bar_batches
 from marketpilot.streaming.mariadb_sink import MariaDbConfig
 
 
@@ -59,3 +59,21 @@ def test_certified_publication_rolls_back_when_quality_watermark_failed(monkeypa
     assert connection.rolled_back
     assert not connection.committed
     assert connection.closed
+
+
+def test_stage_market_bar_batches_keeps_batches_bounded(monkeypatch) -> None:
+    observed: list[list[int]] = []
+
+    monkeypatch.setattr(
+        "marketpilot.batch.mariadb.stage_market_bar_partition",
+        lambda rows, config: observed.append(list(rows)),
+    )
+
+    stage_market_bar_batches(range(5), object(), batch_size=2)
+
+    assert observed == [[0, 1], [2, 3], [4]]
+
+
+def test_stage_market_bar_batches_rejects_invalid_size() -> None:
+    with pytest.raises(ValueError, match="batch_size must be positive"):
+        stage_market_bar_batches([], object(), batch_size=0)

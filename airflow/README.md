@@ -1,13 +1,28 @@
-# Airflow
+# Airflow orchestration
 
-Planned DAGs:
+Phase 5 runs Airflow 3 with `LocalExecutor`, a dedicated PostgreSQL metadata
+database, Scheduler, API Server and DAG Processor. The UI is exposed locally at
+`http://localhost:8080`; credentials come from the ignored `.env` file.
 
-- `sec_polling_dag`
-- `daily_market_close_dag`
-- `weekly_compaction_dag`
-- `annual_archive_dag`
-- `backfill_replay_dag`
+## Implemented DAGs
 
-The MVP uses LocalExecutor and a separate PostgreSQL metadata database.
+- `daily_market_close`: weekdays at 16:30 `America/New_York`. The first task checks
+  the XNYS calendar and short-circuits holidays and weekends. A successful session
+  runs Bronze to Silver, blocking Silver quality checks, then atomic Gold Certified
+  publication.
+- `backfill_replay`: manual only. It validates a maximum 31-calendar-day range and a
+  subset of `MARKET_SYMBOLS`, skips closed sessions, and dynamically maps the same
+  three bounded Spark jobs for each eligible date.
 
-Airflow must not launch or supervise Spark Structured Streaming.
+`spark_batch_pool` has one slot, and both mutating DAGs use `max_active_runs=1`.
+This deliberately serializes local publication work.
+
+## Synthetic weekend verification
+
+The Phase 2 fixture is dated Saturday 2026-08-22. A manual verification may set
+`expected_bars_override=171`; routine schedules leave the value empty and always
+use the exchange calendar.
+
+Airflow has no Docker socket and no DAG references the Structured Streaming
+application. Docker Compose remains the only lifecycle owner for long-running
+services.

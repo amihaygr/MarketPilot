@@ -4,8 +4,8 @@
 > 3.5.8 official images. The original Bitnami tags referenced by the generated
 > engineering bundle were removed from Docker Hub and can no longer be pulled.
 
-Phase 1 keeps the Spark master and worker on `data-plane`. Airflow integration is
-deferred to Phase 5 and must add a tested network path for bounded Spark submissions.
+Spark master and worker remain on `data-plane`. Phase 5 adds a tested Airflow path
+for bounded Spark submissions while keeping long-running streaming under Compose.
 
 MarketPilot is a review-ready reference architecture and implementation scaffold for a local market-data platform. It combines Kafka, Spark Structured Streaming, Spark Batch, Airflow, MinIO, MariaDB, a backend API, and a web client without confusing service supervision with workflow orchestration.
 
@@ -181,17 +181,21 @@ internal Docker networks and are not published directly to the host.
 | MinIO Console | <http://localhost:9001> | Browse Bronze, Silver, checkpoints, and quarantine objects |
 | Kafka UI | <http://localhost:8085> | Inspect topics, messages, partitions, and consumer lag |
 | Adminer | <http://localhost:8086> | Inspect MariaDB schemas and tables |
+| Airflow | <http://localhost:8080> | Inspect bounded daily and backfill workflows |
 | Spark Master | <http://localhost:18080> | Inspect cluster workers and submitted applications |
 | Spark Worker | <http://localhost:18081> | Inspect worker resources and executors |
 
 For Adminer, select `MySQL`, use server `mariadb`, database `marketpilot`, and
 credentials from your local `.env`. MinIO also uses the credentials from `.env`.
+Airflow uses `AIRFLOW_ADMIN_USERNAME` and `AIRFLOW_ADMIN_PASSWORD` from the same
+ignored local file. Both Phase 5 DAGs remain paused until they are deliberately
+enabled after the Phase 6 source integration.
 
 ## Delivery maturity
 
 This repository is an incremental implementation, not a finished trading product.
-The raw, streaming, and batch Medallion paths are concrete and locally verified.
-Airflow orchestration, external API integration, the serving layer, authentication,
+The raw, streaming, batch Medallion, and Airflow orchestration paths are concrete
+and locally verified. External API integration, the serving layer, authentication,
 and archive operations remain milestones tracked in `docs/implementation-plan.md`.
 
 ## Non-goals

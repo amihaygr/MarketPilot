@@ -109,9 +109,23 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--logical-date", required=True)
     parser.add_argument("--run-id", required=True)
+    parser.add_argument("--symbols-json")
     args = parser.parse_args()
     logical_date = date.fromisoformat(args.logical_date)
     UUID(args.run_id)
+    selected_symbols = None
+    if args.symbols_json:
+        selected_symbols = tuple(
+            sorted(
+                {
+                    str(symbol).strip().upper()
+                    for symbol in json.loads(args.symbols_json)
+                    if str(symbol).strip()
+                }
+            )
+        )
+        if not selected_symbols:
+            raise ValueError("symbols-json must contain at least one symbol")
 
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     spark = build_batch_spark_session("marketpilot-bronze-to-silver")
@@ -135,7 +149,10 @@ def main() -> None:
             .option("pathGlobFilter", "*.json")
             .load(source)
         )
-        classified = classify_bronze(raw, logical_date).cache()
+        classified = classify_bronze(raw, logical_date)
+        if selected_symbols is not None:
+            classified = classified.filter(col("bar.symbol").isin(*selected_symbols))
+        classified = classified.cache()
         invalid = classified.filter(col("invalid_reason").isNotNull())
         invalid_count = invalid.count()
         if invalid_count:
@@ -155,13 +172,24 @@ def main() -> None:
         output_count = silver.count()
         if output_count == 0:
             raise RuntimeError("Bronze partition contains no valid market bars")
-        (
-            silver.repartition("symbol")
-            .write.mode("overwrite")
-            .option("compression", "snappy")
-            .partitionBy("symbol")
-            .parquet(target)
-        )
+        if selected_symbols is None:
+            (
+                silver.repartition("symbol")
+                .write.mode("overwrite")
+                .option("compression", "snappy")
+                .partitionBy("symbol")
+                .parquet(target)
+            )
+        else:
+            for symbol in selected_symbols:
+                (
+                    silver.filter(col("symbol") == symbol)
+                    .drop("symbol")
+                    .coalesce(1)
+                    .write.mode("overwrite")
+                    .option("compression", "snappy")
+                    .parquet(f"{target}/symbol={symbol}")
+                )
         logger.info(
             json.dumps(
                 {
@@ -171,6 +199,7 @@ def main() -> None:
                     "input_rows": input_count,
                     "output_rows": output_count,
                     "duplicates_removed": input_count - output_count,
+                    "symbols": selected_symbols or "configured-universe",
                     "target": target,
                 },
                 separators=(",", ":"),

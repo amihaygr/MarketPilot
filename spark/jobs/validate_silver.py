@@ -41,6 +41,7 @@ def main() -> None:
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--expected-symbols-json")
     parser.add_argument("--expected-bars-per-symbol", type=int)
+    parser.add_argument("--partition-key")
     parser.add_argument(
         "--maximum-ingestion-lag-seconds",
         type=int,
@@ -70,7 +71,7 @@ def main() -> None:
         f"year={logical_date:%Y}/month={logical_date:%m}/day={logical_date:%d}"
     )
     try:
-        frame = spark.read.parquet(source).cache()
+        frame = spark.read.parquet(source).filter(col("symbol").isin(*expected_symbols)).cache()
         required = [
             "event_id",
             "symbol",
@@ -147,7 +148,13 @@ def main() -> None:
                 maximum_ingestion_lag_seconds=args.maximum_ingestion_lag_seconds,
             ),
         )
-        record_quality_gate(publisher_config_from_env(), args.run_id, logical_date, results)
+        record_quality_gate(
+            publisher_config_from_env(),
+            args.run_id,
+            logical_date,
+            results,
+            partition_key=args.partition_key,
+        )
         logger.info(
             json.dumps(
                 {
