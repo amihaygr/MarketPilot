@@ -2,7 +2,8 @@
 
 Verified locally on 2026-08-26 with Docker Compose, the official Alpaca Python
 SDK 0.44.0, a deterministic local SEC fixture, Airflow 3.0.3, MinIO, and MariaDB.
-No request was sent to Alpaca or `sec.gov` during verification.
+Alpaca authentication and its IEX websocket were verified with local secrets. No
+request was sent to `sec.gov`; SEC verification used the local fixture only.
 
 ## Implemented boundaries
 
@@ -22,7 +23,7 @@ MinIO.
 ## Alpaca adapter
 
 - `MARKET_DATA_SOURCE` selects `synthetic` or `alpaca`; synthetic remains the
-  default.
+  tracked example default, while the verified workstation now runs `alpaca`.
 - The adapter subscribes to bars through the official SDK and converts them to the
   existing schema-versioned `MarketBarV1` contract.
 - Event IDs are deterministic across reconnects for the same feed, symbol,
@@ -33,8 +34,9 @@ MinIO.
 - The rebuilt producer image imports Alpaca SDK 0.44.0 successfully. Contract,
   calendar, conversion, and retry behavior are covered by unit tests.
 
-A real websocket session was deliberately not opened because Alpaca credentials
-are local operator secrets and were not supplied.
+The local credentials passed a read-only latest-bar request. The long-running
+producer then connected to `wss://stream.data.alpaca.markets/v2/iex` and subscribed
+successfully to all 11 configured symbols. No trading endpoint was called.
 
 ## SEC adapter and persistence
 
@@ -50,6 +52,25 @@ are local operator secrets and were not supplied.
   single-slot `sec_api_pool`.
 
 ## Runtime evidence
+
+### Alpaca
+
+- A read-only IEX request returned the latest AAPL bar successfully.
+- The long-running websocket authenticated, connected, and subscribed to all 11
+  configured symbols.
+- Because activation occurred after the regular session, a bounded smoke check
+  normalized the latest external bars and published the 10 regular-session bars.
+- MinIO contained 10 `source=alpaca/event=market_bar_1m` Bronze objects with zero
+  quarantined records. SPY's latest bar was timestamped 20:00 UTC and was correctly
+  excluded as outside the XNYS regular-session minute range.
+- The historical smoke bars were older than the existing streaming watermark,
+  which had already advanced on synthetic events, so Spark correctly did not add
+  them to live Gold. The first new websocket bars in the next regular session are
+  the remaining live Gold verification point.
+- Spark Streaming was recreated independently, resumed from its durable checkpoint,
+  and loaded code version `ba4cdae` for subsequent lineage.
+
+### SEC fixture
 
 A temporary HTTP container served the checked-in Apple submissions fixture. Two
 bounded poll runs produced this result:
@@ -69,9 +90,8 @@ The stored accessions were one 10-Q and one 8-K. The watermark
 `source=sec/event=submissions/.../sha256=...json` key.
 
 An Airflow `dags test` with `force=true` and the same local fixture completed both
-`external_source_gate` and `poll_sec_submissions` successfully. All production
-source settings remained disabled afterward, and the temporary HTTP container was
-removed.
+`polling_enabled_and_in_window` and `poll_sec_submissions` successfully. Live SEC
+polling remained disabled afterward, and the temporary HTTP container was removed.
 
 ## Safety and restart behavior
 
@@ -81,8 +101,9 @@ removed.
   Kafka and MariaDB business keys preserve idempotency.
 - Secrets are read only from the ignored `.env`; tracked configuration contains
   placeholders.
-- External activation is a separate reviewed step documented in
-  `docs/runbooks/external-source-activation.md`.
+- Alpaca activation followed the reviewed steps in
+  `docs/runbooks/external-source-activation.md`; SEC activation remains gated on a
+  real monitored contact identity.
 
 ## Quality gates
 

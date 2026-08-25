@@ -143,9 +143,9 @@ Status: completed and locally verified on 2026-08-25. See
 ## Phase 6 - External sources
 
 Status: completed and locally verified on 2026-08-26. See
-`docs/phase6-verification.md` for runtime evidence. Production-like activation is
-deliberately disabled until real Alpaca credentials and an identifiable SEC
-User-Agent are supplied locally and approved.
+`docs/phase6-verification.md` for runtime evidence. Alpaca authentication and the
+IEX websocket were activated locally on 2026-08-26. Live SEC polling remains
+disabled until an identifiable User-Agent is supplied locally and approved.
 
 ### Alpaca scope
 
