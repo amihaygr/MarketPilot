@@ -5,6 +5,7 @@ Python services:
 - `market_producer`: long-running Alpaca adapter and Kafka producer.
 - `raw_archive_sink`: long-running Kafka consumer that writes Bronze objects.
 - `sec_adapter`: bounded SEC EDGAR adapter triggered by Airflow or a safe internal interface.
+- `backend_api`: long-running, read-only FastAPI service for application-facing Gold data.
 
 The deterministic synthetic producer remains the safe default for local work.
 
@@ -27,3 +28,9 @@ The deterministic synthetic producer remains the safe default for local work.
 
 External sources are disabled by default. Activation requires local credentials or
 contact identity and the review steps in `docs/runbooks/external-source-activation.md`.
+
+## Phase 7 serving service
+
+`backend_api` provides bounded symbol, market-bar, SEC-filing, freshness, and
+health reads. Docker Compose owns its lifecycle. It receives only the MariaDB
+application identity and never receives infrastructure or source credentials.

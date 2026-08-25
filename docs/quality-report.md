@@ -40,13 +40,20 @@
   After verification, the two exact fixture rows were removed from Gold with
   operator approval, leaving 930 live rows and 930 distinct accessions. The raw
   fixture object remains in immutable Bronze for lineage.
+- The Phase 7 Backend API serves 11 active symbols, bounded market bars, 930 SEC
+  filings, and freshness metadata through parameterized MariaDB reads.
+- The `marketpilot_app` identity passed a read probe and received MariaDB error
+  1142 for a zero-row `UPDATE` probe, proving that API mutation is denied.
+- The Nginx Web App serves a CSP-protected dashboard and proxies relative `/api/`
+  requests without embedding database, MinIO, or source credential names.
 
 ## Deliberately deferred
 
 - Live Alpaca-to-Gold observation remains pending the next regular market session;
   the after-hours historical smoke bars were correctly older than the existing
   streaming watermark.
-- Backend API and Web App integration remain Phase 7 work.
+- End-user authentication remains outside the local Phase 7 MVP; the API and UI
+  bind to `127.0.0.1` and are not ready for shared or Internet-facing deployment.
 
 The Docker-backed recovery test is opt-in because it restarts a running service:
 

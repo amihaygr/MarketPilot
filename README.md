@@ -184,6 +184,8 @@ internal Docker networks and are not published directly to the host.
 | Airflow | <http://localhost:8080> | Inspect bounded daily and backfill workflows |
 | Spark Master | <http://localhost:18080> | Inspect cluster workers and submitted applications |
 | Spark Worker | <http://localhost:18081> | Inspect worker resources and executors |
+| MarketPilot Web App | <http://localhost:3000> | Explore Gold bars, freshness, certification and SEC filings |
+| Backend API docs | <http://localhost:8000/docs> | Inspect and exercise bounded read-only REST endpoints |
 
 For Adminer, select `MySQL`, use server `mariadb`, database `marketpilot`, and
 credentials from your local `.env`. MinIO also uses the credentials from `.env`.
@@ -211,13 +213,41 @@ archives raw JSON before publication, and uses accession number as its idempoten
 business key. Follow `docs/runbooks/external-source-activation.md` before enabling
 either external connection.
 
+## Phase 7 serving layer
+
+Phase 7 completes the application-facing boundary:
+
+```text
+Browser -> Nginx Web App -> FastAPI Backend API -> MariaDB Gold
+                                      |
+                                      +-> marketpilot_app (SELECT only)
+```
+
+Start or rebuild the two serving services after applying the application grant to
+an existing MariaDB volume:
+
+```powershell
+docker compose exec -T mariadb bash /docker-entrypoint-initdb.d/008_app_grants.sh
+docker compose up -d --build backend-api web-app
+docker compose ps backend-api web-app
+```
+
+If `MARIADB_APP_PASSWORD` was changed after MariaDB was already created, follow
+`docs/runbooks/serving-recovery.md` to recreate only the MariaDB container while
+preserving its named volume, apply the grant, and verify row counts.
+
+Open <http://localhost:3000> for the dashboard or <http://localhost:8000/docs>
+for OpenAPI. The Web App uses only relative `/api/` requests. The API enforces
+parameterized filters, a maximum 31-day market range, bounded pagination and safe
+response models that omit internal object-storage and lineage details.
+
 ## Delivery maturity
 
 This repository is an incremental implementation, not a finished trading product.
-The raw, streaming, batch Medallion, Airflow orchestration, and external-source
-boundaries are concrete and locally verified, including Alpaca IEX and SEC EDGAR
-traffic. The serving layer, authentication, and archive operations remain
-milestones tracked in `docs/implementation-plan.md`.
+The raw, streaming, batch Medallion, Airflow orchestration, external-source and
+serving boundaries are concrete and locally verified, including Alpaca IEX, SEC
+EDGAR, the read-only API identity and browser-to-API proxy. End-user authentication
+and archive operations remain milestones tracked in `docs/implementation-plan.md`.
 
 ## Non-goals
 

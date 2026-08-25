@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="MarketPilot market data serving dashboard" />
+    <title>MarketPilot | Data Command Center</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="MarketPilot home">
+          <span class="brand-mark" aria-hidden="true">MP</span>
+          <span>
+            <strong>MarketPilot</strong>
+            <small>Data command center</small>
+          </span>
+        </a>
+        <div class="system-state" id="system-state">
+          <span class="state-dot" aria-hidden="true"></span>
+          <span id="system-state-label">Connecting</span>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="page-title">
+          <div>
+            <p class="eyebrow">GOLD SERVING LAYER</p>
+            <h1 id="page-title">Markets, filings and data confidence.</h1>
+            <p class="hero-copy">
+              A read-only view of live provisional and batch-certified MarketPilot data.
+            </p>
+          </div>
+          <div class="hero-meta">
+            <span>Generated</span>
+            <strong id="generated-at">—</strong>
+            <small>All timestamps shown in UTC</small>
+          </div>
+        </section>
+
+        <section class="metric-grid" aria-label="Platform summary">
+          <article class="metric-card">
+            <span class="metric-label">Tracked assets</span>
+            <strong class="metric-value" id="asset-count">—</strong>
+            <small>Active US equities + SPY</small>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label">Latest market minute</span>
+            <strong class="metric-value metric-time" id="latest-market-time">—</strong>
+            <small id="latest-market-age">Waiting for data</small>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label">Gold market bars</span>
+            <strong class="metric-value" id="bar-count">—</strong>
+            <small id="certification-mix">—</small>
+          </article>
+          <article class="metric-card">
+            <span class="metric-label">SEC filings</span>
+            <strong class="metric-value" id="filing-count">—</strong>
+            <small id="latest-filing-date">—</small>
+          </article>
+        </section>
+
+        <section class="workspace-grid">
+          <article class="panel market-panel">
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow">ONE-MINUTE BARS</p>
+                <h2>Market explorer</h2>
+              </div>
+              <span class="count-label" id="bar-result-count">0 results</span>
+            </div>
+
+            <form class="filter-bar" id="market-filters">
+              <label>
+                <span>Symbol</span>
+                <select id="symbol-filter" name="symbol" required></select>
+              </label>
+              <label>
+                <span>From</span>
+                <input id="start-date" name="start-date" type="date" required />
+              </label>
+              <label>
+                <span>To</span>
+                <input id="end-date" name="end-date" type="date" required />
+              </label>
+              <label>
+                <span>Status</span>
+                <select id="status-filter" name="status">
+                  <option value="">All states</option>
+                  <option value="PROVISIONAL">Provisional</option>
+                  <option value="CERTIFIED">Certified</option>
+                </select>
+              </label>
+              <button type="submit">Apply filters</button>
+            </form>
+
+            <div class="chart-shell" aria-label="Close price chart">
+              <div class="chart-caption">
+                <div>
+                  <span id="chart-symbol">—</span>
+                  <strong id="chart-last-price">—</strong>
+                </div>
+                <span id="chart-range">—</span>
+              </div>
+              <svg id="price-chart" viewBox="0 0 900 250" role="img" aria-label="Close prices">
+                <line class="chart-grid" x1="20" x2="880" y1="50" y2="50"></line>
+                <line class="chart-grid" x1="20" x2="880" y1="125" y2="125"></line>
+                <line class="chart-grid" x1="20" x2="880" y1="200" y2="200"></line>
+                <path id="price-area" class="chart-area" d=""></path>
+                <path id="price-line" class="chart-line" d=""></path>
+              </svg>
+              <p class="empty-state" id="chart-empty" hidden>No bars match this range.</p>
+            </div>
+
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>UTC minute</th>
+                    <th>Open</th>
+                    <th>High</th>
+                    <th>Low</th>
+                    <th>Close</th>
+                    <th>Volume</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="bars-body"></tbody>
+              </table>
+            </div>
+            <div class="pagination">
+              <button type="button" class="button-secondary" id="previous-page">Previous</button>
+              <span id="page-label">Page 1</span>
+              <button type="button" class="button-secondary" id="next-page">Next</button>
+            </div>
+          </article>
+
+          <aside class="panel freshness-panel">
+            <div class="panel-heading compact">
+              <div>
+                <p class="eyebrow">FRESHNESS</p>
+                <h2>Asset pulse</h2>
+              </div>
+            </div>
+            <div class="pulse-list" id="symbol-freshness"></div>
+          </aside>
+        </section>
+
+        <section class="panel filings-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">SEC EDGAR</p>
+              <h2>Recent company filings</h2>
+            </div>
+            <a class="text-link" href="http://localhost:8000/docs" target="_blank" rel="noopener noreferrer">
+              Open API docs
+            </a>
+          </div>
+          <div class="filing-list" id="filing-list"></div>
+        </section>
+
+        <div class="toast" id="error-toast" role="alert" hidden>
+          <strong>Data request failed</strong>
+          <span id="error-message">Please try again.</span>
+        </div>
+      </main>
+
+      <footer>
+        <span>MarketPilot engineering project</span>
+        <span>Browser → Backend API → MariaDB Gold</span>
+      </footer>
+    </div>
+  </body>
+</html>

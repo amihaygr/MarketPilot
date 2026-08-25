@@ -176,6 +176,57 @@ services:
       mariadb: {condition: service_healthy}
     networks: [serving-plane]
 
+  backend-api:
+    image: marketpilot-backend-api:0.1.0
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.api
+    environment:
+      MARIADB_HOST: ${MARIADB_HOST:-mariadb}
+      MARIADB_PORT: ${MARIADB_PORT:-3306}
+      MARIADB_DATABASE: ${MARIADB_DATABASE:-marketpilot}
+      MARIADB_APP_USER: ${MARIADB_APP_USER}
+      MARIADB_APP_PASSWORD: ${MARIADB_APP_PASSWORD}
+      API_CORS_ORIGINS: ${API_CORS_ORIGINS:-http://localhost:3000}
+      API_MAX_MARKET_RANGE_DAYS: ${API_MAX_MARKET_RANGE_DAYS:-31}
+      API_MAX_FILING_RANGE_DAYS: ${API_MAX_FILING_RANGE_DAYS:-3660}
+      API_QUERY_TIMEOUT_SECONDS: ${API_QUERY_TIMEOUT_SECONDS:-10}
+      MARKETPILOT_CODE_VERSION: ${MARKETPILOT_CODE_VERSION:-development}
+    ports: ["127.0.0.1:8000:8000"]
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import urllib.request;
+          urllib.request.urlopen('http://localhost:8000/health/ready', timeout=5).read()
+      interval: 15s
+      timeout: 10s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+    depends_on:
+      mariadb: {condition: service_healthy}
+    networks: [serving-plane]
+
+  web-app:
+    image: marketpilot-web-app:0.1.0
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.web
+    ports: ["127.0.0.1:3000:80"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+    depends_on:
+      backend-api: {condition: service_healthy}
+    networks: [serving-plane]
+
   market-producer:
     <<: *python-service
     command: python -m services.market_producer.main

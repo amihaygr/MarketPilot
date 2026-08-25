@@ -8,6 +8,8 @@
 | Object storage | Destructive overwrite | Immutable Bronze convention, versioning in cloud target |
 | Airflow | Remote command abuse | No Docker socket, bounded allow-listed applications |
 | Web client | Direct data-store access | Backend-only access boundary |
+| Serving query | Unbounded scan or injection | Parameterized SQL, fixed filters, bounded ranges and pagination |
+| Browser content | Script or framing injection | Same-origin API proxy, restrictive CSP and response hardening headers |
 | Supply chain | Compromised container or dependency | Pinned versions, CI scanning, controlled update cadence |
 
 The local MVP uses plaintext internal Docker networking. TLS, secret management, authenticated Kafka and object-storage policies are required before any shared or internet-reachable deployment.

@@ -21,3 +21,7 @@ Phase 6 adds `fact_sec_filing`, keyed by SEC accession number. It retains the
 Bronze object URI and SHA-256 digest together with run, code, and schema lineage.
 The separate `marketpilot_sec` identity has only the read/write grants required to
 resolve symbols, upsert filings, and publish its watermark.
+
+Phase 7 adds `marketpilot_app` through the idempotent `008_app_grants.sh`
+migration. It can `SELECT` only the four Gold tables required by the serving API
+and has no mutation, grant, object-storage, staging, DQ, or archive privileges.

@@ -11,6 +11,5 @@ api
 docs
 spark
 tests
-web
 *.pdf
 *.zip

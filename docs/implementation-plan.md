@@ -172,6 +172,9 @@ verified for idempotency and enabled with an identifiable local User-Agent.
 
 ## Phase 7 - Serving layer
 
+Status: completed and locally verified on 2026-08-26. See
+`docs/phase7-verification.md` for API, UI, privilege, and restart evidence.
+
 ### Scope
 
 - Backend API.

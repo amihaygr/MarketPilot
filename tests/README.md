@@ -15,3 +15,12 @@ Critical recovery scenarios:
 - malformed event;
 - deleted or incompatible checkpoint;
 - Airflow retry and overlapping DAG prevention.
+
+The Phase 7 serving integration check verifies the API and Web App over their host
+ports and proves that the Backend API database identity can read but receives a
+MariaDB authorization error for an `UPDATE` statement:
+
+```powershell
+$env:MARKETPILOT_RUN_SERVING_INTEGRATION = "1"
+pytest tests/integration/test_serving_layer.py
+```

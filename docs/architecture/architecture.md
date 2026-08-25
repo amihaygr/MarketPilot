@@ -202,6 +202,16 @@ The Backend API reads Gold tables through a narrowly scoped database identity. I
 
 The Web App has no database credentials and no MinIO credentials.
 
+The implemented Phase 7 boundary uses a `marketpilot_app` identity with `SELECT`
+only on symbols, market bars, SEC filings, and watermarks. Market queries default
+to seven days and cannot exceed 31 days; all collection responses enforce a page
+and page-size ceiling. Internal Bronze URIs and lineage fields are not part of the
+browser response model.
+
+The Nginx Web App serves static assets and proxies relative `/api/` paths to the
+Backend API over `serving-plane`. This keeps database addressing and credentials
+out of browser code while allowing the API container to be restarted independently.
+
 ## 17. Observability
 
 Minimum metrics:
