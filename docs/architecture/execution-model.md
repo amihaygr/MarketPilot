@@ -23,6 +23,12 @@ Airflow does schedule Spark, but only bounded Spark Batch applications. Airflow 
 
 This is automatic startup, but it is not time scheduling. The process is event-driven and permanent.
 
+For the local MVP, the streaming query owns two subdirectories in the
+`spark-checkpoints` named volume: one for provisional Gold and one for DLQ progress.
+The Spark image embeds its Kafka connector during image build so the internal runtime
+network does not need Internet access. The official Spark 3.5.8 image uses Python
+3.10; this is a documented dependency exception limited to Spark applications.
+
 ## Airflow to Spark interaction
 
 The scheduler creates a DAG run. `SparkSubmitOperator` submits a finite application to the Spark master. Airflow waits for a terminal state, records logs and duration, applies retries, and allows downstream publication only after quality gates pass.

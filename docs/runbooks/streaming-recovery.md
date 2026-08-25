@@ -16,6 +16,32 @@
 7. Run the bounded backfill DAG for any proven gap.
 8. Allow the next daily certification DAG to replace provisional results.
 
+## Verification queries
+
+Confirm business-key uniqueness:
+
+```sql
+SELECT
+    COUNT(*) AS row_count,
+    COUNT(DISTINCT CONCAT(symbol_id, '|', event_time_utc, '|', bar_interval))
+        AS business_key_count
+FROM fact_market_bar_1m;
+```
+
+Measure source-to-Gold p95 latency in seconds:
+
+```sql
+WITH latency AS (
+    SELECT TIMESTAMPDIFF(MICROSECOND, ingested_at_utc, updated_at_utc) / 1000000
+        AS seconds
+    FROM fact_market_bar_1m
+    WHERE certification_status = 'PROVISIONAL'
+)
+SELECT PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY seconds) OVER () AS p95_seconds
+FROM latency
+LIMIT 1;
+```
+
 ## Prohibited shortcuts
 
 - Do not delete a checkpoint without a reviewed replay plan.

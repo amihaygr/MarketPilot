@@ -75,6 +75,9 @@ Implement one verifiable vertical slice at a time. Each phase must have explicit
 
 ## Phase 3 - Live Spark Streaming to MariaDB
 
+Status: completed and locally verified on 2026-08-25. See
+`docs/phase3-verification.md` for runtime evidence.
+
 ### Scope
 
 - Create initial Gold DDL.

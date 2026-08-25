@@ -93,6 +93,46 @@ MinIO buckets. This is expected. The producer and sink remain long-running. Bron
 object names include Kafka topic, partition, and offset so retrying the same Kafka
 record overwrites the same immutable logical object before its offset is committed.
 
+## Phase 3 live Streaming to Gold
+
+Phase 3 adds the continuously running provisional Gold path:
+
+```text
+Kafka -> Spark Structured Streaming -> MariaDB fact_market_bar_1m (PROVISIONAL)
+             |
+             +-> Kafka DLQ (invalid events)
+```
+
+Build the custom Spark image and start the streaming application:
+
+```powershell
+docker compose --env-file .env up -d --build spark-master spark-worker spark-streaming
+docker compose ps spark-master spark-worker spark-streaming
+docker compose logs --tail=200 spark-streaming
+```
+
+The custom image embeds the Spark 3.5.8 Kafka connector at build time because the
+runtime `data-plane` network intentionally has no Internet access. The official
+Spark image currently contains Python 3.10, so the streaming-only sink is kept
+compatible with Python 3.10 while the project services and quality gate remain on
+Python 3.12.
+
+Streaming uses two durable checkpoint subdirectories in the `spark-checkpoints`
+volume: `gold` for valid records and `dlq` for rejected records. The same named
+volume is mounted on the streaming driver and Spark worker because stateful
+executors also write checkpoint state. Never delete these directories without a
+reviewed replay plan.
+
+Apply the Phase 3 migration to an existing local MariaDB volume once:
+
+```powershell
+docker compose exec -T mariadb sh -c 'mariadb -uroot -p"$MARIADB_ROOT_PASSWORD" < /docker-entrypoint-initdb.d/002_phase3_streaming.sql'
+```
+
+Fresh MariaDB volumes apply both migrations automatically. The ingestion identity
+requires only `SELECT`, `INSERT`, and `UPDATE` on `dim_symbol` and
+`fact_market_bar_1m`.
+
 ## Local developer UIs
 
 The management interfaces bind to `127.0.0.1` only. Kafka and MariaDB remain on

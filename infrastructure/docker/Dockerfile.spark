@@ -1,0 +1,22 @@
+FROM spark:3.5.8
+
+USER root
+WORKDIR /opt/marketpilot
+ENV PYTHONPATH=/opt/marketpilot/src
+RUN python3 -m pip install --no-cache-dir PyMySQL==1.2.0
+RUN mkdir -p /tmp/marketpilot-ivy /checkpoints && \
+    chown -R spark:spark /tmp/marketpilot-ivy /checkpoints
+
+USER spark
+RUN /opt/spark/bin/spark-submit \
+    --master local[1] \
+    --conf spark.jars.ivy=/tmp/marketpilot-ivy \
+    --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.8 \
+    /opt/spark/examples/src/main/python/pi.py 1
+
+USER root
+RUN cp /tmp/marketpilot-ivy/jars/*.jar /opt/spark/jars/ && \
+    rm -rf /tmp/marketpilot-ivy
+COPY src ./src
+
+USER spark

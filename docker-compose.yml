@@ -6,6 +6,9 @@ x-python-service: &python-service
   restart: unless-stopped
   networks: [data-plane]
 
+x-spark-image: &spark-image
+  image: marketpilot-spark:3.5.8
+
 services:
   kafka:
     image: apache/kafka:3.9.0
@@ -47,6 +50,9 @@ services:
   mariadb:
     image: mariadb:11.4
     env_file: .env
+    environment:
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
     volumes:
       - mariadb-data:/var/lib/mysql
       - ./db/migrations:/docker-entrypoint-initdb.d:ro
@@ -59,8 +65,14 @@ services:
     networks: [data-plane, serving-plane]
 
   spark-master:
-    image: spark:3.5.8
+    <<: *spark-image
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.spark
     command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master"]
+    environment:
+      SPARK_MASTER_WEBUI_PORT: 18080
+      SPARK_PUBLIC_DNS: localhost
     healthcheck:
       test: ["CMD-SHELL", "bash -c '</dev/tcp/spark-master/7077'"]
       interval: 10s
@@ -70,15 +82,18 @@ services:
     networks: [data-plane]
 
   spark-worker:
-    image: spark:3.5.8
+    <<: *spark-image
     command:
       - /opt/spark/bin/spark-class
       - org.apache.spark.deploy.worker.Worker
       - spark://spark-master:7077
     environment:
       SPARK_WORKER_MEMORY: 2G
+      SPARK_WORKER_WEBUI_PORT: 18081
+      SPARK_PUBLIC_DNS: localhost
+    volumes: [spark-checkpoints:/checkpoints]
     healthcheck:
-      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/8081'"]
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/18081'"]
       interval: 10s
       timeout: 5s
       retries: 12
@@ -161,19 +176,36 @@ services:
       minio: {condition: service_healthy}
 
   spark-streaming:
-    image: spark:3.5.8
+    <<: *spark-image
     command:
       - /opt/spark/bin/spark-submit
       - --master
       - spark://spark-master:7077
+      - --conf
+      - spark.cores.max=2
+      - --conf
+      - spark.executor.cores=2
+      - --conf
+      - spark.executor.memory=768m
       - /opt/marketpilot/spark/jobs/stream_market_bars.py
     env_file: .env
+    environment:
+      SPARK_CHECKPOINT_PATH: ${SPARK_CHECKPOINT_PATH:-/checkpoints/market-bars-v2}
     restart: unless-stopped
     volumes: [./spark:/opt/marketpilot/spark:ro, spark-checkpoints:/checkpoints]
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /tmp/streaming-ready"]
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+    stop_grace_period: 45s
     depends_on:
+      platform-init: {condition: service_completed_successfully}
       kafka: {condition: service_healthy}
       mariadb: {condition: service_healthy}
-      spark-master: {condition: service_started}
+      spark-master: {condition: service_healthy}
+      spark-worker: {condition: service_healthy}
     networks: [data-plane]
 
   airflow-db:

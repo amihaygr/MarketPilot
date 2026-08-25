@@ -1,19 +1,32 @@
 # Delivery Quality Report
 
-## Verified in the delivery environment
+## Verified on the target workstation
 
-- Python source, service, Spark, Airflow and test files compile successfully.
-- The canonical `MarketBarV1` contract validates and serializes a valid UTC event.
-- `pyproject.toml` and VS Code JSON files parse successfully.
-- Required architecture, ADR, DAG, Spark and DDL assets are present.
-- Common private-key and AWS access-key patterns are absent.
-- Legacy Word and PDF diagrams are excluded from this rebuilt delivery.
+- `docker compose config --quiet` passes.
+- Kafka, MinIO, MariaDB, Spark Master, Spark Worker, the producer, the raw sink,
+  and Spark Streaming run locally and report healthy where healthchecks apply.
+- Python 3.12 Ruff lint and formatting checks pass in a clean container.
+- Thirteen unit and contract tests pass.
+- The opt-in Docker recovery integration test passes.
+- The synthetic raw path writes Kafka events to MinIO Bronze.
+- Spark Structured Streaming writes provisional, lineage-bearing Gold rows to MariaDB.
+- Re-delivering a business key does not create a duplicate Gold row.
+- Invalid events reach the Kafka DLQ without terminating the streaming application.
+- Restarting `spark-streaming` resumes from the durable checkpoint.
+- Recreating both the Spark Worker and streaming driver preserves shared state and
+  resumes processing without duplicate business keys.
+- Source-to-Gold p95 latency was measured for the Phase 3 synthetic run.
 
-## Deferred to the target workstation or CI
+## Deliberately deferred
 
-- `docker compose config`, because Docker is not installed in the delivery environment.
-- Ruff lint and format checks, because Ruff is declared as a development dependency but is not installed in the delivery environment.
-- Airflow DAG import tests, because Airflow providers are runtime dependencies of the Airflow image rather than the host package.
-- Kafka, MinIO, MariaDB and Spark integration tests, which require the Compose stack.
+- Airflow runtime and DAG import verification remain Phase 5 work.
+- Bronze-to-Silver and Silver-to-Gold batch integration remain Phase 4 work.
+- External Alpaca and SEC integration remain Phase 6 work.
+- Backend API and Web App integration remain Phase 7 work.
 
-Run `make validate` after installing development dependencies and creating `.env`. A reviewer should not accept the runtime milestone until Compose configuration, health checks and the integration suite pass on the target machine.
+The Docker-backed recovery test is opt-in because it restarts a running service:
+
+```powershell
+$env:MARKETPILOT_RUN_INTEGRATION = "1"
+pytest tests/integration/test_streaming_restart.py
+```

@@ -1,10 +1,16 @@
 # Spark Applications
 
-Planned Spark applications:
+Implemented:
 
-- `streaming/market_bars_to_gold`: long-running Structured Streaming application.
-- `batch/bronze_to_silver`: bounded cleansing and normalization job.
-- `batch/silver_to_gold`: bounded enrichment and certified publication job.
-- `batch/compact_parquet`: bounded small-file compaction job.
+- `jobs/stream_market_bars.py`: long-running Kafka to MariaDB Structured Streaming
+  application. Valid records are written as provisional Gold through idempotent
+  partition transactions. Invalid records are published to the configured Kafka DLQ.
 
-Airflow submits only the bounded applications. Docker Compose owns the streaming application lifecycle.
+Planned bounded applications:
+
+- `jobs/bronze_to_silver.py`: cleansing and normalization.
+- `jobs/silver_to_gold.py`: enrichment and certified publication.
+- `jobs/backfill_replay.py`: parameterized historical replay.
+
+Docker Compose owns the streaming application lifecycle and its durable named-volume
+checkpoints. Airflow submits only bounded applications.
