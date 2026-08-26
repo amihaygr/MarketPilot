@@ -610,6 +610,10 @@ td {
   box-shadow: var(--shadow);
 }
 
+.toast[hidden] {
+  display: none;
+}
+
 .toast span {
   color: #f6bac1;
   font-size: 12px;

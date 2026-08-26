@@ -83,6 +83,14 @@ received the expected MariaDB authorization error. No business row was changed.
 | application identity read probe | allowed |
 | application identity write probe | denied |
 | Web App container during API replacement | unchanged and proxy recovered |
+| desktop visual viewport | 1,440 px, no horizontal overflow |
+| mobile visual viewport | 390 px, no horizontal overflow |
+| rendered market rows | 50 |
+| rendered SEC filing cards | 6 |
+| pagination interaction | page 1 to page 2 changed the first row |
+| symbol filter interaction | SPY returned 418 results |
+| JavaScript runtime errors | none |
+| browser HTTP responses with status 400 or higher | none |
 
 The API, Web App, MariaDB, Spark Streaming, and Airflow Scheduler all returned to
 healthy state after their reviewed recreations or restarts.
@@ -91,9 +99,25 @@ healthy state after their reviewed recreations or restarts.
 
 - `docker compose config --quiet`: passed.
 - Ruff lint and format: passed after adding the serving code.
-- Unit and contract tests: 46 passed.
+- Unit and contract tests: 47 passed.
 - Docker-backed Phase 7 boundaries: exercised directly against the running API,
   Web App, proxy, MariaDB identity, CORS, range validation and healthchecks.
+
+## Visual browser verification
+
+The Dashboard was rendered in local headless Chrome with JavaScript enabled and
+reviewed at desktop and mobile viewport sizes. The desktop review covered the
+summary cards, close-price chart, OHLCV table, freshness panel, pagination, symbol
+filter, SEC filing cards, and footer. The mobile review confirmed the responsive
+single-column layout and absence of horizontal overflow.
+
+The first visual pass exposed a CSS regression: `.toast` set `display: grid`, which
+overrode the initial `hidden` state and made the error message visible even though
+every API request returned HTTP 200. `.toast[hidden] { display: none; }` now makes
+the state explicit, and a focused regression test protects the behavior. A second
+visual and interactive pass confirmed the notification is hidden, all expected
+data is visible, filtering and pagination work, and the browser reported no failed
+responses or JavaScript exceptions.
 
 The checked-in `tests/integration/test_serving_layer.py` is opt-in because it
 expects the local serving stack and Docker daemon. The same assertions were run
