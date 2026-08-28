@@ -301,9 +301,17 @@ function renderAnalytics(indicators, signals) {
   elements["signal-count"].textContent = `${number(signals.pagination.total)} signals`;
   elements["signal-list"].replaceChildren();
   if (!signals.items.length) {
-    const empty = document.createElement("p");
+    const empty = document.createElement("div");
     empty.className = "analytics-empty";
-    empty.textContent = "No threshold crossings in this range.";
+    const icon = document.createElement("span");
+    icon.className = "empty-icon";
+    icon.setAttribute("aria-hidden", "true");
+    icon.textContent = "✓";
+    const title = document.createElement("strong");
+    title.textContent = "No notable threshold crossings";
+    const detail = document.createElement("small");
+    detail.textContent = "The selected range contains no explained signal events.";
+    empty.append(icon, title, detail);
     elements["signal-list"].append(empty);
     return;
   }

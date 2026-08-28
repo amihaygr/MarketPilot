@@ -421,8 +421,49 @@ button:disabled {
 }
 
 .analytics-panel {
+  position: relative;
   margin-bottom: 18px;
-  padding: 25px;
+  padding: 28px;
+  background:
+    radial-gradient(circle at 92% 0%, rgb(115 169 255 / 11%), transparent 30rem),
+    linear-gradient(145deg, rgb(18 35 58 / 92%), rgb(10 22 38 / 96%));
+}
+
+.analytics-panel::before {
+  position: absolute;
+  top: 0;
+  right: 8%;
+  left: 8%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(82 215 181 / 60%), transparent);
+  content: "";
+}
+
+.analytics-heading {
+  align-items: flex-start;
+}
+
+.section-description {
+  max-width: 620px;
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.research-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 11px;
+  border: 1px solid rgb(115 169 255 / 28%);
+  border-radius: 999px;
+  background: rgb(115 169 255 / 8%);
+  color: #a9c9ff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
 .indicator-grid {
@@ -432,13 +473,63 @@ button:disabled {
 }
 
 .indicator-card {
+  position: relative;
   display: grid;
-  min-height: 132px;
-  gap: 11px;
-  padding: 18px;
+  min-height: 154px;
+  gap: 12px;
+  padding: 19px 19px 17px;
+  overflow: hidden;
   border: 1px solid var(--line-soft);
-  border-radius: 14px;
-  background: rgb(7 17 31 / 48%);
+  border-radius: 16px;
+  background: linear-gradient(150deg, rgb(18 35 58 / 74%), rgb(7 17 31 / 72%));
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.indicator-card:hover {
+  border-color: rgb(82 215 181 / 32%);
+  transform: translateY(-2px);
+}
+
+.indicator-card::after {
+  position: absolute;
+  right: -34px;
+  bottom: -45px;
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  background: rgb(82 215 181 / 6%);
+  content: "";
+}
+
+.indicator-sma::after {
+  background: rgb(115 169 255 / 8%);
+}
+
+.indicator-volatility::after {
+  background: rgb(244 187 98 / 7%);
+}
+
+.indicator-volume::after {
+  background: rgb(183 139 255 / 7%);
+}
+
+.indicator-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.indicator-code {
+  color: var(--text) !important;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.indicator-window {
+  padding: 4px 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgb(7 17 31 / 55%);
 }
 
 .indicator-card span,
@@ -450,9 +541,22 @@ button:disabled {
   font-size: 11px;
 }
 
-.indicator-card strong {
+.indicator-card .indicator-value {
+  position: relative;
+  z-index: 1;
+  align-self: end;
   font-family: "SFMono-Regular", Consolas, monospace;
-  font-size: 26px;
+  font-size: clamp(27px, 2.4vw, 36px);
+  font-weight: 650;
+  letter-spacing: -0.04em;
+}
+
+.legend-line {
+  display: inline-block;
+  width: 18px;
+  margin-right: 7px;
+  border-top: 2px dashed var(--blue);
+  vertical-align: middle;
 }
 
 .signal-heading {
@@ -460,6 +564,8 @@ button:disabled {
   align-items: end;
   justify-content: space-between;
   margin: 28px 0 14px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line-soft);
 }
 
 .signal-heading h3 {
@@ -470,6 +576,10 @@ button:disabled {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
+}
+
+.signal-list:has(.analytics-empty) {
+  grid-template-columns: 1fr;
 }
 
 .signal-card {
@@ -493,12 +603,47 @@ button:disabled {
   letter-spacing: 0.04em;
 }
 
-.signal-card p,
-.analytics-empty {
+.signal-card p {
   margin: 0;
   color: var(--muted);
   font-size: 12px;
   line-height: 1.5;
+}
+
+.analytics-empty {
+  display: grid;
+  min-height: 122px;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  padding: 24px;
+  border: 1px dashed var(--line);
+  border-radius: 14px;
+  background: rgb(7 17 31 / 38%);
+  color: var(--muted);
+  text-align: center;
+}
+
+.analytics-empty strong {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.analytics-empty small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.empty-icon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--accent);
+  font-weight: 800;
+  letter-spacing: 0.12em;
 }
 
 .signal-bullish {
@@ -788,8 +933,13 @@ footer {
   }
 
   .market-panel,
-  .filings-panel {
+  .filings-panel,
+  .analytics-panel {
     padding: 20px 14px;
+  }
+
+  .analytics-heading {
+    flex-direction: column;
   }
 
   .panel-heading {

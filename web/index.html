@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="MarketPilot market data serving dashboard" />
     <title>MarketPilot | Data Command Center</title>
-    <link rel="stylesheet" href="/styles.css" />
-    <script src="/app.js" defer></script>
+    <link rel="stylesheet" href="/styles.css?v=phase9-ui-2" />
+    <script src="/app.js?v=phase9-ui-2" defer></script>
   </head>
   <body>
     <div class="app-shell">
@@ -150,33 +150,48 @@
           </aside>
         </section>
 
-        <section class="panel analytics-panel">
-          <div class="panel-heading">
+        <section class="panel analytics-panel" aria-labelledby="analytics-title">
+          <div class="panel-heading analytics-heading">
             <div>
               <p class="eyebrow">EXPLAINABLE ANALYTICS · V1</p>
-              <h2>Indicators and market observations</h2>
+              <h2 id="analytics-title">Indicators and market observations</h2>
+              <p class="section-description">
+                A compact view of the latest certified technical context for the selected asset.
+              </p>
             </div>
-            <span class="count-label">Research context · not financial advice</span>
+            <span class="research-badge">Research only · not financial advice</span>
           </div>
           <div class="indicator-grid">
-            <article class="indicator-card">
-              <span>RSI · 14 bars</span>
-              <strong id="rsi-value">—</strong>
-              <small id="rsi-time">Waiting for analytics</small>
+            <article class="indicator-card indicator-rsi">
+              <div class="indicator-card-top">
+                <span class="indicator-code">RSI</span>
+                <span class="indicator-window">14 bars</span>
+              </div>
+              <strong class="indicator-value" id="rsi-value">—</strong>
+              <small id="rsi-time">Loading analytics…</small>
             </article>
-            <article class="indicator-card">
-              <span>SMA · 20 bars</span>
-              <strong id="sma-value">—</strong>
-              <small>Dashed line on the price chart</small>
+            <article class="indicator-card indicator-sma">
+              <div class="indicator-card-top">
+                <span class="indicator-code">SMA</span>
+                <span class="indicator-window">20 bars</span>
+              </div>
+              <strong class="indicator-value" id="sma-value">—</strong>
+              <small><span class="legend-line" aria-hidden="true"></span>Dashed overlay on price</small>
             </article>
-            <article class="indicator-card">
-              <span>Realized volatility · 20</span>
-              <strong id="volatility-value">—</strong>
-              <small>Annualized from one-minute log returns</small>
+            <article class="indicator-card indicator-volatility">
+              <div class="indicator-card-top">
+                <span class="indicator-code">VOLATILITY</span>
+                <span class="indicator-window">20 bars</span>
+              </div>
+              <strong class="indicator-value" id="volatility-value">—</strong>
+              <small>Annualized one-minute log returns</small>
             </article>
-            <article class="indicator-card">
-              <span>Volume ratio · 20</span>
-              <strong id="volume-ratio-value">—</strong>
+            <article class="indicator-card indicator-volume">
+              <div class="indicator-card-top">
+                <span class="indicator-code">VOLUME RATIO</span>
+                <span class="indicator-window">20 bars</span>
+              </div>
+              <strong class="indicator-value" id="volume-ratio-value">—</strong>
               <small>Current volume ÷ prior 20-bar mean</small>
             </article>
           </div>
@@ -187,7 +202,13 @@
             </div>
             <span id="signal-count">0 signals</span>
           </div>
-          <div class="signal-list" id="signal-list"></div>
+          <div class="signal-list" id="signal-list" aria-live="polite">
+            <div class="analytics-empty analytics-loading">
+              <span class="empty-icon" aria-hidden="true">···</span>
+              <strong>Loading market observations</strong>
+              <small>Reading the selected range from Gold analytics.</small>
+            </div>
+          </div>
         </section>
 
         <section class="panel filings-panel">
