@@ -70,6 +70,43 @@ class FakeReadRepository:
             "pagination": {"page": 1, "page_size": 50, "total": 1, "total_pages": 1},
         }
 
+    def list_indicators(self, **_parameters: Any) -> dict[str, Any]:
+        return {
+            "items": [
+                {
+                    "symbol": "AAPL",
+                    "event_time_utc": datetime(2026, 8, 26, 14, 30, tzinfo=UTC),
+                    "indicator_code": "RSI_14",
+                    "indicator_version": 1,
+                    "value": "42.125",
+                    "lookback_bars": 14,
+                    "certification_status": "PROVISIONAL",
+                    "data_version": "market-analytics-v1",
+                    "schema_version": 1,
+                }
+            ],
+            "pagination": {"page": 1, "page_size": 100, "total": 1, "total_pages": 1},
+        }
+
+    def list_signals(self, **_parameters: Any) -> dict[str, Any]:
+        return {
+            "items": [
+                {
+                    "symbol": "AAPL",
+                    "signal_time_utc": datetime(2026, 8, 26, 14, 30, tzinfo=UTC),
+                    "signal_code": "VOLUME_SPIKE",
+                    "model_version": 1,
+                    "direction": "WATCH",
+                    "strength": "0.4",
+                    "explanation": "Volume is at least 2x its prior 20-bar mean; ratio=3.2",
+                    "certification_status": "PROVISIONAL",
+                    "data_version": "market-signals-v1",
+                    "schema_version": 1,
+                }
+            ],
+            "pagination": {"page": 1, "page_size": 25, "total": 1, "total_pages": 1},
+        }
+
     def freshness(self, *, code_version: str, generated_at_utc: datetime) -> dict[str, Any]:
         return {
             "generated_at_utc": generated_at_utc,
@@ -171,3 +208,23 @@ def test_sec_and_freshness_responses_hide_storage_credentials() -> None:
     assert "bronze_uri" not in filing
     assert freshness["market"]["latest_certification_status"] == "PROVISIONAL"
     assert freshness["code_version"] == "test"
+
+
+def test_analytics_endpoints_are_bounded_versioned_and_read_only() -> None:
+    client = TestClient(create_app(settings(), FakeReadRepository()))
+    parameters = {
+        "symbol": "AAPL",
+        "start_utc": "2026-08-20T00:00:00Z",
+        "end_utc": "2026-08-27T00:00:00Z",
+    }
+    indicator = client.get("/api/v1/indicators", params=parameters)
+    signal = client.get("/api/v1/signals", params=parameters)
+
+    assert indicator.status_code == 200
+    assert indicator.json()["items"][0]["indicator_code"] == "RSI_14"
+    assert indicator.json()["items"][0]["schema_version"] == 1
+    assert signal.status_code == 200
+    assert signal.json()["items"][0]["direction"] == "WATCH"
+    assert client.post("/api/v1/signals").status_code == 405
+    invalid = dict(parameters, indicator_code="DROP_TABLE")
+    assert client.get("/api/v1/indicators", params=invalid).status_code == 422

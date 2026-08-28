@@ -6,6 +6,7 @@ const state = {
   page: 1,
   totalPages: 0,
   bars: [],
+  indicators: [],
 };
 
 const elements = {};
@@ -40,6 +41,7 @@ function captureElements() {
     "chart-range",
     "price-line",
     "price-area",
+    "sma-line",
     "chart-empty",
     "bars-body",
     "previous-page",
@@ -47,6 +49,14 @@ function captureElements() {
     "page-label",
     "symbol-freshness",
     "filing-list",
+    "rsi-value",
+    "rsi-time",
+    "sma-value",
+    "volatility-value",
+    "volume-ratio-value",
+    "signal-symbol",
+    "signal-count",
+    "signal-list",
     "error-toast",
     "error-message",
   ].forEach((id) => {
@@ -114,10 +124,25 @@ async function loadBars() {
   const status = elements["status-filter"].value;
   if (status) parameters.set("certification_status", status);
   try {
-    const result = await fetchJson(`${API}/market-bars?${parameters.toString()}`);
+    const analyticsParameters = new URLSearchParams({
+      symbol,
+      start_utc: `${elements["start-date"].value}T00:00:00Z`,
+      end_utc: `${elements["end-date"].value}T23:59:59Z`,
+      page: "1",
+      page_size: "200",
+    });
+    const signalParameters = new URLSearchParams(analyticsParameters);
+    signalParameters.set("page_size", "25");
+    const [result, indicators, signals] = await Promise.all([
+      fetchJson(`${API}/market-bars?${parameters.toString()}`),
+      fetchJson(`${API}/indicators?${analyticsParameters.toString()}`),
+      fetchJson(`${API}/signals?${signalParameters.toString()}`),
+    ]);
     state.bars = result.items;
+    state.indicators = indicators.items;
     state.totalPages = result.pagination.total_pages;
     renderBars(result);
+    renderAnalytics(indicators.items, signals);
   } catch (error) {
     showError(error);
   }
@@ -212,14 +237,15 @@ function renderBars(result) {
     );
     elements["bars-body"].append(row);
   });
-  renderChart(bars);
+  renderChart(bars, state.indicators);
 }
 
-function renderChart(bars) {
+function renderChart(bars, indicators) {
   const ordered = [...bars].reverse();
   if (!ordered.length) {
     elements["price-line"].setAttribute("d", "");
     elements["price-area"].setAttribute("d", "");
+    elements["sma-line"].setAttribute("d", "");
     elements["chart-last-price"].textContent = "—";
     elements["chart-empty"].hidden = false;
     return;
@@ -236,7 +262,69 @@ function renderChart(bars) {
   const area = `${line} L${x(values.length - 1).toFixed(2)},225 L20,225 Z`;
   elements["price-line"].setAttribute("d", line);
   elements["price-area"].setAttribute("d", area);
+  const smaByTime = new Map(
+    indicators
+      .filter((item) => item.indicator_code === "SMA_20")
+      .map((item) => [new Date(item.event_time_utc).getTime(), Number(item.value)]),
+  );
+  const smaPoints = ordered
+    .map((bar, index) => {
+      const value = smaByTime.get(new Date(bar.event_time_utc).getTime());
+      return value === undefined ? null : `${x(index).toFixed(2)},${y(value).toFixed(2)}`;
+    })
+    .filter(Boolean);
+  elements["sma-line"].setAttribute(
+    "d",
+    smaPoints.map((point, index) => `${index === 0 ? "M" : "L"}${point}`).join(" "),
+  );
   elements["chart-last-price"].textContent = `$${price(ordered.at(-1).close)}`;
+}
+
+function renderAnalytics(indicators, signals) {
+  const latest = (code) => indicators.find((item) => item.indicator_code === code);
+  const rsi = latest("RSI_14");
+  const sma = latest("SMA_20");
+  const volatility = latest("REALIZED_VOLATILITY_20");
+  const volumeRatio = latest("VOLUME_RATIO_20");
+  elements["rsi-value"].textContent = rsi ? Number(rsi.value).toFixed(2) : "—";
+  elements["rsi-time"].textContent = rsi
+    ? `${formatCompactTimestamp(rsi.event_time_utc)} · ${rsi.certification_status}`
+    : "Waiting for analytics";
+  elements["sma-value"].textContent = sma ? `$${price(sma.value)}` : "—";
+  elements["volatility-value"].textContent = volatility
+    ? `${Number(volatility.value).toFixed(2)}%`
+    : "—";
+  elements["volume-ratio-value"].textContent = volumeRatio
+    ? `${Number(volumeRatio.value).toFixed(2)}×`
+    : "—";
+  elements["signal-symbol"].textContent = elements["symbol-filter"].value;
+  elements["signal-count"].textContent = `${number(signals.pagination.total)} signals`;
+  elements["signal-list"].replaceChildren();
+  if (!signals.items.length) {
+    const empty = document.createElement("p");
+    empty.className = "analytics-empty";
+    empty.textContent = "No threshold crossings in this range.";
+    elements["signal-list"].append(empty);
+    return;
+  }
+  signals.items.forEach((signal) => {
+    const card = document.createElement("article");
+    card.className = `signal-card signal-${signal.direction.toLowerCase()}`;
+    const top = document.createElement("div");
+    const direction = document.createElement("strong");
+    direction.textContent = signal.direction;
+    const time = document.createElement("time");
+    time.textContent = formatTimestamp(signal.signal_time_utc);
+    top.append(direction, time);
+    const code = document.createElement("span");
+    code.textContent = signal.signal_code.replaceAll("_", " ");
+    const explanation = document.createElement("p");
+    explanation.textContent = signal.explanation;
+    const strength = document.createElement("small");
+    strength.textContent = `Strength ${Math.round(Number(signal.strength) * 100)}% · ${signal.certification_status}`;
+    card.append(top, code, explanation, strength);
+    elements["signal-list"].append(card);
+  });
 }
 
 function renderFilings(filings) {

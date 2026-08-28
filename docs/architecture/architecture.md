@@ -136,6 +136,13 @@ Initial MariaDB tables:
 
 Application queries require indexes on symbol and event time. Exact DDL is an implementation task and must be tested against query patterns.
 
+Phase 9 implements four versioned, one-minute Indicator series and sparse,
+explained Signal observations. A bounded Spark application reads a configured
+Gold lookback, calculates native Spark window metrics, validates the result, and
+atomically replaces only the requested UTC date in the two Gold analytics tables.
+The daily certified DAG invokes it after `silver_to_gold_certified`. Each row
+retains schema/model, run, code, data, and certification lineage.
+
 ## 11. Streaming application
 
 The Spark Structured Streaming application:
@@ -144,7 +151,9 @@ The Spark Structured Streaming application:
 2. Parses the versioned schema.
 3. Rejects malformed events to quarantine or DLQ.
 4. Applies event-time semantics and a watermark.
-5. Calculates approved near-real-time indicators.
+5. May calculate approved near-real-time indicators after a stateful restart and
+   reconciliation design is accepted. Phase 9 keeps the authoritative Indicator
+   calculation in a bounded Spark application.
 6. Uses `foreachBatch` or another tested sink strategy for transactional MariaDB upserts.
 7. Persists checkpoints.
 8. Emits structured operational metrics.
@@ -213,6 +222,11 @@ the run-specific backup.
 The Backend API reads Gold tables through a narrowly scoped database identity. It provides pagination, filtering, bounded date ranges, input validation, and safe response models.
 
 The Web App has no database credentials and no MinIO credentials.
+
+The Phase 9 `/api/v1/indicators` and `/api/v1/signals` endpoints use the same
+symbol validation, maximum 31-day range, parameterized SQL, and pagination ceiling
+as market bars. Explanations contain calculated market context only; internal
+lineage and credentials remain outside browser response models.
 
 The implemented Phase 7 boundary uses a `marketpilot_app` identity with `SELECT`
 only on symbols, market bars, SEC filings, and watermarks. Market queries default

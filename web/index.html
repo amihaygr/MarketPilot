@@ -111,6 +111,7 @@
                 <line class="chart-grid" x1="20" x2="880" y1="200" y2="200"></line>
                 <path id="price-area" class="chart-area" d=""></path>
                 <path id="price-line" class="chart-line" d=""></path>
+                <path id="sma-line" class="chart-line chart-sma" d=""></path>
               </svg>
               <p class="empty-state" id="chart-empty" hidden>No bars match this range.</p>
             </div>
@@ -147,6 +148,46 @@
             </div>
             <div class="pulse-list" id="symbol-freshness"></div>
           </aside>
+        </section>
+
+        <section class="panel analytics-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">EXPLAINABLE ANALYTICS · V1</p>
+              <h2>Indicators and market observations</h2>
+            </div>
+            <span class="count-label">Research context · not financial advice</span>
+          </div>
+          <div class="indicator-grid">
+            <article class="indicator-card">
+              <span>RSI · 14 bars</span>
+              <strong id="rsi-value">—</strong>
+              <small id="rsi-time">Waiting for analytics</small>
+            </article>
+            <article class="indicator-card">
+              <span>SMA · 20 bars</span>
+              <strong id="sma-value">—</strong>
+              <small>Dashed line on the price chart</small>
+            </article>
+            <article class="indicator-card">
+              <span>Realized volatility · 20</span>
+              <strong id="volatility-value">—</strong>
+              <small>Annualized from one-minute log returns</small>
+            </article>
+            <article class="indicator-card">
+              <span>Volume ratio · 20</span>
+              <strong id="volume-ratio-value">—</strong>
+              <small>Current volume ÷ prior 20-bar mean</small>
+            </article>
+          </div>
+          <div class="signal-heading">
+            <div>
+              <p class="eyebrow">RECENT OBSERVATIONS</p>
+              <h3 id="signal-symbol">—</h3>
+            </div>
+            <span id="signal-count">0 signals</span>
+          </div>
+          <div class="signal-list" id="signal-list"></div>
         </section>
 
         <section class="panel filings-panel">

@@ -42,6 +42,28 @@ class ReadRepository(Protocol):
         page_size: int,
     ) -> Row: ...
 
+    def list_indicators(
+        self,
+        *,
+        symbol: str,
+        start_utc: datetime,
+        end_utc: datetime,
+        indicator_code: str | None,
+        page: int,
+        page_size: int,
+    ) -> Row: ...
+
+    def list_signals(
+        self,
+        *,
+        symbol: str | None,
+        start_utc: datetime,
+        end_utc: datetime,
+        direction: str | None,
+        page: int,
+        page_size: int,
+    ) -> Row: ...
+
     def freshness(self, *, code_version: str, generated_at_utc: datetime) -> Row: ...
 
 
@@ -202,6 +224,84 @@ class MariaDbReadRepository:
             JOIN dim_symbol AS symbols ON symbols.symbol_id = filings.symbol_id
             WHERE {where_clause}
             ORDER BY filings.filing_date DESC, filings.accession_number DESC
+            LIMIT %s OFFSET %s
+        """
+        return self._page(count_sql, item_sql, parameters, page, page_size)
+
+    def list_indicators(
+        self,
+        *,
+        symbol: str,
+        start_utc: datetime,
+        end_utc: datetime,
+        indicator_code: str | None,
+        page: int,
+        page_size: int,
+    ) -> Row:
+        predicates = [
+            "symbols.symbol = %s",
+            "indicators.event_time_utc >= %s",
+            "indicators.event_time_utc < %s",
+        ]
+        parameters: list[Any] = [symbol, _database_utc(start_utc), _database_utc(end_utc)]
+        if indicator_code:
+            predicates.append("indicators.indicator_code = %s")
+            parameters.append(indicator_code)
+        where_clause = " AND ".join(predicates)
+        count_sql = f"""
+            SELECT COUNT(*) AS total
+            FROM fact_indicator_1m AS indicators
+            JOIN dim_symbol AS symbols ON symbols.symbol_id = indicators.symbol_id
+            WHERE {where_clause}
+        """
+        item_sql = f"""
+            SELECT symbols.symbol, indicators.event_time_utc,
+                   indicators.indicator_code, indicators.indicator_version,
+                   indicators.indicator_value AS value, indicators.lookback_bars,
+                   indicators.certification_status, indicators.data_version,
+                   indicators.schema_version
+            FROM fact_indicator_1m AS indicators
+            JOIN dim_symbol AS symbols ON symbols.symbol_id = indicators.symbol_id
+            WHERE {where_clause}
+            ORDER BY indicators.event_time_utc DESC, indicators.indicator_code
+            LIMIT %s OFFSET %s
+        """
+        return self._page(count_sql, item_sql, parameters, page, page_size)
+
+    def list_signals(
+        self,
+        *,
+        symbol: str | None,
+        start_utc: datetime,
+        end_utc: datetime,
+        direction: str | None,
+        page: int,
+        page_size: int,
+    ) -> Row:
+        predicates = ["signals.signal_time_utc >= %s", "signals.signal_time_utc < %s"]
+        parameters: list[Any] = [_database_utc(start_utc), _database_utc(end_utc)]
+        if symbol:
+            predicates.append("symbols.symbol = %s")
+            parameters.append(symbol)
+        if direction:
+            predicates.append("signals.direction = %s")
+            parameters.append(direction)
+        where_clause = " AND ".join(predicates)
+        count_sql = f"""
+            SELECT COUNT(*) AS total
+            FROM fact_signal AS signals
+            JOIN dim_symbol AS symbols ON symbols.symbol_id = signals.symbol_id
+            WHERE {where_clause}
+        """
+        item_sql = f"""
+            SELECT symbols.symbol, signals.signal_time_utc, signals.signal_code,
+                   signals.model_version, signals.direction, signals.strength,
+                   signals.explanation, signals.certification_status,
+                   signals.data_version, signals.schema_version
+            FROM fact_signal AS signals
+            JOIN dim_symbol AS symbols ON symbols.symbol_id = signals.symbol_id
+            WHERE {where_clause}
+            ORDER BY signals.signal_time_utc DESC, signals.signal_code
             LIMIT %s OFFSET %s
         """
         return self._page(count_sql, item_sql, parameters, page, page_size)

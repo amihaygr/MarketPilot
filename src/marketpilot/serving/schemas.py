@@ -67,6 +67,47 @@ class MarketBarPage(ApiModel):
     pagination: PageMetadata
 
 
+class IndicatorRead(ApiModel):
+    symbol: str
+    event_time_utc: datetime
+    indicator_code: Literal["SMA_20", "RSI_14", "REALIZED_VOLATILITY_20", "VOLUME_RATIO_20"]
+    indicator_version: int = Field(ge=1)
+    value: Decimal
+    lookback_bars: int = Field(ge=1)
+    certification_status: Literal["PROVISIONAL", "CERTIFIED"]
+    data_version: str
+    schema_version: int = Field(ge=1)
+
+
+class IndicatorPage(ApiModel):
+    items: list[IndicatorRead]
+    pagination: PageMetadata
+
+
+class SignalRead(ApiModel):
+    symbol: str
+    signal_time_utc: datetime
+    signal_code: Literal[
+        "PRICE_CROSS_ABOVE_SMA20",
+        "PRICE_CROSS_BELOW_SMA20",
+        "RSI_CROSS_OVERSOLD",
+        "RSI_CROSS_OVERBOUGHT",
+        "VOLUME_SPIKE",
+    ]
+    model_version: int = Field(ge=1)
+    direction: Literal["BULLISH", "BEARISH", "WATCH"]
+    strength: Decimal = Field(ge=0, le=1)
+    explanation: str
+    certification_status: Literal["PROVISIONAL", "CERTIFIED"]
+    data_version: str
+    schema_version: int = Field(ge=1)
+
+
+class SignalPage(ApiModel):
+    items: list[SignalRead]
+    pagination: PageMetadata
+
+
 class SecFilingRead(ApiModel):
     accession_number: str
     symbol: str

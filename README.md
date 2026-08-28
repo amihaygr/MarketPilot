@@ -258,6 +258,20 @@ time bounds, schema and checksums; sample restores and full database drills neve
 target the live schema. Follow `docs/runbooks/archive-and-recovery.md` before an
 operator-triggered run.
 
+## Phase 9 explainable analytics
+
+The bounded daily Gold path now continues into versioned analytics:
+
+```text
+Certified Gold bars -> Spark window analytics -> Indicators + explained Signals
+                                                -> Backend API -> Dashboard
+```
+
+The Dashboard overlays SMA20 on price and shows current RSI14, realized
+volatility, volume ratio, and sparse threshold-crossing observations. API queries
+remain read-only, paginated, and limited to 31 days. The observations are
+engineering and research output, not financial advice.
+
 ## Delivery maturity
 
 This repository is an incremental implementation, not a finished trading product.

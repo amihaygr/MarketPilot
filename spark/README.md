@@ -17,6 +17,8 @@ Implemented:
   Parquet plus matching MinIO and MariaDB manifests.
 - `jobs/restore_archive_sample.py`: complete object checksum verification followed
   by a bounded restore into an isolated schema.
+- `jobs/calculate_market_analytics.py`: bounded native Spark windows for versioned
+  Indicators and explained Signals, followed by atomic daily Gold publication.
 
 Planned bounded application:
 

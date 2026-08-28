@@ -30,3 +30,8 @@ Phase 8 extends `archive_manifest`, adds `archive_restore_result`, and creates t
 isolated `marketpilot_restore.restore_market_bar_1m` target. The publisher identity
 can register archive and restore evidence but cannot purge Gold history. Full dump
 restore scripts accept only isolated database names matching their strict allowlist.
+
+Phase 9 adds `fact_indicator_1m` and `fact_signal`. Their composite primary keys
+include the Indicator or model version, and every row includes certification plus
+run, code, data, and schema lineage. The publisher may atomically replace a daily
+analytics partition; the API identity receives `SELECT` only.

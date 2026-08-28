@@ -32,3 +32,11 @@ boundaries and is opt-in:
 $env:MARKETPILOT_RUN_OPERATIONS_INTEGRATION = "1"
 pytest tests/integration/test_archive_operations.py
 ```
+
+Phase 9 can recalculate a static analytics partition twice and verify Spark,
+MariaDB, API, and idempotency boundaries:
+
+```powershell
+$env:MARKETPILOT_RUN_ANALYTICS_INTEGRATION = "1"
+pytest tests/integration/test_phase9_analytics.py
+```

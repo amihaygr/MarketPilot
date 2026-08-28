@@ -98,5 +98,25 @@ with DAG(
         pool="spark_batch_pool",
         verbose=False,
     )
+    calculate_market_analytics = SparkSubmitOperator(
+        task_id="calculate_market_analytics",
+        application="/opt/marketpilot/spark/jobs/calculate_market_analytics.py",
+        conn_id="spark_standalone",
+        application_args=[
+            "--logical-date",
+            "{{ ti.xcom_pull(task_ids='exchange_session_gate')['logical_date'] }}",
+            "--run-id",
+            "{{ ti.xcom_pull(task_ids='exchange_session_gate')['run_id'] }}",
+        ],
+        conf=SPARK_CONF,
+        pool="spark_batch_pool",
+        verbose=False,
+    )
 
-    session_gate >> bronze_to_silver >> silver_quality_gate >> silver_to_gold
+    (
+        session_gate
+        >> bronze_to_silver
+        >> silver_quality_gate
+        >> silver_to_gold
+        >> calculate_market_analytics
+    )

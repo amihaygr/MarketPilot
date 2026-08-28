@@ -212,6 +212,30 @@ and failure-recovery evidence.
 - MariaDB history is not automatically deleted.
 - Recovery steps are documented.
 
+## Phase 9 - Explainable market analytics
+
+Status: completed and locally verified on 2026-08-28. See
+`docs/phase9-verification.md` for Spark, MariaDB, API, privilege, Dashboard, and
+idempotency evidence.
+
+### Scope
+
+- Versioned SMA, RSI, realized-volatility, and volume-ratio indicators.
+- Explainable threshold-crossing and volume observations.
+- Atomic, idempotent Gold publication after the certified daily path.
+- Blocking analytics quality rules and publication watermark.
+- Bounded read-only Indicator and Signal APIs.
+- Dashboard indicators, SMA overlay, and recent explained Signals.
+
+### Acceptance criteria
+
+- Indicator and Signal business keys remain unique after reprocessing.
+- RSI and Signal strength ranges are enforced before publication.
+- A static partition produces identical row counts across repeated runs.
+- The application identity can read analytics but cannot mutate them.
+- Browser analytics requests pass only through the Backend API.
+- Every row carries model/schema, run, code, data, and certification lineage.
+
 ## Required checkpoints
 
 Recommended Git checkpoints:
@@ -225,3 +249,4 @@ Recommended Git checkpoints:
 7. `add external data sources`
 8. `add api and web serving layer`
 9. `add archive and operations`
+10. `add explainable market analytics`

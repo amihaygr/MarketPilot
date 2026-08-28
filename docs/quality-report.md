@@ -56,6 +56,13 @@
   into an isolated database with matching market-bar and SEC-filing counts.
 - All 18 Compose services, including the Docker-owned operational monitor, reported
   healthy during the Phase 8 runtime verification.
+- Phase 9 published four versioned Indicator series and five possible explained
+  Signal types through an atomic daily Gold boundary.
+- Two runs over the static 2026-08-25 partition both produced 10,868 unique
+  Indicator rows and zero threshold-crossing Signals, demonstrating idempotent
+  replacement without touching market bars.
+- The analytics API and Nginx proxy returned bounded AAPL data. The application
+  identity could read analytics and was denied mutation with MariaDB error 1142.
 
 ## Deliberately deferred
 

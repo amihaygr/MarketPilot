@@ -413,6 +413,106 @@ button:disabled {
   filter: drop-shadow(0 3px 8px rgb(82 215 181 / 30%));
 }
 
+.chart-sma {
+  stroke: var(--blue);
+  stroke-dasharray: 8 7;
+  stroke-width: 2;
+  filter: none;
+}
+
+.analytics-panel {
+  margin-bottom: 18px;
+  padding: 25px;
+}
+
+.indicator-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.indicator-card {
+  display: grid;
+  min-height: 132px;
+  gap: 11px;
+  padding: 18px;
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  background: rgb(7 17 31 / 48%);
+}
+
+.indicator-card span,
+.indicator-card small,
+.signal-heading span,
+.signal-card time,
+.signal-card small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.indicator-card strong {
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 26px;
+}
+
+.signal-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  margin: 28px 0 14px;
+}
+
+.signal-heading h3 {
+  margin: 0;
+}
+
+.signal-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.signal-card {
+  display: grid;
+  gap: 9px;
+  padding: 16px;
+  border: 1px solid var(--line-soft);
+  border-left: 3px solid var(--blue);
+  border-radius: 12px;
+  background: rgb(7 17 31 / 48%);
+}
+
+.signal-card > div {
+  display: flex;
+  justify-content: space-between;
+}
+
+.signal-card > span {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.signal-card p,
+.analytics-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.signal-bullish {
+  border-left-color: var(--accent);
+}
+
+.signal-bearish {
+  border-left-color: var(--danger);
+}
+
+.signal-watch {
+  border-left-color: var(--amber);
+}
+
 .chart-area {
   fill: url("#market-gradient");
   fill: rgb(82 215 181 / 9%);
@@ -650,6 +750,11 @@ footer {
   .filing-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .indicator-grid,
+  .signal-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 680px) {
@@ -673,7 +778,12 @@ footer {
   .metric-grid,
   .filter-bar,
   .filing-list,
-  .pulse-list {
+    .pulse-list {
+    grid-template-columns: 1fr;
+  }
+
+  .indicator-grid,
+  .signal-list {
     grid-template-columns: 1fr;
   }
 

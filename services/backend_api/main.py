@@ -18,8 +18,10 @@ from marketpilot.serving.schemas import (
     ApiIndexResponse,
     FreshnessResponse,
     HealthResponse,
+    IndicatorPage,
     MarketBarPage,
     SecFilingPage,
+    SignalPage,
     SymbolListResponse,
 )
 from marketpilot.serving.settings import ServingSettings
@@ -191,6 +193,67 @@ def create_app(
             page_size=page_size,
         )
         return SecFilingPage.model_validate(result)
+
+    @app.get("/api/v1/indicators", response_model=IndicatorPage, tags=["analytics"])
+    def indicators(
+        symbol: str = Query(pattern=r"^[A-Z][A-Z0-9.-]{0,15}$"),
+        start_utc: datetime | None = None,
+        end_utc: datetime | None = None,
+        indicator_code: str | None = Query(
+            default=None,
+            pattern=r"^(SMA_20|RSI_14|REALIZED_VOLATILITY_20|VOLUME_RATIO_20)$",
+        ),
+        page: int = Query(default=1, ge=1, le=MAX_PAGE),
+        page_size: int = Query(default=100, ge=1, le=MAX_PAGE_SIZE),
+    ) -> IndicatorPage:
+        try:
+            start, end = market_time_range(
+                start_utc,
+                end_utc,
+                now_utc=datetime.now(UTC),
+                max_days=resolved_settings.max_market_range_days,
+            )
+        except QueryRangeError as error:
+            raise HTTPException(status_code=422, detail=str(error)) from error
+        return IndicatorPage.model_validate(
+            resolved_repository.list_indicators(
+                symbol=symbol,
+                start_utc=start,
+                end_utc=end,
+                indicator_code=indicator_code,
+                page=page,
+                page_size=page_size,
+            )
+        )
+
+    @app.get("/api/v1/signals", response_model=SignalPage, tags=["analytics"])
+    def signals(
+        symbol: str | None = Query(default=None, pattern=r"^[A-Z][A-Z0-9.-]{0,15}$"),
+        start_utc: datetime | None = None,
+        end_utc: datetime | None = None,
+        direction: str | None = Query(default=None, pattern=r"^(BULLISH|BEARISH|WATCH)$"),
+        page: int = Query(default=1, ge=1, le=MAX_PAGE),
+        page_size: int = Query(default=25, ge=1, le=MAX_PAGE_SIZE),
+    ) -> SignalPage:
+        try:
+            start, end = market_time_range(
+                start_utc,
+                end_utc,
+                now_utc=datetime.now(UTC),
+                max_days=resolved_settings.max_market_range_days,
+            )
+        except QueryRangeError as error:
+            raise HTTPException(status_code=422, detail=str(error)) from error
+        return SignalPage.model_validate(
+            resolved_repository.list_signals(
+                symbol=symbol,
+                start_utc=start,
+                end_utc=end,
+                direction=direction,
+                page=page,
+                page_size=page_size,
+            )
+        )
 
     @app.get("/api/v1/freshness", response_model=FreshnessResponse, tags=["service"])
     def freshness() -> FreshnessResponse:
