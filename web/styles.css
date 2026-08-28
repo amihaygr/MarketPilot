@@ -124,6 +124,31 @@ input {
   text-transform: uppercase;
 }
 
+.topbar-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.story-link {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.story-link:hover {
+  border-color: rgb(82 215 181 / 38%);
+  color: var(--accent);
+}
+
 .state-dot {
   width: 7px;
   height: 7px;
@@ -1202,6 +1227,13 @@ footer {
 @media (max-width: 680px) {
   .app-shell {
     padding: 0 16px;
+  }
+
+  .story-link {
+    width: 36px;
+    overflow: hidden;
+    padding: 0 10px;
+    white-space: nowrap;
   }
 
   main {

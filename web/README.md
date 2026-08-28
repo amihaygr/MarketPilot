@@ -21,5 +21,11 @@ dashboard uses bounded Backend API requests only; all summary values shown in th
 browser are derived from those responses and are descriptive research context, not
 investment advice.
 
+The same Nginx service also publishes `showcase.html`, a separate Project Story
+for reviewers and live demonstrations. It reuses the visual language but does not
+turn the analytical dashboard into a marketing page. Its only runtime request is
+the existing relative `/api/v1/freshness` endpoint; dated verification evidence is
+rendered as clearly labelled static project documentation.
+
 The Nginx response includes a restrictive Content Security Policy and other basic
 browser hardening headers. This local MVP does not implement end-user authentication.

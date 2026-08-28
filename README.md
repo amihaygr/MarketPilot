@@ -9,6 +9,17 @@ for bounded Spark submissions while keeping long-running streaming under Compose
 
 MarketPilot is a review-ready reference architecture and implementation scaffold for a local market-data platform. It combines Kafka, Spark Structured Streaming, Spark Batch, Airflow, MinIO, MariaDB, a backend API, and a web client without confusing service supervision with workflow orchestration.
 
+## Start with the story
+
+With the local stack running, open:
+
+- **Project Story:** <http://localhost:3000/showcase.html> — architecture, decisions,
+  measured evidence, implementation journey and demo launchpad.
+- **Interactive Dashboard:** <http://localhost:3000/> — Gold market data, freshness,
+  indicators and explained observations.
+- **Final Demo Guide:** [`docs/demo-guide.md`](docs/demo-guide.md) — an eight-minute
+  end-to-end presentation path with expected questions and recovery fallbacks.
+
 ## Architectural position
 
 - Docker Compose owns long-running processes and restarts them after failure.
@@ -185,6 +196,7 @@ internal Docker networks and are not published directly to the host.
 | Spark Master | <http://localhost:18080> | Inspect cluster workers and submitted applications |
 | Spark Worker | <http://localhost:18081> | Inspect worker resources and executors |
 | MarketPilot Web App | <http://localhost:3000> | Explore Gold bars, freshness, certification and SEC filings |
+| MarketPilot Project Story | <http://localhost:3000/showcase.html> | Present architecture, evidence and the end-to-end engineering journey |
 | Backend API docs | <http://localhost:8000/docs> | Inspect and exercise bounded read-only REST endpoints |
 
 For Adminer, select `MySQL`, use server `mariadb`, database `marketpilot`, and
@@ -272,9 +284,21 @@ volatility, volume ratio, and sparse threshold-crossing observations. API querie
 remain read-only, paginated, and limited to 31 days. The observations are
 engineering and research output, not financial advice.
 
+## Phase 10 final showcase and delivery
+
+Phase 10 packages the engineering work for review without introducing another
+data path. The Nginx Web App now serves a separate Project Story that loads only
+the existing read-only freshness API for its live proof. Static verification
+evidence is explicitly dated, and the Dashboard remains focused on exploration.
+
+Use [`docs/demo-guide.md`](docs/demo-guide.md) to present one event across Kafka,
+MinIO, Spark, Airflow, MariaDB, the Backend API and the Web App. The guide avoids
+displaying credentials and distinguishes current runtime state from recorded
+verification evidence.
+
 ## Delivery maturity
 
-This repository is an incremental implementation, not a finished trading product.
+This repository is a completed local engineering capstone, not a finished trading product.
 The raw, streaming, batch Medallion, Airflow orchestration, external-source and
 serving, archive and recovery boundaries are concrete and locally verified,
 including Alpaca IEX, SEC EDGAR, the read-only API identity, browser-to-API proxy,

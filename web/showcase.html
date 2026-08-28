@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="MarketPilot project story: architecture, engineering decisions, verification evidence and live demo links."
+    />
+    <title>MarketPilot | Project Story</title>
+    <link rel="stylesheet" href="/showcase.css?v=phase10-1" />
+    <script src="/showcase.js?v=phase10-1" defer></script>
+  </head>
+  <body>
+    <header class="story-nav">
+      <a class="story-brand" href="/" aria-label="Open MarketPilot dashboard">
+        <span>MP</span>
+        <strong>MarketPilot</strong>
+      </a>
+      <nav aria-label="Project story sections">
+        <a href="#architecture">Architecture</a>
+        <a href="#evidence">Evidence</a>
+        <a href="#journey">Journey</a>
+      </nav>
+      <a class="nav-cta" href="/">Open dashboard <span aria-hidden="true">→</span></a>
+    </header>
+
+    <main>
+      <section class="story-hero" aria-labelledby="story-title">
+        <div class="hero-copy-block">
+          <p class="story-eyebrow">DATA ENGINEERING · STREAMING · ANALYTICS</p>
+          <h1 id="story-title">From a market event to a trusted, explainable decision surface.</h1>
+          <p class="story-lede">
+            MarketPilot is a reproducible local data platform that combines live ingestion,
+            immutable replay, certified batch processing, operational recovery, and a secure
+            serving layer—without confusing orchestration with service supervision.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-action" href="/">Explore live Gold data</a>
+            <a class="secondary-action" href="#architecture">See how it works</a>
+          </div>
+        </div>
+        <div class="hero-proof" aria-label="Current platform status">
+          <div class="proof-status">
+            <span class="proof-dot" id="proof-dot" aria-hidden="true"></span>
+            <span id="proof-status">Checking local platform</span>
+          </div>
+          <div class="proof-number">
+            <strong id="proof-bars">—</strong>
+            <span>Gold market bars now visible to the application</span>
+          </div>
+          <div class="proof-meta">
+            <div><span>Assets</span><strong id="proof-assets">—</strong></div>
+            <div><span>SEC filings</span><strong id="proof-filings">—</strong></div>
+            <div><span>Latest state</span><strong id="proof-certification">—</strong></div>
+          </div>
+          <small id="proof-generated">Live proof loads through the Backend API only.</small>
+        </div>
+      </section>
+
+      <section class="story-principles" aria-label="What the project demonstrates">
+        <article>
+          <span>01</span>
+          <h2>Live without losing history</h2>
+          <p>Kafka fans each event into low-latency Gold and immutable Bronze for replay.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h2>Fast now, certified later</h2>
+          <p>Streaming publishes provisional rows; bounded batch rebuilds and certifies closed data.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h2>Operations are part of the product</h2>
+          <p>Checkpoints, quality gates, manifests, backups, alerts, and isolated restores are tested.</p>
+        </article>
+        <article>
+          <span>04</span>
+          <h2>The browser stays outside the data plane</h2>
+          <p>Nginx proxies bounded API reads through a MariaDB identity that cannot mutate Gold.</p>
+        </article>
+      </section>
+
+      <section class="architecture-section" id="architecture" aria-labelledby="architecture-title">
+        <div class="section-intro">
+          <p class="story-eyebrow">ONE PLATFORM · THREE VALID PATHS</p>
+          <h2 id="architecture-title">Each workload has one clear owner.</h2>
+          <p>
+            Select a path to see its lifecycle and why it exists. Docker Compose owns long-running
+            services. Airflow schedules bounded work only.
+          </p>
+        </div>
+
+        <div class="path-tabs" role="tablist" aria-label="Data paths">
+          <button type="button" role="tab" aria-selected="true" aria-controls="path-panel" data-path="live">
+            Live path
+          </button>
+          <button type="button" role="tab" aria-selected="false" aria-controls="path-panel" data-path="certified">
+            Certified path
+          </button>
+          <button type="button" role="tab" aria-selected="false" aria-controls="path-panel" data-path="archive">
+            Raw + archive
+          </button>
+        </div>
+
+        <div class="path-stage" id="path-panel" role="tabpanel" tabindex="0">
+          <div class="path-flow" id="path-flow" aria-label="Selected data flow"></div>
+          <div class="path-explanation">
+            <span id="path-owner">—</span>
+            <h3 id="path-title">—</h3>
+            <p id="path-description">—</p>
+            <div class="path-outcome">
+              <span>Outcome</span>
+              <strong id="path-outcome">—</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="decision-section" aria-labelledby="decision-title">
+        <div class="section-intro compact-intro">
+          <p class="story-eyebrow">ENGINEERING JUDGMENT</p>
+          <h2 id="decision-title">The architecture is defined as much by its boundaries as its tools.</h2>
+        </div>
+        <div class="decision-lines">
+          <article>
+            <strong>Compose ≠ Airflow</strong>
+            <p>Permanent services restart under Docker; workflows start and finish under Airflow.</p>
+          </article>
+          <article>
+            <strong>Delivery ≠ exactly once</strong>
+            <p>Kafka and Spark may retry, so MariaDB business keys and idempotent upserts carry correctness.</p>
+          </article>
+          <article>
+            <strong>Fresh ≠ certified</strong>
+            <p>The application can show recent provisional data without pretending it passed the closed-session gate.</p>
+          </article>
+          <article>
+            <strong>Archive ≠ purge</strong>
+            <p>Exports are hashed and restored before any future retention decision; MVP history is never auto-deleted.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="evidence-section" id="evidence" aria-labelledby="evidence-title">
+        <div class="section-intro evidence-intro">
+          <div>
+            <p class="story-eyebrow">MEASURED ON THE TARGET WORKSTATION</p>
+            <h2 id="evidence-title">Evidence, not architecture theater.</h2>
+          </div>
+          <p>Verification snapshots below were recorded during Phases 8–9 on 28 Aug 2026.</p>
+        </div>
+        <div class="evidence-grid">
+          <article class="evidence-lead">
+            <strong>18 / 18</strong>
+            <span>Compose services healthy in the reviewed runtime</span>
+          </article>
+          <article><strong>68</strong><span>Unit and contract tests passing in the Phase 10 gate</span></article>
+          <article><strong>5,106</strong><span>Gold rows exported into a verified Parquet archive drill</span></article>
+          <article><strong>25</strong><span>Rows restored after re-hashing the complete archive inventory</span></article>
+          <article><strong>4,636</strong><span>Versioned Indicator rows in the reviewed live analytics snapshot</span></article>
+          <article><strong>273</strong><span>Explained Signal observations in that same atomic publication</span></article>
+          <article><strong>0</strong><span>Duplicate business keys after reviewed idempotency reprocessing</span></article>
+        </div>
+        <p class="evidence-note">
+          These are dated engineering verification results, not production scale claims.
+        </p>
+      </section>
+
+      <section class="journey-section" id="journey" aria-labelledby="journey-title">
+        <div class="section-intro">
+          <p class="story-eyebrow">BUILD SEQUENCE</p>
+          <h2 id="journey-title">Ten phases, each ending in observable proof.</h2>
+          <p>Choose a milestone to see what became verifiable at that point.</p>
+        </div>
+        <div class="journey-layout">
+          <div class="phase-list" role="list" aria-label="Implementation phases">
+            <button type="button" class="phase-button active" data-phase="0" aria-pressed="true">0–2 · Foundation</button>
+            <button type="button" class="phase-button" data-phase="3" aria-pressed="false">3–5 · Processing</button>
+            <button type="button" class="phase-button" data-phase="6" aria-pressed="false">6–7 · Product</button>
+            <button type="button" class="phase-button" data-phase="8" aria-pressed="false">8–9 · Trust</button>
+            <button type="button" class="phase-button" data-phase="10" aria-pressed="false">10 · Showcase</button>
+          </div>
+          <article class="phase-detail" aria-live="polite">
+            <span id="phase-label">PHASES 0–2</span>
+            <h3 id="phase-title">A reproducible event enters Kafka and survives as immutable Bronze.</h3>
+            <p id="phase-description">Repository rules, core infrastructure, a versioned event contract, deterministic production, and quarantine behavior establish the first trusted vertical slice.</p>
+            <strong id="phase-proof">Proof: the same Kafka record maps to one recoverable Bronze object.</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="demo-section" aria-labelledby="demo-title">
+        <div>
+          <p class="story-eyebrow">LIVE DEMO LAUNCHPAD</p>
+          <h2 id="demo-title">Follow one event across the whole platform.</h2>
+          <p>
+            Start in the dashboard, then prove transport, raw lineage, bounded orchestration,
+            compute, and the Gold serving boundary through the local engineering interfaces.
+          </p>
+        </div>
+        <div class="demo-links">
+          <a href="/">01 · Dashboard <span>Gold + analytics</span></a>
+          <a href="http://localhost:8085/">02 · Kafka UI <span>Topic + consumer lag</span></a>
+          <a href="http://localhost:9001/">03 · MinIO <span>Bronze + Silver + archive</span></a>
+          <a href="http://localhost:8080/">04 · Airflow <span>Bounded workflows</span></a>
+          <a href="http://localhost:18080/">05 · Spark <span>Cluster + applications</span></a>
+          <a href="http://localhost:8086/">06 · Adminer <span>Gold tables</span></a>
+          <a href="http://localhost:8000/docs">07 · API docs <span>Read-only contract</span></a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="story-footer">
+      <div>
+        <strong>MarketPilot</strong>
+        <span>Local data engineering capstone · research context, not financial advice</span>
+      </div>
+      <a href="/">Return to dashboard →</a>
+    </footer>
+  </body>
+</html>

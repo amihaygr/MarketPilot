@@ -236,6 +236,35 @@ idempotency evidence.
 - Browser analytics requests pass only through the Backend API.
 - Every row carries model/schema, run, code, data, and certification lineage.
 
+## Phase 10 - Final showcase and delivery
+
+Status: implemented and locally verified on 2026-08-28. The Project Story is
+the presentation artifact for this phase. See `docs/phase10-verification.md`
+for release evidence and the remaining manual visual-review note.
+
+### Scope
+
+- A dedicated Project Story served by the existing Nginx Web App.
+- A clear end-to-end demo route across application and engineering interfaces.
+- A final presentation package for academic review and interviews.
+- Review-ready README, architecture narrative, evidence and delivery notes.
+- A final release gate covering tests, formatting, service health, logs and secrets.
+
+### Architecture boundary
+
+- The Project Story may read only existing bounded Backend API endpoints.
+- It must not connect directly to MariaDB, MinIO, Kafka or Airflow.
+- Dated verification evidence must not be presented as live production state.
+- The analytical Dashboard remains a decision surface, not a presentation page.
+
+### Acceptance criteria
+
+- A reviewer can understand the problem, architecture and key decisions before a live demo.
+- The demo guide traverses source, transport, storage, compute, orchestration and serving.
+- Every quantitative claim is either live through the API or tied to a dated verification file.
+- The Project Story is responsive, keyboard accessible and contains no credentials.
+- All final release gates pass and the delivery has a Git checkpoint.
+
 ## Required checkpoints
 
 Recommended Git checkpoints:
@@ -250,3 +279,4 @@ Recommended Git checkpoints:
 8. `add api and web serving layer`
 9. `add archive and operations`
 10. `add explainable market analytics`
+11. `add final showcase and delivery package`

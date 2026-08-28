@@ -26,3 +26,21 @@ def test_dashboard_uses_safe_dom_rendering_for_api_content() -> None:
 
     assert ".innerHTML" not in script
     assert "textContent" in script
+
+
+def test_phase10_showcase_is_packaged_and_uses_the_existing_api_boundary() -> None:
+    dashboard = (PROJECT_ROOT / "web" / "index.html").read_text(encoding="utf-8")
+    showcase = (PROJECT_ROOT / "web" / "showcase.html").read_text(encoding="utf-8")
+    script = (PROJECT_ROOT / "web" / "showcase.js").read_text(encoding="utf-8")
+    dockerfile = (PROJECT_ROOT / "infrastructure" / "docker" / "Dockerfile.web").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'href="/showcase.html"' in dashboard
+    assert "showcase.css?v=phase10-1" in showcase
+    assert "showcase.js?v=phase10-1" in showcase
+    assert 'fetch("/api/v1/freshness"' in script
+    assert ".innerHTML" not in script
+    assert "COPY web/showcase.html" in dockerfile
+    assert "COPY web/showcase.css" in dockerfile
+    assert "COPY web/showcase.js" in dockerfile
