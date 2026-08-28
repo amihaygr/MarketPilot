@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="MarketPilot market data serving dashboard" />
     <title>MarketPilot | Data Command Center</title>
-    <link rel="stylesheet" href="/styles.css?v=phase9-ui-2" />
-    <script src="/app.js?v=phase9-ui-2" defer></script>
+    <link rel="stylesheet" href="/styles.css?v=phase9-bi-1" />
+    <script src="/app.js?v=phase9-bi-1" defer></script>
   </head>
   <body>
     <div class="app-shell">
@@ -70,7 +70,21 @@
                 <p class="eyebrow">ONE-MINUTE BARS</p>
                 <h2>Market explorer</h2>
               </div>
-              <span class="count-label" id="bar-result-count">0 results</span>
+              <div class="heading-actions">
+                <span class="live-selection" id="live-selection">AAPL · 7D</span>
+                <span class="count-label" id="bar-result-count">0 results</span>
+              </div>
+            </div>
+
+            <div class="explorer-toolbar" aria-label="Market explorer controls">
+              <div class="range-presets" aria-label="Quick date ranges">
+                <span>Range</span>
+                <button type="button" class="range-button" data-days="1" aria-pressed="false">1D</button>
+                <button type="button" class="range-button" data-days="5" aria-pressed="false">5D</button>
+                <button type="button" class="range-button active" data-days="7" aria-pressed="true">7D</button>
+                <button type="button" class="range-button" data-days="30" aria-pressed="false">30D</button>
+              </div>
+              <span class="toolbar-hint">Click an asset in Asset pulse to explore it</span>
             </div>
 
             <form class="filter-bar" id="market-filters">
@@ -94,8 +108,30 @@
                   <option value="CERTIFIED">Certified</option>
                 </select>
               </label>
-              <button type="submit">Apply filters</button>
+              <button type="submit" id="apply-filters">
+                <span class="button-label">Apply filters</span>
+                <span class="button-loader" aria-hidden="true"></span>
+              </button>
             </form>
+
+            <div class="market-snapshot" aria-label="Visible range summary">
+              <div>
+                <span>Price change</span>
+                <strong id="range-change">—</strong>
+              </div>
+              <div>
+                <span>Range high</span>
+                <strong id="range-high">—</strong>
+              </div>
+              <div>
+                <span>Range low</span>
+                <strong id="range-low">—</strong>
+              </div>
+              <div>
+                <span>Average volume</span>
+                <strong id="average-volume">—</strong>
+              </div>
+            </div>
 
             <div class="chart-shell" aria-label="Close price chart">
               <div class="chart-caption">
@@ -103,21 +139,38 @@
                   <span id="chart-symbol">—</span>
                   <strong id="chart-last-price">—</strong>
                 </div>
-                <span id="chart-range">—</span>
+                <div class="chart-actions">
+                  <button type="button" class="series-toggle price-toggle" id="toggle-price" aria-pressed="true">
+                    <span aria-hidden="true"></span>Close
+                  </button>
+                  <button type="button" class="series-toggle sma-toggle" id="toggle-sma" aria-pressed="true">
+                    <span aria-hidden="true"></span>SMA 20
+                  </button>
+                  <span id="chart-range">—</span>
+                </div>
               </div>
-              <svg id="price-chart" viewBox="0 0 900 250" role="img" aria-label="Close prices">
+              <svg id="price-chart" viewBox="0 0 900 250" role="img" aria-label="Interactive close-price chart" tabindex="0">
                 <line class="chart-grid" x1="20" x2="880" y1="50" y2="50"></line>
                 <line class="chart-grid" x1="20" x2="880" y1="125" y2="125"></line>
                 <line class="chart-grid" x1="20" x2="880" y1="200" y2="200"></line>
                 <path id="price-area" class="chart-area" d=""></path>
                 <path id="price-line" class="chart-line" d=""></path>
                 <path id="sma-line" class="chart-line chart-sma" d=""></path>
+                <line id="chart-crosshair" class="chart-crosshair" x1="0" x2="0" y1="35" y2="225" hidden></line>
+                <circle id="chart-focus-dot" class="chart-focus-dot" cx="0" cy="0" r="5" hidden></circle>
+                <rect id="chart-hit-area" class="chart-hit-area" x="20" y="35" width="860" height="190"></rect>
               </svg>
+              <div class="chart-tooltip" id="chart-tooltip" hidden>
+                <time id="tooltip-time">—</time>
+                <strong id="tooltip-price">—</strong>
+                <span id="tooltip-sma">SMA —</span>
+                <small id="tooltip-volume">Volume —</small>
+              </div>
               <p class="empty-state" id="chart-empty" hidden>No bars match this range.</p>
             </div>
 
             <div class="table-scroll">
-              <table>
+              <table aria-label="Market bars for the selected asset">
                 <thead>
                   <tr>
                     <th>UTC minute</th>
@@ -146,6 +199,7 @@
                 <h2>Asset pulse</h2>
               </div>
             </div>
+            <p class="panel-description">Select an asset to update every chart and analytical card.</p>
             <div class="pulse-list" id="symbol-freshness"></div>
           </aside>
         </section>
@@ -168,7 +222,9 @@
                 <span class="indicator-window">14 bars</span>
               </div>
               <strong class="indicator-value" id="rsi-value">—</strong>
-              <small id="rsi-time">Loading analytics…</small>
+              <div class="indicator-meter" aria-hidden="true"><span id="rsi-meter"></span></div>
+              <small id="rsi-context">Loading analytics…</small>
+              <time id="rsi-time"></time>
             </article>
             <article class="indicator-card indicator-sma">
               <div class="indicator-card-top">
@@ -176,7 +232,7 @@
                 <span class="indicator-window">20 bars</span>
               </div>
               <strong class="indicator-value" id="sma-value">—</strong>
-              <small><span class="legend-line" aria-hidden="true"></span>Dashed overlay on price</small>
+              <small id="sma-context"><span class="legend-line" aria-hidden="true"></span>Dashed overlay on price</small>
             </article>
             <article class="indicator-card indicator-volatility">
               <div class="indicator-card-top">
@@ -184,7 +240,7 @@
                 <span class="indicator-window">20 bars</span>
               </div>
               <strong class="indicator-value" id="volatility-value">—</strong>
-              <small>Annualized one-minute log returns</small>
+              <small id="volatility-context">Annualized one-minute log returns</small>
             </article>
             <article class="indicator-card indicator-volume">
               <div class="indicator-card-top">
@@ -192,7 +248,7 @@
                 <span class="indicator-window">20 bars</span>
               </div>
               <strong class="indicator-value" id="volume-ratio-value">—</strong>
-              <small>Current volume ÷ prior 20-bar mean</small>
+              <small id="volume-context">Current volume ÷ prior 20-bar mean</small>
             </article>
           </div>
           <div class="signal-heading">
@@ -200,7 +256,15 @@
               <p class="eyebrow">RECENT OBSERVATIONS</p>
               <h3 id="signal-symbol">—</h3>
             </div>
-            <span id="signal-count">0 signals</span>
+            <div class="signal-controls">
+              <div class="signal-filters" aria-label="Filter observations by direction">
+                <button type="button" class="signal-filter active" data-direction="ALL" aria-pressed="true">All</button>
+                <button type="button" class="signal-filter" data-direction="BULLISH" aria-pressed="false">Bullish</button>
+                <button type="button" class="signal-filter" data-direction="BEARISH" aria-pressed="false">Bearish</button>
+                <button type="button" class="signal-filter" data-direction="WATCH" aria-pressed="false">Watch</button>
+              </div>
+              <span id="signal-count">0 signals</span>
+            </div>
           </div>
           <div class="signal-list" id="signal-list" aria-live="polite">
             <div class="analytics-empty analytics-loading">

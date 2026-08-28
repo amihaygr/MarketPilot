@@ -7,10 +7,19 @@ so browser code never receives MariaDB, MinIO, Alpaca, or internal network detai
 The dashboard provides:
 
 - asset and freshness summaries;
-- symbol, date, and certification filters;
-- a one-minute close-price chart and paginated OHLCV table;
+- linked asset, date-range, and certification filters;
+- one-click 1D, 5D, 7D, and 30D exploration presets;
+- an interactive one-minute chart with keyboard/pointer inspection and Close/SMA toggles;
+- visible-range price, high, low, and average-volume context;
+- explainable Indicator cards and client-side Signal direction filters;
+- a paginated OHLCV detail table;
 - recent SEC filing links;
 - explicit `PROVISIONAL` and `CERTIFIED` status labels.
+
+Asset pulse rows are interactive and update the entire analytical workspace. The
+dashboard uses bounded Backend API requests only; all summary values shown in the
+browser are derived from those responses and are descriptive research context, not
+investment advice.
 
 The Nginx response includes a restrictive Content Security Policy and other basic
 browser hardening headers. This local MVP does not implement end-user authentication.
