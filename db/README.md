@@ -25,3 +25,8 @@ resolve symbols, upsert filings, and publish its watermark.
 Phase 7 adds `marketpilot_app` through the idempotent `008_app_grants.sh`
 migration. It can `SELECT` only the four Gold tables required by the serving API
 and has no mutation, grant, object-storage, staging, DQ, or archive privileges.
+
+Phase 8 extends `archive_manifest`, adds `archive_restore_result`, and creates the
+isolated `marketpilot_restore.restore_market_bar_1m` target. The publisher identity
+can register archive and restore evidence but cannot purge Gold history. Full dump
+restore scripts accept only isolated database names matching their strict allowlist.

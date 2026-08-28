@@ -192,6 +192,10 @@ Status: completed and locally verified on 2026-08-26. See
 
 ## Phase 8 - Operations and archive
 
+Status: completed and locally verified on 2026-08-28. See
+`docs/phase8-verification.md` for compaction, archive, backup, restore, monitoring,
+and failure-recovery evidence.
+
 ### Scope
 
 - Weekly Parquet compaction.

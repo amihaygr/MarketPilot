@@ -24,3 +24,11 @@ MariaDB authorization error for an `UPDATE` statement:
 $env:MARKETPILOT_RUN_SERVING_INTEGRATION = "1"
 pytest tests/integration/test_serving_layer.py
 ```
+
+The Phase 8 integration check reads Docker-backed object-storage and database
+boundaries and is opt-in:
+
+```powershell
+$env:MARKETPILOT_RUN_OPERATIONS_INTEGRATION = "1"
+pytest tests/integration/test_archive_operations.py
+```

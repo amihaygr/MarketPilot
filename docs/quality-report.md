@@ -46,6 +46,16 @@
   1142 for a zero-row `UPDATE` probe, proving that API mutation is denied.
 - The Nginx Web App serves a CSP-protected dashboard and proxies relative `/api/`
   requests without embedding database, MinIO, or source credential names.
+- Weekly Silver compaction preserved 1,936 rows, business keys, logical hashes,
+  and schema while backing up the original objects before replacement.
+- The Phase 8 validation archive exported 5,106 Gold rows to 11 Parquet objects,
+  verified every SHA-256 digest, and registered matching MinIO and MariaDB evidence.
+- The sample restore re-verified the full archive and restored 25 rows into an
+  isolated schema with a persisted PASS result.
+- A full compressed MariaDB backup was checksummed, uploaded to MinIO, and restored
+  into an isolated database with matching market-bar and SEC-filing counts.
+- All 18 Compose services, including the Docker-owned operational monitor, reported
+  healthy during the Phase 8 runtime verification.
 
 ## Deliberately deferred
 

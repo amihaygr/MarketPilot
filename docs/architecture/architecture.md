@@ -40,6 +40,7 @@ Docker Compose is the service supervisor for the local environment. Airflow is t
 | `airflow-dag-processor` | Long-running | DAG parsing |
 | `backend-api` | Long-running | Application data API |
 | `web-app` | Long-running | Browser UI |
+| `operational-monitor` | Long-running | Dependency and freshness probes with deduplicated alerts |
 
 ## 4. Network boundaries
 
@@ -196,6 +197,17 @@ The daily DAG checks the exchange calendar and short-circuits on non-trading day
 5. Register `archive_manifest` as verified.
 6. Do not automatically purge MariaDB in the MVP.
 
+The implementation writes immutable, versioned Parquet objects to the dedicated
+`marketpilot-archive` bucket. Every object has a SHA-256 digest; the deterministic
+inventory digest, counts, time bounds, run ID, code version, and closed-period flag
+are stored in both an object-store manifest and `archive_manifest`. Restore drills
+first verify the complete inventory and write only to an isolated restore schema.
+
+Weekly Silver compaction follows the same safety model: measure input rows,
+business keys, logical row hashes, and schema; write staging output; back up the
+original objects; replace; then publish its manifest. A failed replacement restores
+the run-specific backup.
+
 ## 16. API boundary
 
 The Backend API reads Gold tables through a narrowly scoped database identity. It provides pagination, filtering, bounded date ranges, input validation, and safe response models.
@@ -227,6 +239,11 @@ Minimum metrics:
 - Airflow DAG status and duration;
 - MariaDB connection and query latency;
 - object count and small-file growth.
+
+The local `operational-monitor` is supervised by Compose, not Airflow. It performs
+read-only dependency and freshness probes, writes structured JSON logs, and emits
+only state transitions to avoid repeated alerts. A generic webhook is optional and
+disabled by default.
 
 ## 18. Capacity assumptions
 

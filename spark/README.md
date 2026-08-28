@@ -11,6 +11,12 @@ Implemented:
   OHLC, date, schema, and expected-session checks persisted to MariaDB.
 - `jobs/silver_to_gold.py`: least-privilege staging followed by an atomic,
   quality-gated certified partition replacement and publication watermark.
+- `jobs/compact_silver.py`: bounded, recoverable Silver compaction with exact
+  row/key/hash/schema validation and original-object backup.
+- `jobs/archive_market_bars.py`: closed-year Gold export to verified, versioned
+  Parquet plus matching MinIO and MariaDB manifests.
+- `jobs/restore_archive_sample.py`: complete object checksum verification followed
+  by a bounded restore into an isolated schema.
 
 Planned bounded application:
 

@@ -6,7 +6,7 @@ USER spark
 RUN /opt/spark/bin/spark-submit \
     --master local[1] \
     --conf spark.jars.ivy=/tmp/marketpilot-ivy \
-    --packages org.apache.hadoop:hadoop-aws:3.3.4 \
+    --packages org.apache.hadoop:hadoop-aws:3.3.4,org.mariadb.jdbc:mariadb-java-client:3.5.7 \
     /opt/spark/examples/src/main/python/pi.py 1
 USER root
 RUN cp /tmp/marketpilot-ivy/jars/*.jar /opt/spark/jars/

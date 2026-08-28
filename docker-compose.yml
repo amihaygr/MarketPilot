@@ -251,6 +251,34 @@ services:
     depends_on:
       platform-init: {condition: service_completed_successfully}
 
+  operational-monitor:
+    <<: *python-service
+    command: python -m services.operational_monitor.main
+    environment:
+      MINIO_ARCHIVE_BUCKET: ${MINIO_ARCHIVE_BUCKET:-marketpilot-archive}
+      OPERATIONS_CHECK_INTERVAL_SECONDS: ${OPERATIONS_CHECK_INTERVAL_SECONDS:-60}
+      OPERATIONS_MARKET_FRESHNESS_MAX_HOURS: ${OPERATIONS_MARKET_FRESHNESS_MAX_HOURS:-96}
+      OPERATIONS_SEC_FRESHNESS_MAX_HOURS: ${OPERATIONS_SEC_FRESHNESS_MAX_HOURS:-336}
+      OPERATIONS_ALERT_WEBHOOK_URL: ${OPERATIONS_ALERT_WEBHOOK_URL:-}
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import os,time;
+          path='/tmp/operational-monitor-ready';
+          assert os.path.exists(path) and time.time()-os.path.getmtime(path)<180
+      interval: 30s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+    restart: unless-stopped
+    depends_on:
+      platform-init: {condition: service_completed_successfully}
+      backend-api: {condition: service_healthy}
+    networks: [data-plane, serving-plane]
+
   sec-adapter:
     <<: *python-service
     profiles: [jobs]

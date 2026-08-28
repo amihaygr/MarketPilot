@@ -241,13 +241,31 @@ for OpenAPI. The Web App uses only relative `/api/` requests. The API enforces
 parameterized filters, a maximum 31-day market range, bounded pagination and safe
 response models that omit internal object-storage and lineage details.
 
+## Phase 8 operations and archive
+
+Phase 8 adds safe, bounded operational workflows without changing the lifecycle
+boundary:
+
+```text
+Airflow -> Spark compaction/archive -> MinIO archive + MariaDB manifest
+Compose -> operational-monitor -> read-only health and freshness probes
+Operator -> backup/restore scripts -> isolated recovery database
+```
+
+`weekly_compaction` and `annual_archive` are paused by default. The annual job
+accepts only a closed year in production. Archives are verified by row count,
+time bounds, schema and checksums; sample restores and full database drills never
+target the live schema. Follow `docs/runbooks/archive-and-recovery.md` before an
+operator-triggered run.
+
 ## Delivery maturity
 
 This repository is an incremental implementation, not a finished trading product.
 The raw, streaming, batch Medallion, Airflow orchestration, external-source and
-serving boundaries are concrete and locally verified, including Alpaca IEX, SEC
-EDGAR, the read-only API identity and browser-to-API proxy. End-user authentication
-and archive operations remain milestones tracked in `docs/implementation-plan.md`.
+serving, archive and recovery boundaries are concrete and locally verified,
+including Alpaca IEX, SEC EDGAR, the read-only API identity, browser-to-API proxy,
+verified Parquet archive and isolated restore. End-user authentication remains
+outside the local MVP.
 
 ## Non-goals
 
