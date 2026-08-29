@@ -32,5 +32,6 @@ contact identity and the review steps in `docs/runbooks/external-source-activati
 ## Phase 7 serving service
 
 `backend_api` provides bounded symbol, market-bar, SEC-filing, freshness, and
-health reads. Docker Compose owns its lifecycle. It receives only the MariaDB
-application identity and never receives infrastructure or source credentials.
+historical-backtest reads, plus health reads. Docker Compose owns its lifecycle.
+It receives only the MariaDB application identity and never receives infrastructure
+or source credentials.

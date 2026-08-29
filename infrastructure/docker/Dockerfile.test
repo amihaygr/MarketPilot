@@ -1,0 +1,16 @@
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+WORKDIR /opt/marketpilot
+COPY pyproject.toml README.md ./
+COPY src ./src
+COPY services ./services
+COPY tests ./tests
+COPY airflow/dags ./airflow/dags
+COPY spark/jobs ./spark/jobs
+COPY scripts ./scripts
+COPY web ./web
+COPY infrastructure/docker/Dockerfile.web ./infrastructure/docker/Dockerfile.web
+RUN pip install --no-cache-dir '.[dev]'
+
+CMD ["python", "-m", "pytest", "-q"]

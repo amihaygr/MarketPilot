@@ -6,7 +6,7 @@ import json
 import logging
 from datetime import UTC, date, datetime
 from time import perf_counter
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pymysql
 from fastapi import FastAPI, HTTPException, Query, Request
@@ -16,6 +16,9 @@ from fastapi.responses import JSONResponse
 from marketpilot.serving.repository import MariaDbReadRepository, ReadRepository
 from marketpilot.serving.schemas import (
     ApiIndexResponse,
+    BacktestEquityResponse,
+    BacktestRunDetail,
+    BacktestRunPage,
     FreshnessResponse,
     HealthResponse,
     IndicatorPage,
@@ -254,6 +257,49 @@ def create_app(
                 page_size=page_size,
             )
         )
+
+    @app.get("/api/v1/backtests", response_model=BacktestRunPage, tags=["backtesting"])
+    def backtest_runs(
+        page: int = Query(default=1, ge=1, le=MAX_PAGE),
+        page_size: int = Query(default=20, ge=1, le=100),
+    ) -> BacktestRunPage:
+        return BacktestRunPage.model_validate(
+            resolved_repository.list_backtest_runs(page=page, page_size=page_size)
+        )
+
+    @app.get(
+        "/api/v1/backtests/{run_id}",
+        response_model=BacktestRunDetail,
+        tags=["backtesting"],
+    )
+    def backtest_detail(run_id: str) -> BacktestRunDetail:
+        try:
+            normalized_run_id = str(UUID(run_id))
+        except ValueError as error:
+            raise HTTPException(status_code=422, detail="run_id must be a UUID") from error
+        result = resolved_repository.get_backtest_run(run_id=normalized_run_id)
+        if result is None:
+            raise HTTPException(status_code=404, detail="backtest run not found")
+        return BacktestRunDetail.model_validate(result)
+
+    @app.get(
+        "/api/v1/backtests/{run_id}/equity",
+        response_model=BacktestEquityResponse,
+        tags=["backtesting"],
+    )
+    def backtest_equity(
+        run_id: str,
+        symbol: str = Query(pattern=r"^[A-Z][A-Z0-9.-]{0,15}$"),
+    ) -> BacktestEquityResponse:
+        try:
+            normalized_run_id = str(UUID(run_id))
+        except ValueError as error:
+            raise HTTPException(status_code=422, detail="run_id must be a UUID") from error
+        items = resolved_repository.list_backtest_equity(
+            run_id=normalized_run_id,
+            symbol=symbol,
+        )
+        return BacktestEquityResponse(items=items, total=len(items))
 
     @app.get("/api/v1/freshness", response_model=FreshnessResponse, tags=["service"])
     def freshness() -> FreshnessResponse:

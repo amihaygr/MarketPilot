@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="MarketPilot historical backtesting explorer" />
+    <title>MarketPilot | Backtesting Lab</title>
+    <link rel="stylesheet" href="/styles.css?v=phase11-1" />
+    <link rel="stylesheet" href="/backtesting.css?v=phase11-1" />
+    <script src="/backtesting.js?v=phase11-1" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="MarketPilot dashboard">
+          <span class="brand-mark" aria-hidden="true">MP</span>
+          <span><strong>MarketPilot</strong><small>Backtesting lab</small></span>
+        </a>
+        <div class="topbar-actions">
+          <a class="story-link" href="/">Command center</a>
+          <a class="story-link" href="/showcase.html">Project story</a>
+          <div class="system-state" id="backtest-state">
+            <span class="state-dot" aria-hidden="true"></span>
+            <span id="backtest-state-label">Connecting</span>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero backtest-hero" aria-labelledby="page-title">
+          <div>
+            <p class="eyebrow">HISTORICAL STRATEGY EVALUATION · V1</p>
+            <h1 id="page-title">Test the process, not a promise.</h1>
+            <p class="hero-copy">
+              Reproducible long-or-cash SMA crossover results over certified one-minute data.
+            </p>
+          </div>
+          <span class="research-badge">Historical simulation · not financial advice</span>
+        </section>
+
+        <section class="panel run-context" aria-labelledby="run-context-title">
+          <div class="panel-heading compact">
+            <div><p class="eyebrow">RUN CONTEXT</p><h2 id="run-context-title">Choose a published run</h2></div>
+            <span class="count-label" id="run-count">0 runs</span>
+          </div>
+          <div class="run-controls">
+            <label><span>Backtest run</span><select id="run-select" aria-describedby="run-help"></select></label>
+            <label><span>Asset</span><select id="backtest-symbol"></select></label>
+            <p id="run-help">Runs are created by the bounded Airflow historical_backtest DAG.</p>
+          </div>
+          <dl class="assumption-strip" id="assumption-strip">
+            <div><dt>Strategy</dt><dd id="strategy-name">—</dd></div>
+            <div><dt>Window</dt><dd id="strategy-window">—</dd></div>
+            <div><dt>Period</dt><dd id="strategy-period">—</dd></div>
+            <div><dt>Costs</dt><dd id="strategy-costs">—</dd></div>
+            <div><dt>Benchmark</dt><dd id="strategy-benchmark">—</dd></div>
+          </dl>
+        </section>
+
+        <p class="backtest-message" id="backtest-message" role="status">Loading published runs…</p>
+
+        <div id="backtest-content" hidden>
+          <section class="metric-grid backtest-metrics" aria-label="Selected backtest metrics">
+            <article class="metric-card"><span class="metric-label">Strategy return</span><strong class="metric-value" id="metric-return">—</strong><small>Net of configured costs</small></article>
+            <article class="metric-card"><span class="metric-label">Versus benchmark</span><strong class="metric-value" id="metric-excess">—</strong><small id="metric-benchmark">Benchmark —</small></article>
+            <article class="metric-card"><span class="metric-label">Maximum drawdown</span><strong class="metric-value" id="metric-drawdown">—</strong><small>Largest peak-to-trough decline</small></article>
+            <article class="metric-card"><span class="metric-label">Risk-adjusted return</span><strong class="metric-value" id="metric-sharpe">—</strong><small id="metric-volatility">Annualized volatility —</small></article>
+          </section>
+
+          <section class="backtest-grid">
+            <article class="panel chart-panel">
+              <div class="panel-heading compact"><div><p class="eyebrow">EQUITY CURVE</p><h2>Strategy vs benchmark</h2></div><span class="count-label" id="equity-count">0 sessions</span></div>
+              <div class="chart-legend" aria-label="Chart legend"><span class="legend-strategy">Strategy</span><span class="legend-benchmark">Benchmark</span></div>
+              <svg id="equity-chart" class="backtest-chart" viewBox="0 0 900 300" role="img" aria-label="Strategy and benchmark equity curves" tabindex="0">
+                <line class="chart-grid" x1="40" x2="880" y1="60" y2="60"></line>
+                <line class="chart-grid" x1="40" x2="880" y1="150" y2="150"></line>
+                <line class="chart-grid" x1="40" x2="880" y1="240" y2="240"></line>
+                <path id="benchmark-line" class="backtest-line benchmark-line" d=""></path>
+                <path id="strategy-line" class="backtest-line strategy-line" d=""></path>
+                <circle id="benchmark-point" class="benchmark-point" cx="0" cy="0" r="5" hidden></circle>
+                <circle id="strategy-point" class="strategy-point" cx="0" cy="0" r="5" hidden></circle>
+              </svg>
+              <div class="chart-axis"><span id="chart-start">—</span><span id="chart-end">—</span></div>
+            </article>
+
+            <aside class="panel methodology-panel">
+              <div class="panel-heading compact"><div><p class="eyebrow">BIAS CONTROLS</p><h2>How to read this result</h2></div></div>
+              <ol class="method-list">
+                <li><strong>Certified input only.</strong><span>Provisional market bars fail the run.</span></li>
+                <li><strong>Next-bar application.</strong><span>A close signal cannot earn that same bar's return.</span></li>
+                <li><strong>Explicit friction.</strong><span>Transaction cost and slippage reduce net return.</span></li>
+                <li><strong>Reproducible lineage.</strong><span>Run, strategy, schema, code and data versions are retained.</span></li>
+              </ol>
+              <p class="limitation-note">Limitations: fixed-universe survivorship bias, no dividends, splits, taxes, market impact or order-book liquidity.</p>
+            </aside>
+          </section>
+
+          <section class="panel results-panel" aria-labelledby="results-title">
+            <div class="panel-heading compact"><div><p class="eyebrow">CROSS-ASSET COMPARISON</p><h2 id="results-title">Run results</h2></div></div>
+            <div class="table-scroll"><table><thead><tr><th>Symbol</th><th>Net return</th><th>Benchmark</th><th>Excess</th><th>Max drawdown</th><th>Volatility</th><th>Sharpe</th><th>Trades</th><th>Bars</th></tr></thead><tbody id="backtest-results"></tbody></table></div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

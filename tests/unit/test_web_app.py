@@ -78,3 +78,22 @@ def test_presenter_console_packages_timed_routes_without_a_data_plane_connection
         15: 15 * 60,
         20: 20 * 60,
     }
+
+
+def test_phase11_backtesting_experience_uses_only_bounded_backend_endpoints() -> None:
+    dashboard = (PROJECT_ROOT / "web" / "index.html").read_text(encoding="utf-8")
+    page = (PROJECT_ROOT / "web" / "backtesting.html").read_text(encoding="utf-8")
+    script = (PROJECT_ROOT / "web" / "backtesting.js").read_text(encoding="utf-8")
+    dockerfile = (PROJECT_ROOT / "infrastructure" / "docker" / "Dockerfile.web").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'href="/backtesting.html"' in dashboard
+    assert "backtesting.css?v=phase11-1" in page
+    assert "backtesting.js?v=phase11-1" in page
+    assert 'const API = "/api/v1"' in script
+    assert "/backtests" in script
+    assert "MinIO" not in script
+    assert ".innerHTML" not in script
+    assert "replaceChildren" in script
+    assert "COPY web/backtesting.html" in dockerfile

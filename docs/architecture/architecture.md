@@ -130,6 +130,8 @@ Initial MariaDB tables:
 | `fact_signal` | symbol, signal timestamp, model version | Application signal |
 | `fact_sec_filing` | accession number | Filing metadata and Bronze URI |
 | `fact_backtest_result` | run, symbol, horizon | Backtest results |
+| `fact_backtest_run` | run ID | Immutable strategy parameters and publication state |
+| `fact_backtest_equity_daily` | run, symbol, trading date | Bounded application equity curve |
 | `etl_watermark` | pipeline and partition | Progress and publication state |
 | `data_quality_result` | run, check, partition | Quality results |
 | `archive_manifest` | dataset, year, version | Archive verification metadata |
@@ -142,6 +144,12 @@ Gold lookback, calculates native Spark window metrics, validates the result, and
 atomically replaces only the requested UTC date in the two Gold analytics tables.
 The daily certified DAG invokes it after `silver_to_gold_certified`. Each row
 retains schema/model, run, code, data, and certification lineage.
+
+Phase 11 adds bounded historical strategy evaluation. Certified Gold bars feed a
+Spark Batch backtest whose signal from bar `t` is applied only to the following
+bar return. Full-resolution results are versioned Parquet in MinIO; MariaDB stores
+run metadata, summary metrics, and a bounded daily equity curve for the API. SPY
+is a comparison benchmark and no component performs trade execution.
 
 ## 11. Streaming application
 
@@ -183,6 +191,7 @@ Airflow submits Spark Batch work to `spark-master` through `SparkSubmitOperator`
 | `weekly_compaction_dag` | Saturday 06:00 America/New_York | Discover small files, compact, validate, manifest |
 | `annual_archive_dag` | January 10 at 02:00 America/New_York | Export previous year, verify, register manifest |
 | `backfill_replay_dag` | Manual with validated parameters | Replay selected date range and symbols |
+| `historical_backtest_dag` | Manual with validated parameters | Validate scope, submit Spark backtest, quality gate, publish |
 
 The daily DAG checks the exchange calendar and short-circuits on non-trading days. A future custom timetable may replace simple cron scheduling.
 

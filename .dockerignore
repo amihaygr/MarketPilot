@@ -7,9 +7,17 @@ __pycache__
 .pytest_cache
 .ruff_cache
 airflow
+!airflow
+!airflow/dags
+!airflow/dags/**
 api
 docs
 spark
+!spark
+!spark/jobs
+!spark/jobs/**
 tests
+!tests
+!tests/**
 *.pdf
 *.zip

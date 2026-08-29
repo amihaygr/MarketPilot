@@ -64,6 +64,12 @@ class ReadRepository(Protocol):
         page_size: int,
     ) -> Row: ...
 
+    def list_backtest_runs(self, *, page: int, page_size: int) -> Row: ...
+
+    def get_backtest_run(self, *, run_id: str) -> Row | None: ...
+
+    def list_backtest_equity(self, *, run_id: str, symbol: str) -> list[Row]: ...
+
     def freshness(self, *, code_version: str, generated_at_utc: datetime) -> Row: ...
 
 
@@ -306,6 +312,74 @@ class MariaDbReadRepository:
         """
         return self._page(count_sql, item_sql, parameters, page, page_size)
 
+    def list_backtest_runs(self, *, page: int, page_size: int) -> Row:
+        result = self._page(
+            "SELECT COUNT(*) AS total FROM fact_backtest_run",
+            """
+            SELECT run_id, strategy_code, strategy_version, start_date, end_date,
+                   symbols_csv, benchmark_symbol, short_window, long_window,
+                   initial_capital, transaction_cost_bps, slippage_bps, status,
+                   schema_version, started_at_utc, completed_at_utc
+            FROM fact_backtest_run
+            ORDER BY started_at_utc DESC, run_id DESC
+            LIMIT %s OFFSET %s
+            """,
+            [],
+            page,
+            page_size,
+        )
+        result["items"] = [_public_backtest_run(row) for row in result["items"]]
+        return result
+
+    def get_backtest_run(self, *, run_id: str) -> Row | None:
+        rows = self._fetch_all(
+            """
+            SELECT run_id, strategy_code, strategy_version, start_date, end_date,
+                   symbols_csv, benchmark_symbol, short_window, long_window,
+                   initial_capital, transaction_cost_bps, slippage_bps, status,
+                   schema_version, started_at_utc, completed_at_utc
+            FROM fact_backtest_run WHERE run_id=%s
+            """,
+            (run_id,),
+        )
+        if not rows:
+            return None
+        results = self._fetch_all(
+            """
+            SELECT symbols.symbol, results.first_event_time_utc,
+                   results.last_event_time_utc, results.observation_count,
+                   results.trade_count, results.total_return_pct,
+                   results.benchmark_return_pct, results.excess_return_pct,
+                   results.max_drawdown_pct, results.annualized_volatility_pct,
+                   results.sharpe_ratio
+            FROM fact_backtest_result AS results
+            JOIN dim_symbol AS symbols ON symbols.symbol_id=results.symbol_id
+            WHERE results.run_id=%s
+            ORDER BY symbols.symbol
+            """,
+            (run_id,),
+        )
+        return {
+            "run": _public_backtest_run(_normalize_datetimes(rows[0])),
+            "results": [_normalize_datetimes(row) for row in results],
+        }
+
+    def list_backtest_equity(self, *, run_id: str, symbol: str) -> list[Row]:
+        rows = self._fetch_all(
+            """
+            SELECT symbols.symbol, equity.trading_date, equity.event_time_utc,
+                   equity.equity, equity.benchmark_equity, equity.drawdown_pct,
+                   equity.applied_position
+            FROM fact_backtest_equity_daily AS equity
+            JOIN dim_symbol AS symbols ON symbols.symbol_id=equity.symbol_id
+            WHERE equity.run_id=%s AND symbols.symbol=%s
+            ORDER BY equity.trading_date
+            LIMIT 367
+            """,
+            (run_id, symbol),
+        )
+        return [_normalize_datetimes(row) for row in rows]
+
     def freshness(self, *, code_version: str, generated_at_utc: datetime) -> Row:
         connection = self._connect()
         try:
@@ -432,3 +506,9 @@ def _normalize_datetimes(row: Row) -> Row:
                 value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
             )
     return normalized
+
+
+def _public_backtest_run(row: Row) -> Row:
+    public = dict(row)
+    public["symbols"] = [value for value in str(public.pop("symbols_csv")).split(",") if value]
+    return public

@@ -108,6 +108,64 @@ class SignalPage(ApiModel):
     pagination: PageMetadata
 
 
+class BacktestRunRead(ApiModel):
+    run_id: str
+    strategy_code: Literal["SMA_CROSS_LONG_CASH"]
+    strategy_version: int = Field(ge=1)
+    start_date: date
+    end_date: date
+    symbols: list[str]
+    benchmark_symbol: str
+    short_window: int = Field(ge=2)
+    long_window: int = Field(ge=3)
+    initial_capital: Decimal = Field(gt=0)
+    transaction_cost_bps: Decimal = Field(ge=0)
+    slippage_bps: Decimal = Field(ge=0)
+    status: Literal["RUNNING", "PUBLISHED", "FAILED"]
+    schema_version: int = Field(ge=1)
+    started_at_utc: datetime
+    completed_at_utc: datetime | None
+
+
+class BacktestRunPage(ApiModel):
+    items: list[BacktestRunRead]
+    pagination: PageMetadata
+
+
+class BacktestResultRead(ApiModel):
+    symbol: str
+    first_event_time_utc: datetime
+    last_event_time_utc: datetime
+    observation_count: int = Field(gt=0)
+    trade_count: int = Field(ge=0)
+    total_return_pct: Decimal
+    benchmark_return_pct: Decimal
+    excess_return_pct: Decimal
+    max_drawdown_pct: Decimal = Field(le=0)
+    annualized_volatility_pct: Decimal = Field(ge=0)
+    sharpe_ratio: Decimal | None
+
+
+class BacktestRunDetail(ApiModel):
+    run: BacktestRunRead
+    results: list[BacktestResultRead]
+
+
+class BacktestEquityRead(ApiModel):
+    symbol: str
+    trading_date: date
+    event_time_utc: datetime
+    equity: Decimal = Field(gt=0)
+    benchmark_equity: Decimal = Field(gt=0)
+    drawdown_pct: Decimal = Field(le=0)
+    applied_position: Literal[0, 1]
+
+
+class BacktestEquityResponse(ApiModel):
+    items: list[BacktestEquityRead]
+    total: int = Field(ge=0)
+
+
 class SecFilingRead(ApiModel):
     accession_number: str
     symbol: str

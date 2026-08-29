@@ -35,3 +35,8 @@ state. The canonical timing and expanded learning materials live under
 
 The Nginx response includes a restrictive Content Security Policy and other basic
 browser hardening headers. This local MVP does not implement end-user authentication.
+
+`backtesting.html` is the Phase 11 historical research view. It uses only the
+read-only `/api/v1/backtests` endpoints and provides run, symbol, assumption, KPI,
+equity-curve, result-table, methodology, and limitation views. The page does not
+execute a strategy in the browser and does not read MinIO directly.

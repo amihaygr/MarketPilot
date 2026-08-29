@@ -19,6 +19,8 @@ With the local stack running, open:
   20-minute routes with speaker cues, transitions and safe fallbacks.
 - **Interactive Dashboard:** <http://localhost:3000/> — Gold market data, freshness,
   indicators and explained observations.
+- **Backtesting Lab:** <http://localhost:3000/backtesting.html> — bounded historical
+  strategy runs, assumptions, benchmark comparison and daily equity curves.
 - **Final Demo Guide:** [`docs/demo-guide.md`](docs/demo-guide.md) — the canonical
   15-minute presentation path, with 10 and 20-minute variants.
 - **Presenter learning aids:** [`docs/presentation/`](docs/presentation/) — architecture
@@ -200,6 +202,7 @@ internal Docker networks and are not published directly to the host.
 | Spark Master | <http://localhost:18080> | Inspect cluster workers and submitted applications |
 | Spark Worker | <http://localhost:18081> | Inspect worker resources and executors |
 | MarketPilot Web App | <http://localhost:3000> | Explore Gold bars, freshness, certification and SEC filings |
+| MarketPilot Backtesting Lab | <http://localhost:3000/backtesting.html> | Inspect historical runs, assumptions, benchmark results and equity curves |
 | MarketPilot Project Story | <http://localhost:3000/showcase.html> | Present architecture, evidence and the end-to-end engineering journey |
 | MarketPilot Presenter Console | <http://localhost:3000/presenter.html> | Run a timed demo with speaker notes, navigation and fallbacks |
 | Backend API docs | <http://localhost:8000/docs> | Inspect and exercise bounded read-only REST endpoints |
@@ -302,6 +305,27 @@ the Web App. The 15-minute route is the canonical timing source; the guide inclu
 10 and 20-minute variants, extensive learning aids, and safe failure fallbacks. It
 avoids displaying credentials and distinguishes current runtime state from recorded
 verification evidence.
+
+## Phase 11 historical backtesting
+
+Phase 11 adds a reproducible research path without changing the live-data paths:
+
+```text
+Airflow -> Spark Batch -> MariaDB Gold CERTIFIED bars
+                         |-> MinIO detailed Parquet + manifest
+                         \-> MariaDB run summaries + daily equity -> API -> Backtesting Lab
+```
+
+The manual `historical_backtest` DAG validates a bounded date and symbol scope and
+submits the versioned `SMA_CROSS_LONG_CASH` strategy through
+`SparkSubmitOperator`. A signal calculated at minute `t` can affect only the next
+bar, and transaction cost plus slippage assumptions are explicit. Publication is
+transactional and idempotent by run ID. The browser reads bounded summaries through
+the Backend API; it never connects to MinIO or MariaDB directly.
+
+Open <http://localhost:3000/backtesting.html> to inspect the verified local run.
+See [`docs/phase11-verification.md`](docs/phase11-verification.md) for the evidence
+and [`ADR-005`](docs/decisions/ADR-005-historical-backtesting.md) for the design.
 
 ## Delivery maturity
 

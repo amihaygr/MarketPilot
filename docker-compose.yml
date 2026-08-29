@@ -33,10 +33,21 @@ x-airflow-common: &airflow-common
   volumes:
     - ./airflow/dags:/opt/airflow/dags:ro
     - ./spark:/opt/marketpilot/spark:ro
+    - ./src:/opt/marketpilot/src:ro
     - airflow-auth:/opt/airflow/auth
     - airflow-logs:/opt/airflow/logs
 
 services:
+  test-runner:
+    profiles: [tools]
+    image: marketpilot-test:0.1.0
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.test
+    command: python -m pytest -q
+    network_mode: none
+    restart: "no"
+
   kafka:
     image: apache/kafka:3.9.0
     environment:
@@ -295,6 +306,8 @@ services:
       context: .
       dockerfile: infrastructure/docker/Dockerfile.python
     command: python -m services.platform_init.main
+    environment:
+      MINIO_ANALYTICS_BUCKET: ${MINIO_ANALYTICS_BUCKET:-marketpilot-analytics}
     restart: "no"
     depends_on:
       kafka: {condition: service_healthy}

@@ -41,6 +41,7 @@ def ensure_buckets() -> None:
         os.environ["MINIO_SILVER_BUCKET"],
         os.environ["MINIO_CHECKPOINT_BUCKET"],
         os.environ.get("MINIO_ARCHIVE_BUCKET", "marketpilot-archive"),
+        os.environ.get("MINIO_ANALYTICS_BUCKET", "marketpilot-analytics"),
     ):
         try:
             s3.head_bucket(Bucket=bucket)

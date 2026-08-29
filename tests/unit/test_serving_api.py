@@ -107,6 +107,70 @@ class FakeReadRepository:
             "pagination": {"page": 1, "page_size": 25, "total": 1, "total_pages": 1},
         }
 
+    def list_backtest_runs(self, **_parameters: Any) -> dict[str, Any]:
+        return {
+            "items": [self._backtest_run()],
+            "pagination": {"page": 1, "page_size": 20, "total": 1, "total_pages": 1},
+        }
+
+    def get_backtest_run(self, *, run_id: str) -> dict[str, Any] | None:
+        if run_id != "11111111-1111-4111-8111-111111111111":
+            return None
+        return {
+            "run": self._backtest_run(),
+            "results": [
+                {
+                    "symbol": "AAPL",
+                    "first_event_time_utc": datetime(2026, 8, 21, 14, 30, tzinfo=UTC),
+                    "last_event_time_utc": datetime(2026, 8, 24, 20, 0, tzinfo=UTC),
+                    "observation_count": 500,
+                    "trade_count": 4,
+                    "total_return_pct": "2.5",
+                    "benchmark_return_pct": "1.5",
+                    "excess_return_pct": "1.0",
+                    "max_drawdown_pct": "-0.8",
+                    "annualized_volatility_pct": "12.4",
+                    "sharpe_ratio": "1.2",
+                }
+            ],
+        }
+
+    def list_backtest_equity(self, *, run_id: str, symbol: str) -> list[dict[str, Any]]:
+        assert run_id == "11111111-1111-4111-8111-111111111111"
+        assert symbol == "AAPL"
+        return [
+            {
+                "symbol": "AAPL",
+                "trading_date": date(2026, 8, 24),
+                "event_time_utc": datetime(2026, 8, 24, 20, 0, tzinfo=UTC),
+                "equity": "10250",
+                "benchmark_equity": "10150",
+                "drawdown_pct": "-0.2",
+                "applied_position": 1,
+            }
+        ]
+
+    @staticmethod
+    def _backtest_run() -> dict[str, Any]:
+        return {
+            "run_id": "11111111-1111-4111-8111-111111111111",
+            "strategy_code": "SMA_CROSS_LONG_CASH",
+            "strategy_version": 1,
+            "start_date": date(2026, 8, 21),
+            "end_date": date(2026, 8, 24),
+            "symbols": ["AAPL"],
+            "benchmark_symbol": "SPY",
+            "short_window": 20,
+            "long_window": 50,
+            "initial_capital": "10000",
+            "transaction_cost_bps": "1",
+            "slippage_bps": "1",
+            "status": "PUBLISHED",
+            "schema_version": 1,
+            "started_at_utc": datetime(2026, 8, 25, 1, 0, tzinfo=UTC),
+            "completed_at_utc": datetime(2026, 8, 25, 1, 1, tzinfo=UTC),
+        }
+
     def freshness(self, *, code_version: str, generated_at_utc: datetime) -> dict[str, Any]:
         return {
             "generated_at_utc": generated_at_utc,
@@ -228,3 +292,25 @@ def test_analytics_endpoints_are_bounded_versioned_and_read_only() -> None:
     assert client.post("/api/v1/signals").status_code == 405
     invalid = dict(parameters, indicator_code="DROP_TABLE")
     assert client.get("/api/v1/indicators", params=invalid).status_code == 422
+
+
+def test_backtest_endpoints_are_read_only_bounded_and_hide_internal_storage() -> None:
+    client = TestClient(create_app(settings(), FakeReadRepository()))
+    run_id = "11111111-1111-4111-8111-111111111111"
+    runs = client.get("/api/v1/backtests")
+    detail = client.get(f"/api/v1/backtests/{run_id}")
+    equity = client.get(f"/api/v1/backtests/{run_id}/equity", params={"symbol": "AAPL"})
+
+    assert runs.status_code == 200
+    assert detail.status_code == 200
+    assert detail.json()["results"][0]["benchmark_return_pct"] == "1.5"
+    assert "detailed_output_uri" not in detail.text
+    assert equity.status_code == 200
+    assert equity.json()["total"] == 1
+    assert client.get("/api/v1/backtests/not-a-uuid").status_code == 422
+    invalid_symbol = client.get(
+        f"/api/v1/backtests/{run_id}/equity",
+        params={"symbol": "bad symbol"},
+    )
+    assert invalid_symbol.status_code == 422
+    assert client.post("/api/v1/backtests").status_code == 405

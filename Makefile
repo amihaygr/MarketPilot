@@ -13,11 +13,10 @@ repository-check:
 	python scripts/validate_repository.py
 
 test:
-	python -m pytest -q
+	docker compose --profile tools run --rm --build test-runner
 
 lint:
-	python -m ruff check .
-	python -m ruff format --check .
+	docker compose --profile tools run --rm --build test-runner sh -c "ruff check . && ruff format --check ."
 
 format:
 	python -m ruff format .

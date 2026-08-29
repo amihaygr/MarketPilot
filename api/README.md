@@ -14,6 +14,9 @@ documentation at <http://localhost:8000/docs>.
 | `GET` | `/api/v1/market-bars` | Filtered, bounded and paginated one-minute OHLCV |
 | `GET` | `/api/v1/sec-filings` | Filtered and paginated SEC filing metadata |
 | `GET` | `/api/v1/freshness` | Market, SEC, per-symbol and pipeline freshness |
+| `GET` | `/api/v1/backtests` | Bounded, paginated historical backtest runs |
+| `GET` | `/api/v1/backtests/{run_id}` | Run assumptions and per-symbol summary results |
+| `GET` | `/api/v1/backtests/{run_id}/equity` | Bounded daily strategy and benchmark equity |
 
 Market bars require `symbol`, default to a seven-day UTC window, and reject
 ranges longer than 31 days. Filing queries default to one year. Both collections
@@ -28,3 +31,8 @@ credentials.
 Response models intentionally omit internal Bronze URIs, Kafka positions, pipeline
 run IDs, and database identifiers. SEC source URLs remain available for direct
 links to the public filing source.
+
+Backtest responses expose the assumptions needed to interpret a result, but not
+the internal MinIO URI or detailed lineage inventory. The browser retrieves only
+bounded daily-equity points; full-resolution Parquet remains an analytical artifact
+in object storage.

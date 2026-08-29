@@ -16,6 +16,10 @@ database, Scheduler, API Server and DAG Processor. The UI is exposed locally at
 - `sec_polling`: every 15 minutes on weekdays within the configured
   06:00-22:00 `America/New_York` window. A gate skips the bounded poll while
   `SEC_POLL_ENABLED=false`; `force=true` exists only for reviewed manual runs.
+- `historical_backtest`: manual only. It validates a bounded certified-data scope,
+  creates a stable run identity, and submits the versioned historical backtest to
+  Spark. Full curves are stored as Parquet in MinIO while bounded summaries and
+  daily equity points are published transactionally to MariaDB Gold.
 
 `spark_batch_pool` and `sec_api_pool` each have one slot. All mutating DAGs use
 `max_active_runs=1`; SEC polling also uses `catchup=False`. This serializes local

@@ -265,6 +265,59 @@ for release evidence and the remaining manual visual-review note.
 - The Project Story is responsive, keyboard accessible and contains no credentials.
 - All final release gates pass and the delivery has a Git checkpoint.
 
+## Phase 11 - Historical backtesting
+
+Status: implemented and locally verified on 2026-08-29. See ADR-005 and
+`docs/phase11-verification.md`. Final visual acceptance remains manual because the
+local browser connector rejected its Trusted Path before navigation.
+
+### Scope
+
+- Versioned, long-or-cash SMA crossover strategy.
+- Parameterized Spark Batch backtest over certified one-minute Gold bars.
+- Next-bar position application, transaction costs, slippage, and SPY comparison.
+- Full-resolution Parquet output in MinIO and bounded Gold read models in MariaDB.
+- Blocking quality checks, idempotent publication, and complete run lineage.
+- Manual Airflow DAG submitted through `SparkSubmitOperator`.
+- Read-only Backend API and interactive Backtesting dashboard.
+
+### Acceptance criteria
+
+- Repeating the same run ID and parameters does not create duplicate business rows.
+- No bar can influence a position applied to that same bar's return.
+- Runs with non-certified, missing, duplicated, or invalid OHLC input are rejected.
+- Costs and slippage are explicit and included in net performance.
+- Summary metrics and the daily equity curve reconcile with detailed Parquet output.
+- The browser reads results only through the Backend API.
+- Every run carries strategy, schema, run, code, and data lineage.
+- Unit, integration, lint, formatting, Compose, restart, and visual checks pass.
+
+### Checkpoints
+
+1. `add versioned historical backtesting engine`
+2. `add backtest orchestration and serving`
+3. `add interactive backtesting experience`
+
+## Phase 12 - Optional local observability
+
+Status: proposed on 2026-08-29. Implementation is gated by ADR-006 and a local
+resource measurement after Phase 11.
+
+### Candidate scope
+
+- Optional `observability` Compose profile.
+- Elasticsearch for retained operational logs.
+- Kibana for searchable run, event, service, and correlation context.
+- Defined retention, security, healthchecks, and memory limits.
+- No dependency from core MarketPilot services to the observability profile.
+
+### Go/no-go criteria
+
+- The core stack remains healthy with the profile disabled.
+- The host has sufficient measured memory and CPU headroom.
+- Log collection does not weaken Docker or Airflow security boundaries.
+- A bounded retention policy prevents uncontrolled local disk growth.
+
 ## Required checkpoints
 
 Recommended Git checkpoints:
@@ -280,3 +333,6 @@ Recommended Git checkpoints:
 9. `add archive and operations`
 10. `add explainable market analytics`
 11. `add final showcase and delivery package`
+12. `add versioned historical backtesting engine`
+13. `add backtest orchestration and serving`
+14. `add interactive backtesting experience`

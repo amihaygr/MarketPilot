@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 
+from marketpilot.orchestration.backtest_scope import prepare_backtest_arguments
 from marketpilot.orchestration.batch_scope import (
     configured_market_symbols,
     prepare_backfill_arguments,
@@ -69,6 +70,30 @@ def test_configured_symbols_are_normalized_and_non_empty() -> None:
     assert configured_market_symbols(" spy,AAPL,spy ") == ("AAPL", "SPY")
     with pytest.raises(ValueError, match="at least one symbol"):
         configured_market_symbols(" , ")
+
+
+def test_backtest_arguments_are_bounded_validated_and_retry_stable() -> None:
+    values = {
+        "start_date_value": "2026-08-21",
+        "end_date_value": "2026-08-24",
+        "requested_symbols": ["AAPL", "SPY"],
+        "benchmark_symbol": "SPY",
+        "short_window": 20,
+        "long_window": 50,
+        "initial_capital": "10000",
+        "transaction_cost_bps": "1",
+        "slippage_bps": "1",
+        "configured_symbols_value": "AAPL,MSFT,SPY",
+        "airflow_run_id": "manual__phase11",
+    }
+    first = prepare_backtest_arguments(**values)
+    assert first == prepare_backtest_arguments(**values)
+    assert "--run-id" in first
+    assert "AAPL,SPY" in first
+
+    values["requested_symbols"] = ["UNKNOWN"]
+    with pytest.raises(ValueError, match="outside MARKET_SYMBOLS"):
+        prepare_backtest_arguments(**values)
 
 
 def test_airflow_dags_never_launch_or_reference_streaming_application() -> None:
