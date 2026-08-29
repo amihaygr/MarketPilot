@@ -1,5 +1,5 @@
 .backtest-hero { align-items: center; }
-.run-context { margin-bottom: 18px; }
+.run-context { margin-bottom: 18px; padding: 24px; }
 .run-controls { display: grid; grid-template-columns: minmax(260px, 2fr) minmax(140px, 1fr) 2fr; gap: 18px; align-items: end; }
 .run-controls label { display: grid; gap: 7px; color: var(--muted); font-size: 12px; font-weight: 700; text-transform: uppercase; }
 .run-controls select { min-height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-soft); color: var(--text); }
@@ -18,8 +18,10 @@
 .diagnostic-facts dt { color: var(--muted); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
 .diagnostic-facts dd { margin: 4px 0 0; color: var(--amber); font-size: 20px; font-weight: 800; }
 .backtest-metrics { margin-top: 20px; }
-.backtest-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, .72fr); gap: 20px; margin-top: 20px; }
-.backtest-chart { width: 100%; min-height: 280px; }
+.backtest-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(300px, .72fr); gap: 20px; align-items: start; margin-top: 20px; }
+.chart-panel, .methodology-panel, .results-panel { padding: 24px; }
+.methodology-panel { align-self: start; }
+.backtest-chart { display: block; width: 100%; height: clamp(240px, 24vw, 320px); min-height: 0; }
 .backtest-line { fill: none; stroke-width: 3; vector-effect: non-scaling-stroke; }
 .strategy-line { stroke: var(--accent); }
 .benchmark-line { stroke: var(--blue); stroke-dasharray: 8 6; }
@@ -40,5 +42,5 @@
 .metric-value.negative { color: var(--danger); }
 .result-symbol { color: var(--accent); font-weight: 800; }
 @media (max-width: 900px) { .run-controls, .backtest-grid, .data-diagnostic { grid-template-columns: 1fr; } .assumption-strip { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .assumption-strip { grid-template-columns: 1fr; } .backtest-chart { min-height: 220px; } }
+@media (max-width: 560px) { .run-context, .chart-panel, .methodology-panel, .results-panel { padding: 18px; } .assumption-strip { grid-template-columns: 1fr; } .backtest-chart { height: 230px; } }
 @media (prefers-reduced-motion: reduce) { .backtest-line { transition: none; } }

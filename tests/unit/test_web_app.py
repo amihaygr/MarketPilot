@@ -89,8 +89,8 @@ def test_phase11_backtesting_experience_uses_only_bounded_backend_endpoints() ->
     )
 
     assert 'href="/backtesting.html"' in dashboard
-    assert "backtesting.css?v=phase11-2" in page
-    assert "backtesting.js?v=phase11-2" in page
+    assert "backtesting.css?v=phase11-3" in page
+    assert "backtesting.js?v=phase11-3" in page
     assert 'const API = "/api/v1"' in script
     assert "/backtests" in script
     assert "MinIO" not in script
