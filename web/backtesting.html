@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="MarketPilot historical backtesting explorer" />
     <title>MarketPilot | Backtesting Lab</title>
-    <link rel="stylesheet" href="/styles.css?v=phase11-1" />
-    <link rel="stylesheet" href="/backtesting.css?v=phase11-1" />
-    <script src="/backtesting.js?v=phase11-1" defer></script>
+    <link rel="stylesheet" href="/styles.css?v=phase11-2" />
+    <link rel="stylesheet" href="/backtesting.css?v=phase11-2" />
+    <script src="/backtesting.js?v=phase11-2" defer></script>
   </head>
   <body>
     <div class="app-shell">
@@ -60,6 +60,16 @@
         <p class="backtest-message" id="backtest-message" role="status">Loading published runs…</p>
 
         <div id="backtest-content" hidden>
+          <section class="data-diagnostic" id="data-diagnostic" hidden aria-labelledby="diagnostic-title">
+            <div><p class="eyebrow">DATA READINESS</p><h2 id="diagnostic-title">Verification run</h2></div>
+            <p id="diagnostic-message"></p>
+            <dl class="diagnostic-facts">
+              <div><dt>Certified bars</dt><dd id="diagnostic-bars">—</dd></div>
+              <div><dt>Sessions</dt><dd id="diagnostic-sessions">—</dd></div>
+              <div><dt>Trades</dt><dd id="diagnostic-trades">—</dd></div>
+            </dl>
+          </section>
+
           <section class="metric-grid backtest-metrics" aria-label="Selected backtest metrics">
             <article class="metric-card"><span class="metric-label">Strategy return</span><strong class="metric-value" id="metric-return">—</strong><small>Net of configured costs</small></article>
             <article class="metric-card"><span class="metric-label">Versus benchmark</span><strong class="metric-value" id="metric-excess">—</strong><small id="metric-benchmark">Benchmark —</small></article>
@@ -81,6 +91,7 @@
                 <circle id="strategy-point" class="strategy-point" cx="0" cy="0" r="5" hidden></circle>
               </svg>
               <div class="chart-axis"><span id="chart-start">—</span><span id="chart-end">—</span></div>
+              <p class="chart-note" id="chart-note"></p>
             </article>
 
             <aside class="panel methodology-panel">

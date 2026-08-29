@@ -5,7 +5,7 @@ const elements = {};
 let currentDetail = null;
 
 document.addEventListener("DOMContentLoaded", () => {
-  ["backtest-state", "backtest-state-label", "run-count", "run-select", "backtest-symbol", "strategy-name", "strategy-window", "strategy-period", "strategy-costs", "strategy-benchmark", "backtest-message", "backtest-content", "metric-return", "metric-excess", "metric-benchmark", "metric-drawdown", "metric-sharpe", "metric-volatility", "equity-count", "equity-chart", "strategy-line", "benchmark-line", "strategy-point", "benchmark-point", "chart-start", "chart-end", "backtest-results"].forEach((id) => { elements[id] = document.getElementById(id); });
+  ["backtest-state", "backtest-state-label", "run-count", "run-select", "backtest-symbol", "strategy-name", "strategy-window", "strategy-period", "strategy-costs", "strategy-benchmark", "backtest-message", "backtest-content", "data-diagnostic", "diagnostic-title", "diagnostic-message", "diagnostic-bars", "diagnostic-sessions", "diagnostic-trades", "metric-return", "metric-excess", "metric-benchmark", "metric-drawdown", "metric-sharpe", "metric-volatility", "equity-count", "equity-chart", "strategy-line", "benchmark-line", "strategy-point", "benchmark-point", "chart-start", "chart-end", "chart-note", "backtest-results"].forEach((id) => { elements[id] = document.getElementById(id); });
   elements["run-select"].addEventListener("change", loadRun);
   elements["backtest-symbol"].addEventListener("change", renderSelectedSymbol);
   loadRuns();
@@ -54,6 +54,7 @@ async function loadRun() {
       elements["backtest-symbol"].append(option);
     });
     renderResultTable(currentDetail.results);
+    renderDiagnostic(currentDetail);
     elements["backtest-message"].hidden = true;
     elements["backtest-content"].hidden = false;
     await renderSelectedSymbol();
@@ -86,6 +87,7 @@ function renderEquity(items) {
     elements["benchmark-point"].hidden = true;
     elements["chart-start"].textContent = "No daily equity points";
     elements["chart-end"].textContent = "—";
+    elements["chart-note"].textContent = "No certified equity points were published for this selection.";
     return;
   }
   const values = items.flatMap((item) => [Number(item.equity), Number(item.benchmark_equity)]);
@@ -97,8 +99,12 @@ function renderEquity(items) {
     const y = 240 - (Number(item[field]) - minimum) / (maximum - minimum) * 180;
     return `${index ? "L" : "M"}${x.toFixed(2)},${y.toFixed(2)}`;
   }).join(" ");
-  elements["strategy-line"].setAttribute("d", path("equity"));
-  elements["benchmark-line"].setAttribute("d", path("benchmark_equity"));
+  const singlePointPath = (field) => {
+    const y = 240 - (Number(items[0][field]) - minimum) / (maximum - minimum) * 180;
+    return `M40,${y.toFixed(2)} L880,${y.toFixed(2)}`;
+  };
+  elements["strategy-line"].setAttribute("d", items.length === 1 ? singlePointPath("equity") : path("equity"));
+  elements["benchmark-line"].setAttribute("d", items.length === 1 ? singlePointPath("benchmark_equity") : path("benchmark_equity"));
   [
     ["strategy-point", "equity"],
     ["benchmark-point", "benchmark_equity"],
@@ -112,7 +118,35 @@ function renderEquity(items) {
   });
   elements["chart-start"].textContent = items[0].trading_date;
   elements["chart-end"].textContent = items.at(-1).trading_date;
+  elements["chart-note"].textContent = items.length === 1
+    ? "One certified session is available. The horizontal line is a real flat result, not missing chart data."
+    : `${items.length} certified sessions are shown; strategy and benchmark may overlap when returns are equal.`;
   elements["equity-chart"].setAttribute("aria-label", `Equity curve from ${items[0].trading_date} through ${items.at(-1).trading_date}`);
+}
+
+function renderDiagnostic(detail) {
+  const results = detail.results;
+  const totalBars = results.reduce((total, result) => total + Number(result.observation_count), 0);
+  const totalTrades = results.reduce((total, result) => total + Number(result.trade_count), 0);
+  const oneSession = detail.run.start_date === detail.run.end_date;
+  const flat = results.length > 0 && results.every((result) => Number(result.annualized_volatility_pct) === 0 && Number(result.total_return_pct) === 0);
+  elements["diagnostic-bars"].textContent = totalBars.toLocaleString();
+  elements["diagnostic-sessions"].textContent = oneSession ? "1" : `${detail.run.start_date} → ${detail.run.end_date}`;
+  elements["diagnostic-trades"].textContent = totalTrades.toLocaleString();
+  elements["data-diagnostic"].hidden = false;
+  if (flat) {
+    elements["diagnostic-title"].textContent = "Pipeline verified · market movement unavailable";
+    elements["diagnostic-message"].textContent = "The certified verification input contains constant closing prices. The backtest completed correctly, but a flat price series cannot create volatility, crossovers, trades, or returns. Values shown as 0.00% are real results—not missing data.";
+    elements["data-diagnostic"].dataset.state = "limited";
+  } else if (oneSession) {
+    elements["diagnostic-title"].textContent = "Single-session research run";
+    elements["diagnostic-message"].textContent = "This result is valid but covers only one certified market session. Use a longer certified history before drawing strategy conclusions.";
+    elements["data-diagnostic"].dataset.state = "limited";
+  } else {
+    elements["diagnostic-title"].textContent = "Certified historical run";
+    elements["diagnostic-message"].textContent = "The run contains multiple certified sessions. Review assumptions and limitations before comparing results.";
+    elements["data-diagnostic"].dataset.state = "ready";
+  }
 }
 
 function renderResultTable(results) {

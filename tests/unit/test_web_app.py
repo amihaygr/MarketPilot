@@ -89,11 +89,14 @@ def test_phase11_backtesting_experience_uses_only_bounded_backend_endpoints() ->
     )
 
     assert 'href="/backtesting.html"' in dashboard
-    assert "backtesting.css?v=phase11-1" in page
-    assert "backtesting.js?v=phase11-1" in page
+    assert "backtesting.css?v=phase11-2" in page
+    assert "backtesting.js?v=phase11-2" in page
     assert 'const API = "/api/v1"' in script
     assert "/backtests" in script
     assert "MinIO" not in script
     assert ".innerHTML" not in script
     assert "replaceChildren" in script
+    assert "data-diagnostic" in page
+    assert "constant closing prices" in script
+    assert "singlePointPath" in script
     assert "COPY web/backtesting.html" in dockerfile
