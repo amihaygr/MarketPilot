@@ -10,11 +10,21 @@ Verification date: 2026-08-28
 - An interactive phase journey covering Phases 0 through 10.
 - A demo launchpad for the local engineering interfaces.
 - A Hebrew end-to-end presentation route in `docs/demo-guide.md`.
+- A read-only Presenter Console at `http://localhost:3000/presenter.html` with
+  synchronized 10, 15, and 20-minute routes, timer, speaker cues, transitions,
+  screen links, and safe fallbacks.
+- A Hebrew learning package under `docs/presentation/` covering architecture
+  explanations, terminology, reviewer Q&A, rehearsal, and failure recovery.
 - Updated root and Web App documentation.
 
 The Project Story is the final presentation artifact. It is intentionally
 separate from the analytical Dashboard so that the Dashboard remains a
 decision surface while the Project Story explains the engineering journey.
+
+The canonical presentation duration was revised on 2026-08-29 from the original
+eight-minute suggestion to a 15-minute primary route. Ten-minute compression and
+20-minute extension plans reuse the same evidence and do not introduce a new data
+path.
 
 ## Architecture verification
 
@@ -31,7 +41,7 @@ decision surface while the Project Story explains the engineering journey.
 
 The following checks passed on 2026-08-28:
 
-- Python 3.12 test gate: `68 passed, 7 skipped`.
+- Python 3.12 presentation delivery gate: `69 passed, 7 skipped`.
 - The seven skipped tests are opt-in integration suites for Airflow, archive
   operations, batch, Phase 9 analytics, SEC, serving, and streaming restart.
 - Ruff lint gate: all checks passed.
@@ -42,6 +52,8 @@ The following checks passed on 2026-08-28:
 - All 18 Compose services were running and healthy.
 - Project Story, Dashboard, Kafka UI, MinIO, Airflow, Spark master, Spark
   worker, Adminer, and Backend API documentation each returned HTTP 200.
+- Presenter Console HTML, CSS, and JavaScript each returned HTTP 200; its timed
+  routes were verified to total exactly 600, 900, and 1,200 seconds.
 - The live API snapshot reported 7,196 Gold bars, 11 symbols, and 932 SEC
   filings. These values are a dated verification snapshot, not a permanent
   product claim.
@@ -54,6 +66,13 @@ routing, JavaScript syntax, DOM references, responsive CSS rules, API calls,
 and service health were verified independently. Final visual acceptance still
 requires opening the Project Story in the already-running local browser and
 checking the tabs, phase selector, links, and responsive layout.
+
+The same local Trusted Path limitation prevented automated visual inspection of
+the Presenter Console on 2026-08-29. Static DOM checks found no missing or
+duplicate identifiers; JavaScript syntax, route timing, responsive CSS, asset
+packaging, HTTP responses, and service health passed. Manual visual acceptance
+is still required for the 10/15/20-minute selectors, timer, cue navigation, and
+Hebrew layout.
 
 ## Presentation format note
 

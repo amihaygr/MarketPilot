@@ -15,10 +15,14 @@ With the local stack running, open:
 
 - **Project Story:** <http://localhost:3000/showcase.html> — architecture, decisions,
   measured evidence, implementation journey and demo launchpad.
+- **Presenter Console:** <http://localhost:3000/presenter.html> — timed 10, 15 and
+  20-minute routes with speaker cues, transitions and safe fallbacks.
 - **Interactive Dashboard:** <http://localhost:3000/> — Gold market data, freshness,
   indicators and explained observations.
-- **Final Demo Guide:** [`docs/demo-guide.md`](docs/demo-guide.md) — an eight-minute
-  end-to-end presentation path with expected questions and recovery fallbacks.
+- **Final Demo Guide:** [`docs/demo-guide.md`](docs/demo-guide.md) — the canonical
+  15-minute presentation path, with 10 and 20-minute variants.
+- **Presenter learning aids:** [`docs/presentation/`](docs/presentation/) — architecture
+  explanations, glossary, reviewer Q&A, rehearsal and failure recovery.
 
 ## Architectural position
 
@@ -197,6 +201,7 @@ internal Docker networks and are not published directly to the host.
 | Spark Worker | <http://localhost:18081> | Inspect worker resources and executors |
 | MarketPilot Web App | <http://localhost:3000> | Explore Gold bars, freshness, certification and SEC filings |
 | MarketPilot Project Story | <http://localhost:3000/showcase.html> | Present architecture, evidence and the end-to-end engineering journey |
+| MarketPilot Presenter Console | <http://localhost:3000/presenter.html> | Run a timed demo with speaker notes, navigation and fallbacks |
 | Backend API docs | <http://localhost:8000/docs> | Inspect and exercise bounded read-only REST endpoints |
 
 For Adminer, select `MySQL`, use server `mariadb`, database `marketpilot`, and
@@ -291,9 +296,11 @@ data path. The Nginx Web App now serves a separate Project Story that loads only
 the existing read-only freshness API for its live proof. Static verification
 evidence is explicitly dated, and the Dashboard remains focused on exploration.
 
-Use [`docs/demo-guide.md`](docs/demo-guide.md) to present one event across Kafka,
-MinIO, Spark, Airflow, MariaDB, the Backend API and the Web App. The guide avoids
-displaying credentials and distinguishes current runtime state from recorded
+Use [`docs/demo-guide.md`](docs/demo-guide.md) and the local Presenter Console to
+present one event across Kafka, MinIO, Spark, Airflow, MariaDB, the Backend API and
+the Web App. The 15-minute route is the canonical timing source; the guide includes
+10 and 20-minute variants, extensive learning aids, and safe failure fallbacks. It
+avoids displaying credentials and distinguishes current runtime state from recorded
 verification evidence.
 
 ## Delivery maturity

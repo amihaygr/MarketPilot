@@ -7,3 +7,6 @@ COPY web/app.js /usr/share/nginx/html/app.js
 COPY web/showcase.html /usr/share/nginx/html/showcase.html
 COPY web/showcase.css /usr/share/nginx/html/showcase.css
 COPY web/showcase.js /usr/share/nginx/html/showcase.js
+COPY web/presenter.html /usr/share/nginx/html/presenter.html
+COPY web/presenter.css /usr/share/nginx/html/presenter.css
+COPY web/presenter.js /usr/share/nginx/html/presenter.js

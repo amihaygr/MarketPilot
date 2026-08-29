@@ -27,5 +27,11 @@ turn the analytical dashboard into a marketing page. Its only runtime request is
 the existing relative `/api/v1/freshness` endpoint; dated verification evidence is
 rendered as clearly labelled static project documentation.
 
+`presenter.html` is a separate, read-only Presenter Console. It provides 10, 15,
+and 20-minute routes, a local timer, Hebrew speaker cues, transitions, screen links,
+and safe fallbacks. It makes no API or data-plane request and cannot mutate project
+state. The canonical timing and expanded learning materials live under
+`docs/demo-guide.md` and `docs/presentation/`.
+
 The Nginx response includes a restrictive Content Security Policy and other basic
 browser hardening headers. This local MVP does not implement end-user authentication.

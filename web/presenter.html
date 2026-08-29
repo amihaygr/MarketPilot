@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="MarketPilot presenter console with timed 10, 15 and 20 minute demo routes, speaker cues and safe fallbacks."
+    />
+    <title>MarketPilot | Presenter Console</title>
+    <link rel="stylesheet" href="/presenter.css?v=demo-coach-1" />
+    <script src="/presenter.js?v=demo-coach-1" defer></script>
+  </head>
+  <body>
+    <header class="console-header">
+      <a class="brand" href="/showcase.html" aria-label="חזרה לסיפור הפרויקט">
+        <span>MP</span>
+        <div><strong>MarketPilot</strong><small>Presenter Console</small></div>
+      </a>
+      <nav aria-label="קישורי הצגה">
+        <a href="/showcase.html">Project Story</a>
+        <a href="/">Dashboard</a>
+      </nav>
+      <div class="live-indicator"><span aria-hidden="true"></span> עזר מקומי - ללא כתיבות</div>
+    </header>
+
+    <main>
+      <section class="control-deck" aria-labelledby="console-title">
+        <div>
+          <p class="eyebrow">DEMO COACH · מסלול בטוח ומדוד</p>
+          <h1 id="console-title">דע מה לומר, מה להראות ולמה זה חשוב.</h1>
+          <p class="lede">בחר זמן, הפעל את הטיימר והתקדם בין כרטיסי ההסבר. ברירת המחדל היא 15 דקות.</p>
+        </div>
+
+        <div class="timer-panel" aria-label="בקרת זמן">
+          <div class="mode-selector" role="group" aria-label="משך הדמו">
+            <button type="button" data-mode="10">10 דקות</button>
+            <button type="button" data-mode="15" class="active" aria-pressed="true">15 דקות</button>
+            <button type="button" data-mode="20">20 דקות</button>
+          </div>
+          <div class="timer" id="timer" aria-live="polite">15:00</div>
+          <div class="timer-actions">
+            <button type="button" id="timer-toggle" class="primary">התחל</button>
+            <button type="button" id="timer-reset">איפוס</button>
+          </div>
+          <div class="total-progress" aria-label="התקדמות כוללת"><span id="total-progress"></span></div>
+        </div>
+      </section>
+
+      <section class="presentation-grid" aria-label="כרטיס ההצגה הנוכחי">
+        <aside class="segment-rail">
+          <div class="rail-heading">
+            <span>RUN OF SHOW</span>
+            <strong id="plan-label">15 דקות</strong>
+          </div>
+          <div id="segment-list" class="segment-list" role="list"></div>
+        </aside>
+
+        <article class="cue-card" aria-live="polite">
+          <header>
+            <div>
+              <span id="cue-number">01</span>
+              <span id="cue-window">00:00-01:30</span>
+            </div>
+            <a id="cue-link" href="/showcase.html" target="_blank" rel="noreferrer">פתח מסך ↗</a>
+          </header>
+          <p class="cue-purpose" id="cue-purpose">פתיחה</p>
+          <h2 id="cue-title">הבעיה, ההיקף והבטחת המוצר</h2>
+
+          <div class="speaker-script">
+            <span>מה לומר</span>
+            <blockquote id="cue-say"></blockquote>
+          </div>
+
+          <div class="cue-grid">
+            <section>
+              <span>מה להראות</span>
+              <p id="cue-show"></p>
+            </section>
+            <section>
+              <span>מה חשוב שיבינו</span>
+              <p id="cue-notice"></p>
+            </section>
+            <section>
+              <span>משפט מעבר</span>
+              <p id="cue-transition"></p>
+            </section>
+            <section class="fallback">
+              <span>אם המסך לא עובד</span>
+              <p id="cue-fallback"></p>
+            </section>
+          </div>
+
+          <footer>
+            <button type="button" id="previous-cue">הקודם</button>
+            <span id="cue-position">1 מתוך 7</span>
+            <button type="button" id="next-cue" class="primary">הבא</button>
+          </footer>
+        </article>
+      </section>
+
+      <section class="tool-launchpad" aria-labelledby="tools-title">
+        <div>
+          <p class="eyebrow">PRE-OPEN THESE TABS</p>
+          <h2 id="tools-title">מסכי ההוכחה</h2>
+          <p>פתח מראש. בזמן הדמו אין חיפוש, אין שינוי נתונים ואין הצגת סודות.</p>
+        </div>
+        <div class="tool-links">
+          <a href="/showcase.html" target="_blank">Project Story <span>הסיפור והתרשים</span></a>
+          <a href="/" target="_blank">Dashboard <span>Gold ו-Analytics</span></a>
+          <a href="http://localhost:8085/" target="_blank">Kafka UI <span>Topic ו-offset</span></a>
+          <a href="http://localhost:9001/" target="_blank">MinIO <span>Bronze ו-Silver</span></a>
+          <a href="http://localhost:8080/" target="_blank">Airflow <span>Bounded workflows</span></a>
+          <a href="http://localhost:18080/" target="_blank">Spark <span>Cluster ו-applications</span></a>
+          <a href="http://localhost:8086/" target="_blank">Adminer <span>Gold tables</span></a>
+          <a href="http://localhost:8000/docs" target="_blank">Backend API <span>חוזה read-only</span></a>
+        </div>
+      </section>
+
+      <section class="memory-strip" aria-label="משפטי מפתח">
+        <article><strong>Docker ≠ Airflow</strong><span>שירותים קבועים מול עבודות תחומות</span></article>
+        <article><strong>Fresh ≠ Certified</strong><span>מה ידוע עכשיו מול מה שאושר</span></article>
+        <article><strong>Retry ≠ Duplicate</strong><span>Idempotency הופכת חזרה לבטוחה</span></article>
+        <article><strong>Archive ≠ Purge</strong><span>שחזור מוכח לפני החלטת מחיקה</span></article>
+      </section>
+    </main>
+
+    <footer class="console-footer">
+      <span>קיצורי מקלדת: ←/→ מעבר בין כרטיסים · רווח הפעלה/השהיה · R איפוס</span>
+      <a href="/showcase.html">חזרה ל-Project Story</a>
+    </footer>
+  </body>
+</html>
