@@ -14,6 +14,7 @@ def ensure_topics() -> None:
     admin = AdminClient({"bootstrap.servers": os.environ["KAFKA_BOOTSTRAP_SERVERS"]})
     topics = [
         os.environ["KAFKA_MARKET_BARS_TOPIC"],
+        os.environ.get("KAFKA_HISTORICAL_BARS_TOPIC", "market.bars.1m.backfill.v1"),
         os.environ["KAFKA_DEAD_LETTER_TOPIC"],
     ]
     futures = admin.create_topics(

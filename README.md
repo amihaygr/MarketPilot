@@ -327,6 +327,23 @@ Open <http://localhost:3000/backtesting.html> to inspect the verified local run.
 See [`docs/phase11-verification.md`](docs/phase11-verification.md) for the evidence
 and [`ADR-005`](docs/decisions/ADR-005-historical-backtesting.md) for the design.
 
+## Phase 12 certified historical acquisition
+
+The manual `historical_market_backfill` DAG turns Alpaca historical IEX bars into
+auditable Certified Gold data and then launches the Phase 11 backtest. It is a
+finite workflow with a maximum 31-calendar-day scope:
+
+```text
+Alpaca REST -> source-page Bronze archive -> historical Kafka topic
+           -> raw-archive-sink -> offset-level Bronze barrier
+           -> Spark Bronze/Silver/DQ/Gold Certified -> historical backtest
+```
+
+Historical traffic uses a dedicated Kafka topic and therefore never floods the
+live Structured Streaming consumer. Credentials remain only in the ignored `.env`.
+See [`docs/runbooks/historical-market-backfill.md`](docs/runbooks/historical-market-backfill.md)
+and [`ADR-007`](docs/decisions/ADR-007-certified-historical-acquisition.md).
+
 ## Delivery maturity
 
 This repository is a completed local engineering capstone, not a finished trading product.

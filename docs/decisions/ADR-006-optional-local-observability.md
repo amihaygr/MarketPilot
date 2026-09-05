@@ -12,7 +12,7 @@ Kibana must not destabilize the data paths.
 
 ## Proposed decision
 
-- Phase 12 may add a self-managed Elasticsearch and Kibana deployment under an
+- Phase 13 may add a self-managed Elasticsearch and Kibana deployment under an
   explicit Compose profile named `observability`.
 - The profile is disabled by default and is not a dependency of ingestion,
   streaming, batch, storage, orchestration, API, or Web App services.
@@ -26,6 +26,6 @@ Kibana must not destabilize the data paths.
 
 ## Decision gate
 
-This ADR remains `Proposed` until Phase 11 is complete and an empirical Docker
+This ADR remains `Proposed` until the certified historical path is complete and an empirical Docker
 resource check confirms that the optional profile can run without destabilizing
 the core platform.

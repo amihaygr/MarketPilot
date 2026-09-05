@@ -1,0 +1,1 @@
+"""Immutable Bronze object conventions."""

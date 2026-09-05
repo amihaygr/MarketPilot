@@ -8,6 +8,7 @@ from marketpilot.orchestration.batch_scope import (
     prepare_backfill_arguments,
     prepare_daily_scope,
 )
+from marketpilot.orchestration.historical_scope import prepare_historical_backfill_plan
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIGURED = ("AAPL", "MSFT", "SPY")
@@ -112,3 +113,45 @@ def test_sec_dag_is_bounded_and_rate_limited_by_pool() -> None:
     assert "catchup=False" in source
     assert "max_active_runs=1" in source
     assert 'pool="sec_api_pool"' in source
+
+
+def test_historical_plan_is_bounded_coverage_aware_and_retry_stable() -> None:
+    values = {
+        "start_date_value": "2026-08-21",
+        "end_date_value": "2026-08-24",
+        "requested_symbols": ["AAPL", "SPY"],
+        "benchmark_symbol": "SPY",
+        "configured_symbols": CONFIGURED,
+        "airflow_run_id": "manual__historical",
+        "minimum_coverage_pct": 80,
+        "maximum_ingestion_lag_seconds": 60_000_000,
+        "short_window": 20,
+        "long_window": 50,
+        "initial_capital": "10000",
+        "transaction_cost_bps": "1",
+        "slippage_bps": "1",
+    }
+    plan = prepare_historical_backfill_plan(**values)
+    assert plan == prepare_historical_backfill_plan(**values)
+    assert len(plan["ingestion"]) == 2
+    assert plan["ingestion"][0]["session_date"] == "2026-08-21"
+    assert "logical_date" not in plan["ingestion"][0]
+    assert "312" in plan["quality"][0]
+    assert "--maximum-ingestion-lag-seconds" in plan["quality"][0]
+    assert plan["ingestion"][0]["run_id"] == plan["bronze"][0][3]
+
+    values["benchmark_symbol"] = "MSFT"
+    with pytest.raises(ValueError, match="included in symbols"):
+        prepare_historical_backfill_plan(**values)
+
+
+def test_historical_dag_is_manual_serial_and_uses_bronze_barrier() -> None:
+    source = (ROOT / "airflow" / "dags" / "historical_market_backfill.py").read_text(
+        encoding="utf-8"
+    )
+    assert 'dag_id="historical_market_backfill"' in source
+    assert "schedule=None" in source
+    assert "max_active_runs=1" in source
+    assert 'pool="alpaca_api_pool"' in source
+    assert "backfill_historical_session_from_env" in source
+    assert "bronze_to_silver >> silver_quality_gate >> silver_to_gold >> run_backtest" in source

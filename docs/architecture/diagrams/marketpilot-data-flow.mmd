@@ -33,6 +33,12 @@ flowchart TB
     rawsink --> bronze
     stream -->|"UPSERT idempotent | עדכון כמעט בזמן אמת"| gold
 
+    historical["Airflow historical_market_backfill | Alpaca REST תחום בזמן"]
+    backfilltopic["Kafka | market.bars.1m.backfill.v1"]
+    historical -->|"ארכוב עמודי מקור + MarketBarV1"| backfilltopic
+    backfilltopic -->|"topic + partition + offset"| rawsink
+    historical -. "מחסום Bronze ואז Spark Batch" .-> b2sjob
+
     sec["SEC EDGAR | submissions ו-XBRL JSON"]
     secjob["sec-adapter | משימת Docker קצרת חיים"]
     sec -->|"HTTP עם User-Agent והגבלת קצב"| secjob
@@ -52,8 +58,8 @@ flowchart TB
     note -.-> stream
 
     class alpaca,sec source
-    class kafka transport
+    class kafka,backfilltopic transport
     class producer,stream,rawsink,secjob,b2sjob,s2gjob compute
     class bronze,silver,gold storage
     class api,web serving
-    class airflow,note control
+    class airflow,historical,note control

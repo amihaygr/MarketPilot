@@ -441,6 +441,8 @@ services:
         "Serialize local Spark Batch work" &&
         runuser -u airflow -- airflow pools set sec_api_pool 1
         "Serialize SEC API access below the shared rate limit" &&
+        runuser -u airflow -- airflow pools set alpaca_api_pool 1
+        "Serialize bounded Alpaca historical API access" &&
         (runuser -u airflow -- airflow connections delete spark_standalone || true) &&
         runuser -u airflow -- airflow connections add spark_standalone
         --conn-type spark --conn-host "spark://spark-master" --conn-port 7077

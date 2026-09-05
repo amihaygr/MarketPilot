@@ -14,7 +14,8 @@ The deterministic synthetic producer remains the safe default for local work.
 - `platform_init`: idempotently creates Kafka topics and MinIO buckets, then exits.
 - `market_producer`: publishes deterministic `MarketBarV1` events once per configured interval.
 - `raw_archive_sink`: validates events, archives valid payloads to Bronze, quarantines invalid
-  payloads, and commits Kafka offsets only after the object upload succeeds.
+  payloads from both live and historical topics, and commits Kafka offsets only after
+  the object upload succeeds.
 
 ## Phase 6 external adapters
 
@@ -28,6 +29,11 @@ The deterministic synthetic producer remains the safe default for local work.
 
 External sources are disabled by default. Activation requires local credentials or
 contact identity and the review steps in `docs/runbooks/external-source-activation.md`.
+
+The Phase 12 historical adapter is a bounded Airflow task. It paginates Alpaca's
+multi-symbol bars endpoint, archives exact source pages by SHA-256, publishes
+`MarketBarV1` events to `market.bars.1m.backfill.v1`, and waits until the
+long-running raw sink has persisted every Kafka position in Bronze.
 
 ## Phase 7 serving service
 

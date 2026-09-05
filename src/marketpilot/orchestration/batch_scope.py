@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from datetime import date, timedelta
 from uuid import NAMESPACE_URL, uuid5
 
@@ -36,6 +37,8 @@ def prepare_backfill_arguments(
     configured_symbols: tuple[str, ...],
     airflow_run_id: str,
     expected_bars_override: int | None = None,
+    minimum_coverage_pct: int = 100,
+    maximum_ingestion_lag_seconds: int | None = None,
 ) -> dict[str, list[list[str]]]:
     """Build mapped Spark arguments for a validated, finite replay scope."""
     start_date = date.fromisoformat(start_date_value)
@@ -45,6 +48,10 @@ def prepare_backfill_arguments(
     inclusive_days = (end_date - start_date).days + 1
     if inclusive_days > MAX_BACKFILL_DAYS:
         raise ValueError(f"backfill scope cannot exceed {MAX_BACKFILL_DAYS} calendar days")
+    if not 1 <= int(minimum_coverage_pct) <= 100:
+        raise ValueError("minimum_coverage_pct must be in [1, 100]")
+    if maximum_ingestion_lag_seconds is not None and maximum_ingestion_lag_seconds < 1:
+        raise ValueError("maximum_ingestion_lag_seconds must be positive")
 
     configured = _normalize_symbols(list(configured_symbols))
     requested = _normalize_symbols(requested_symbols)
@@ -60,22 +67,25 @@ def prepare_backfill_arguments(
         expected_bars = _expected_bars(logical_date, expected_bars_override)
         if expected_bars == 0:
             continue
+        if expected_bars_override is None:
+            expected_bars = math.ceil(expected_bars * int(minimum_coverage_pct) / 100)
         date_value = logical_date.isoformat()
         partition_key = f"{date_value}|symbols={scope_suffix}"
         run_id = _stable_run_id("backfill", airflow_run_id, partition_key)
         common = ["--logical-date", date_value, "--run-id", run_id]
         arguments["bronze"].append([*common, "--symbols-json", symbols_json])
-        arguments["quality"].append(
-            [
-                *common,
-                "--expected-symbols-json",
-                symbols_json,
-                "--expected-bars-per-symbol",
-                str(expected_bars),
-                "--partition-key",
-                partition_key,
-            ]
-        )
+        quality = [
+            *common,
+            "--expected-symbols-json",
+            symbols_json,
+            "--expected-bars-per-symbol",
+            str(expected_bars),
+            "--partition-key",
+            partition_key,
+        ]
+        if maximum_ingestion_lag_seconds is not None:
+            quality.extend(["--maximum-ingestion-lag-seconds", str(maximum_ingestion_lag_seconds)])
+        arguments["quality"].append(quality)
         arguments["gold"].append(
             [
                 *common,

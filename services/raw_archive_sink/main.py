@@ -4,12 +4,12 @@ import io
 import json
 import logging
 import os
-from datetime import datetime
 from typing import Any
 
 import boto3
 from confluent_kafka import Consumer, KafkaError
 
+from marketpilot.bronze.keys import market_bar_bronze_key
 from marketpilot.contracts.market_bar import MarketBarV1
 
 logger = logging.getLogger(__name__)
@@ -24,12 +24,7 @@ def parse_record(value: bytes) -> dict[str, Any]:
 
 
 def bronze_key(event: dict[str, Any], topic: str, partition: int, offset: int) -> str:
-    event_time = datetime.fromisoformat(str(event["event_time_utc"]))
-    return (
-        f"source={event['source']}/event=market_bar_1m/"
-        f"year={event_time:%Y}/month={event_time:%m}/day={event_time:%d}/"
-        f"symbol={event['symbol']}/topic={topic}/partition={partition}/offset={offset}.json"
-    )
+    return market_bar_bronze_key(event, topic, partition, offset)
 
 
 def quarantine_key(topic: str, partition: int, offset: int) -> str:
@@ -56,7 +51,15 @@ def main() -> None:
         aws_secret_access_key=os.environ["MINIO_ROOT_PASSWORD"],
     )
     bucket = os.environ["MINIO_BRONZE_BUCKET"]
-    consumer.subscribe([os.environ["KAFKA_MARKET_BARS_TOPIC"]])
+    topics = list(
+        dict.fromkeys(
+            (
+                os.environ["KAFKA_MARKET_BARS_TOPIC"],
+                os.environ.get("KAFKA_HISTORICAL_BARS_TOPIC", "market.bars.1m.backfill.v1"),
+            )
+        )
+    )
+    consumer.subscribe(topics)
 
     try:
         while True:

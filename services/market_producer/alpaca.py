@@ -3,28 +3,16 @@
 import logging
 import os
 from collections.abc import Callable
-from datetime import UTC, datetime
-from decimal import Decimal
 from threading import Event
 from typing import Any, Protocol
-from uuid import NAMESPACE_URL, uuid5
 
 from marketpilot.batch.market_calendar import is_xnys_regular_market_minute
 from marketpilot.contracts.market_bar import MarketBarV1
 from marketpilot.core.settings import Settings
+from marketpilot.sources.alpaca import AlpacaBarLike, build_alpaca_market_bar
 from services.market_producer.publishing import ProducerLike, publish_event
 
 logger = logging.getLogger(__name__)
-
-
-class AlpacaBarLike(Protocol):
-    symbol: str
-    timestamp: datetime
-    open: Any
-    high: Any
-    low: Any
-    close: Any
-    volume: int
 
 
 class StockStreamLike(Protocol):
@@ -53,27 +41,10 @@ def default_stream_factory(settings: Settings) -> StockStreamLike:
 
 
 def build_alpaca_bar(bar: AlpacaBarLike, settings: Settings) -> MarketBarV1:
-    timestamp = bar.timestamp
-    if timestamp.tzinfo is None or timestamp.utcoffset() is None:
-        raise ValueError("Alpaca bar timestamp must be timezone-aware")
-    minute = timestamp.astimezone(UTC).replace(second=0, microsecond=0)
-    symbol = str(bar.symbol).upper()
-    event_id = uuid5(
-        NAMESPACE_URL,
-        f"marketpilot:alpaca:{settings.alpaca_data_feed}:{symbol}:"
-        f"{minute.isoformat()}:{settings.market_bar_interval}",
-    )
-    return MarketBarV1(
-        event_id=event_id,
-        symbol=symbol,
-        event_time_utc=minute,
+    return build_alpaca_market_bar(
+        bar,
+        feed=settings.alpaca_data_feed,
         interval=settings.market_bar_interval,
-        open=Decimal(str(bar.open)),
-        high=Decimal(str(bar.high)),
-        low=Decimal(str(bar.low)),
-        close=Decimal(str(bar.close)),
-        volume=int(bar.volume),
-        source="alpaca",
     )
 
 

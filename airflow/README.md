@@ -20,8 +20,12 @@ database, Scheduler, API Server and DAG Processor. The UI is exposed locally at
   creates a stable run identity, and submits the versioned historical backtest to
   Spark. Full curves are stored as Parquet in MinIO while bounded summaries and
   daily equity points are published transactionally to MariaDB Gold.
+- `historical_market_backfill`: manual only. It acquires at most 31 calendar days
+  from Alpaca, archives source pages, sends canonical events through a dedicated
+  Kafka topic, waits for exact Bronze offsets, maps the existing certification
+  chain by session, and finally runs the historical backtest.
 
-`spark_batch_pool` and `sec_api_pool` each have one slot. All mutating DAGs use
+`spark_batch_pool`, `sec_api_pool`, and `alpaca_api_pool` each have one slot. All mutating DAGs use
 `max_active_runs=1`; SEC polling also uses `catchup=False`. This serializes local
 publication work and prevents overlapping SEC requests.
 

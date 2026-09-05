@@ -5,6 +5,7 @@ import pytest
 from marketpilot.batch.market_calendar import (
     expected_xnys_market_minutes,
     is_xnys_regular_market_minute,
+    xnys_session_bounds,
 )
 
 
@@ -25,3 +26,11 @@ def test_xnys_minute_gate_rejects_extended_hours_and_naive_time() -> None:
     assert not is_xnys_regular_market_minute(datetime(2026, 8, 24, 23, 0, tzinfo=UTC))
     with pytest.raises(ValueError, match="timezone-aware"):
         is_xnys_regular_market_minute(datetime(2026, 8, 24, 14, 30))
+
+
+def test_xnys_session_bounds_are_utc_and_reject_closed_dates() -> None:
+    session_open, session_close = xnys_session_bounds(date(2026, 8, 24))
+    assert session_open == datetime(2026, 8, 24, 13, 30, tzinfo=UTC)
+    assert session_close == datetime(2026, 8, 24, 20, 0, tzinfo=UTC)
+    with pytest.raises(ValueError, match="not an XNYS trading session"):
+        xnys_session_bounds(date(2026, 8, 22))

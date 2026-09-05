@@ -46,7 +46,9 @@
           <div class="run-controls">
             <label><span>Backtest run</span><select id="run-select" aria-describedby="run-help"></select></label>
             <label><span>Asset</span><select id="backtest-symbol"></select></label>
-            <p id="run-help">Runs are created by the bounded Airflow historical_backtest DAG.</p>
+            <p id="run-help">
+              Runs are created by bounded Airflow backtest or certified historical-backfill DAGs.
+            </p>
           </div>
           <dl class="assumption-strip" id="assumption-strip">
             <div><dt>Strategy</dt><dd id="strategy-name">—</dd></div>

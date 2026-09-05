@@ -73,6 +73,7 @@ Initial topics:
 | Topic | Key | Value |
 |---|---|---|
 | `market.bars.1m.v1` | symbol | Versioned market-bar event |
+| `market.bars.1m.backfill.v1` | symbol | Historical bars for bounded Bronze certification; not consumed by live streaming |
 | `market.bars.1m.dlq.v1` | event identifier | Rejected event with reason metadata |
 | `sec.filings.v1` | accession number | Optional modeled filing event |
 
@@ -151,6 +152,15 @@ bar return. Full-resolution results are versioned Parquet in MinIO; MariaDB stor
 run metadata, summary metrics, and a bounded daily equity curve for the API. SPY
 is a comparison benchmark and no component performs trade execution.
 
+Phase 12 acquires real historical bars without introducing a shortcut around the
+Medallion pipeline. A manual Airflow task pages through Alpaca IEX, stores each exact
+API response in content-addressed Bronze objects, normalizes bars to `MarketBarV1`,
+and publishes them to `market.bars.1m.backfill.v1`. The long-running
+`raw-archive-sink` consumes both market topics. A bounded barrier confirms the exact
+topic, partition, and offset object for every published event before the existing
+Spark Batch certification chain starts. The separate topic prevents historical
+traffic from entering the live Structured Streaming application.
+
 ## 11. Streaming application
 
 The Spark Structured Streaming application:
@@ -192,6 +202,7 @@ Airflow submits Spark Batch work to `spark-master` through `SparkSubmitOperator`
 | `annual_archive_dag` | January 10 at 02:00 America/New_York | Export previous year, verify, register manifest |
 | `backfill_replay_dag` | Manual with validated parameters | Replay selected date range and symbols |
 | `historical_backtest_dag` | Manual with validated parameters | Validate scope, submit Spark backtest, quality gate, publish |
+| `historical_market_backfill` | Manual, at most 31 calendar days | Alpaca pages, source archive, Kafka, Bronze barrier, Silver, DQ, Gold Certified, backtest |
 
 The daily DAG checks the exchange calendar and short-circuits on non-trading days. A future custom timetable may replace simple cron scheduling.
 
@@ -200,6 +211,7 @@ The daily DAG checks the exchange calendar and short-circuits on non-trading day
 - `catchup=False` for polling and routine daily DAGs.
 - `max_active_runs=1` for partition-mutating DAGs.
 - `sec_api_pool=1`.
+- `alpaca_api_pool=1` for bounded historical acquisition.
 - `spark_batch_pool=1` for the local MVP.
 - Two or three retries with exponential backoff.
 - Explicit execution timeouts.

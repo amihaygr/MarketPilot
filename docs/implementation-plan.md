@@ -298,25 +298,38 @@ local browser connector rejected its Trusted Path before navigation.
 2. `add backtest orchestration and serving`
 3. `add interactive backtesting experience`
 
-## Phase 12 - Optional local observability
+## Phase 12 - Alpaca historical acquisition and certified backfill
 
-Status: proposed on 2026-08-29. Implementation is gated by ADR-006 and a local
-resource measurement after Phase 11.
+Status: implemented on 2026-09-05. Runtime verification is recorded in
+`docs/phase12-verification.md`. The design is accepted in ADR-007.
 
-### Candidate scope
+### Scope
 
-- Optional `observability` Compose profile.
-- Elasticsearch for retained operational logs.
-- Kibana for searchable run, event, service, and correlation context.
-- Defined retention, security, healthchecks, and memory limits.
-- No dependency from core MarketPilot services to the observability profile.
+- Manual, parameterized Airflow DAG for at most 31 calendar days.
+- Multi-symbol Alpaca historical IEX acquisition with retry, rate limiting, and pagination.
+- Exact, content-addressed source-page archive in MinIO Bronze.
+- Dedicated Kafka topic for historical events, isolated from live Structured Streaming.
+- A Bronze barrier that proves every produced Kafka offset was archived before Spark starts.
+- Existing Bronze-to-Silver, blocking quality, and Silver-to-Gold Certified jobs.
+- Automatic Phase 11 backtest after every requested market session is certified.
+- Retry-stable run identities and completion manifests.
 
-### Go/no-go criteria
+### Acceptance criteria
 
-- The core stack remains healthy with the profile disabled.
-- The host has sufficient measured memory and CPU headroom.
-- Log collection does not weaken Docker or Airflow security boundaries.
-- A bounded retention policy prevents uncontrolled local disk growth.
+- Historical data never bypasses Kafka or the immutable Bronze layer.
+- Airflow runs only bounded work and does not own any long-running service lifecycle.
+- API credentials remain in the ignored `.env` and never enter manifests or logs.
+- Pagination is complete and upstream source payloads are retained by SHA-256.
+- Publication is blocked when the minimum per-symbol IEX coverage is not met.
+- Repeating an Airflow run reuses completed session manifests without duplicating Gold rows.
+- The final backtest reads Certified Gold only.
+
+## Phase 13 - Optional local observability
+
+Status: proposed. Implementation remains gated by ADR-006 and a local resource measurement.
+
+Candidate scope remains an optional Elasticsearch and Kibana Compose profile for
+operational logs only, with bounded retention and no dependency from the core platform.
 
 ## Required checkpoints
 
@@ -336,3 +349,4 @@ Recommended Git checkpoints:
 12. `add versioned historical backtesting engine`
 13. `add backtest orchestration and serving`
 14. `add interactive backtesting experience`
+15. `add certified alpaca historical backfill`
