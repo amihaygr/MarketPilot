@@ -83,4 +83,15 @@ def test_distributed_job_stays_on_native_spark_dataframe_execution() -> None:
     job = Path("spark/jobs/run_historical_backtest.py").read_text(encoding="utf-8")
 
     assert ".rdd" not in job
+    assert "spark.createDataFrame" not in job
+    assert "SELECT * FROM VALUES" in job
     assert "lag(" in job
+    assert "xnys_session_windows" in job
+    assert "excluded_non_session_rows" in job
+
+
+def test_historical_bronze_job_supports_source_partition_isolation() -> None:
+    job = Path("spark/jobs/bronze_to_silver.py").read_text(encoding="utf-8")
+
+    assert 'parser.add_argument("--source-name")' in job
+    assert "source={source_name}" in job

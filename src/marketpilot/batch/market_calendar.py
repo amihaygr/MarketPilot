@@ -37,3 +37,22 @@ def xnys_session_bounds(logical_date: date) -> tuple[datetime, datetime]:
     session_open = calendar.session_open(session).to_pydatetime().astimezone(UTC)
     session_close = calendar.session_close(session).to_pydatetime().astimezone(UTC)
     return session_open, session_close
+
+
+@lru_cache(maxsize=128)
+def xnys_session_windows(
+    start_date: date, end_date: date
+) -> tuple[tuple[date, datetime, datetime], ...]:
+    """Return every regular XNYS session window in an inclusive date range."""
+    if end_date < start_date:
+        raise ValueError("XNYS session range end date must not precede start date")
+    calendar = exchange_calendars.get_calendar("XNYS")
+    sessions = calendar.sessions_in_range(pd.Timestamp(start_date), pd.Timestamp(end_date))
+    return tuple(
+        (
+            session.date(),
+            calendar.session_open(session).to_pydatetime().astimezone(UTC),
+            calendar.session_close(session).to_pydatetime().astimezone(UTC),
+        )
+        for session in sessions
+    )

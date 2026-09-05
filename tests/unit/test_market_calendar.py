@@ -6,6 +6,7 @@ from marketpilot.batch.market_calendar import (
     expected_xnys_market_minutes,
     is_xnys_regular_market_minute,
     xnys_session_bounds,
+    xnys_session_windows,
 )
 
 
@@ -34,3 +35,14 @@ def test_xnys_session_bounds_are_utc_and_reject_closed_dates() -> None:
     assert session_close == datetime(2026, 8, 24, 20, 0, tzinfo=UTC)
     with pytest.raises(ValueError, match="not an XNYS trading session"):
         xnys_session_bounds(date(2026, 8, 22))
+
+
+def test_xnys_session_windows_exclude_weekends_and_preserve_early_close() -> None:
+    windows = xnys_session_windows(date(2026, 8, 3), date(2026, 8, 28))
+
+    assert len(windows) == 20
+    assert all(session_date.weekday() < 5 for session_date, _, _ in windows)
+    assert date(2026, 8, 22) not in {session_date for session_date, _, _ in windows}
+
+    with pytest.raises(ValueError, match="must not precede"):
+        xnys_session_windows(date(2026, 8, 28), date(2026, 8, 3))

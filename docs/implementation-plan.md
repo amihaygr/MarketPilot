@@ -300,7 +300,8 @@ local browser connector rejected its Trusted Path before navigation.
 
 ## Phase 12 - Alpaca historical acquisition and certified backfill
 
-Status: implemented on 2026-09-05. Runtime verification is recorded in
+Status: implemented and release-candidate verified on 2026-09-05 across 20
+XNYS trading sessions. Runtime evidence is recorded in
 `docs/phase12-verification.md`. The design is accepted in ADR-007.
 
 ### Scope
@@ -311,7 +312,9 @@ Status: implemented on 2026-09-05. Runtime verification is recorded in
 - Dedicated Kafka topic for historical events, isolated from live Structured Streaming.
 - A Bronze barrier that proves every produced Kafka offset was archived before Spark starts.
 - Existing Bronze-to-Silver, blocking quality, and Silver-to-Gold Certified jobs.
+- Alpaca source-partition isolation during the historical Bronze-to-Silver step.
 - Automatic Phase 11 backtest after every requested market session is certified.
+- Native Spark SQL filtering against XNYS regular-session windows before backtesting.
 - Retry-stable run identities and completion manifests.
 
 ### Acceptance criteria
@@ -323,6 +326,7 @@ Status: implemented on 2026-09-05. Runtime verification is recorded in
 - Publication is blocked when the minimum per-symbol IEX coverage is not met.
 - Repeating an Airflow run reuses completed session manifests without duplicating Gold rows.
 - The final backtest reads Certified Gold only.
+- Non-session rows are excluded explicitly and counted in the immutable run manifest.
 
 ## Phase 13 - Optional local observability
 

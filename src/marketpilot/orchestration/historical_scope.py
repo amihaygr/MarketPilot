@@ -38,6 +38,8 @@ def prepare_historical_backfill_plan(
         minimum_coverage_pct=int(minimum_coverage_pct),
         maximum_ingestion_lag_seconds=int(maximum_ingestion_lag_seconds),
     )
+    for bronze_args in mapped["bronze"]:
+        bronze_args.extend(["--source-name", "alpaca"])
     ingestion = []
     for bronze_args in mapped["bronze"]:
         ingestion.append(

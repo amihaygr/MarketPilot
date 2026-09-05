@@ -17,6 +17,7 @@ from pyspark.sql.functions import (
 )
 from pyspark.sql.functions import (
     avg,
+    broadcast,
     col,
     count,
     exp,
@@ -50,6 +51,7 @@ from marketpilot.backtesting.rules import (
     resolve_backtest_scope,
 )
 from marketpilot.batch.mariadb import publisher_config_from_env
+from marketpilot.batch.market_calendar import xnys_session_windows
 from marketpilot.batch.spark_support import build_batch_spark_session
 from marketpilot.operations.archive import spark_mariadb_jdbc_url
 from marketpilot.operations.object_store import (
@@ -101,7 +103,25 @@ def main() -> None:
     code_version = os.environ.get("MARKETPILOT_CODE_VERSION", "development")
     data_version = "certified-gold-bars-v1"
     try:
-        source = _read_source(spark, query).cache()
+        raw_source = _read_source(spark, query).cache()
+        raw_source_count = raw_source.count()
+        source = _filter_xnys_regular_sessions(
+            spark, raw_source, scope.start_date, scope.end_date
+        ).cache()
+        source_count = source.count()
+        excluded_non_session_rows = raw_source_count - source_count
+        logger.info(
+            json.dumps(
+                {
+                    "event": "backtest_source_session_filter",
+                    "run_id": scope.run_id,
+                    "raw_rows": raw_source_count,
+                    "eligible_rows": source_count,
+                    "excluded_non_session_rows": excluded_non_session_rows,
+                },
+                separators=(",", ":"),
+            )
+        )
         _validate_source(source, symbols, scope.long_window)
         curve = _calculate_curve(source, scope).cache()
         detail_count = curve.count()
@@ -145,6 +165,8 @@ def main() -> None:
             "start_date": scope.start_date.isoformat(),
             "end_date": scope.end_date.isoformat(),
             "detail_row_count": detail_count,
+            "source_row_count": raw_source_count,
+            "excluded_non_session_rows": excluded_non_session_rows,
             "object_count": len(objects),
             "inventory_checksum_sha256": inventory_checksum(objects),
             "detailed_output_uri": detailed_uri,
@@ -177,6 +199,7 @@ def main() -> None:
         )
         curve.unpersist()
         source.unpersist()
+        raw_source.unpersist()
     finally:
         spark.stop()
 
@@ -206,6 +229,48 @@ def _read_source(spark, query: str) -> DataFrame:  # type: ignore[no-untyped-def
         .option("driver", "org.mariadb.jdbc.Driver")
         .option("fetchsize", "2000")
         .load()
+    )
+
+
+def _filter_xnys_regular_sessions(
+    spark,
+    source: DataFrame,
+    start_date,
+    end_date,  # type: ignore[no-untyped-def]
+) -> DataFrame:
+    windows = xnys_session_windows(start_date, end_date)
+    if not windows:
+        raise RuntimeError("backtest range contains no XNYS trading sessions")
+    values = ",".join(
+        "("
+        f"DATE '{session_date.isoformat()}',"
+        f"TIMESTAMP '{session_open.replace(tzinfo=None).isoformat(sep=' ')}',"
+        f"TIMESTAMP '{session_close.replace(tzinfo=None).isoformat(sep=' ')}'"
+        ")"
+        for session_date, session_open, session_close in windows
+    )
+    session_frame = spark.sql(
+        "SELECT * FROM VALUES "
+        f"{values} AS session_windows("
+        "xnys_session_date, session_open_utc, session_close_utc)"
+    )
+    return (
+        source.withColumn("source_session_date", to_date("event_time_utc"))
+        .join(
+            broadcast(session_frame),
+            col("source_session_date") == col("xnys_session_date"),
+            "inner",
+        )
+        .filter(
+            (col("event_time_utc") >= col("session_open_utc"))
+            & (col("event_time_utc") < col("session_close_utc"))
+        )
+        .drop(
+            "source_session_date",
+            "xnys_session_date",
+            "session_open_utc",
+            "session_close_utc",
+        )
     )
 
 

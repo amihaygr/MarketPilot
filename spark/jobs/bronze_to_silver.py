@@ -4,6 +4,7 @@ import argparse
 import json
 import logging
 import os
+import re
 from datetime import date
 from uuid import UUID
 
@@ -110,9 +111,13 @@ def main() -> None:
     parser.add_argument("--logical-date", required=True)
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--symbols-json")
+    parser.add_argument("--source-name")
     args = parser.parse_args()
     logical_date = date.fromisoformat(args.logical_date)
     UUID(args.run_id)
+    source_name = args.source_name.strip().lower() if args.source_name else "*"
+    if source_name != "*" and not re.fullmatch(r"[a-z0-9][a-z0-9_-]{0,31}", source_name):
+        raise ValueError("source-name must be a safe lowercase storage partition")
     selected_symbols = None
     if args.symbols_json:
         selected_symbols = tuple(
@@ -131,7 +136,7 @@ def main() -> None:
     spark = build_batch_spark_session("marketpilot-bronze-to-silver")
     spark.sparkContext.setLogLevel(os.environ.get("SPARK_LOG_LEVEL", "WARN"))
     source = (
-        f"{os.environ['BRONZE_URI']}/source=*/event=market_bar_1m/"
+        f"{os.environ['BRONZE_URI']}/source={source_name}/event=market_bar_1m/"
         f"year={logical_date:%Y}/month={logical_date:%m}/day={logical_date:%d}"
     )
     target = (
@@ -200,6 +205,7 @@ def main() -> None:
                     "output_rows": output_count,
                     "duplicates_removed": input_count - output_count,
                     "symbols": selected_symbols or "configured-universe",
+                    "source_name": source_name,
                     "target": target,
                 },
                 separators=(",", ":"),

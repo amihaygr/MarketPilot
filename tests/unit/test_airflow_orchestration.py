@@ -139,6 +139,7 @@ def test_historical_plan_is_bounded_coverage_aware_and_retry_stable() -> None:
     assert "312" in plan["quality"][0]
     assert "--maximum-ingestion-lag-seconds" in plan["quality"][0]
     assert plan["ingestion"][0]["run_id"] == plan["bronze"][0][3]
+    assert plan["bronze"][0][-2:] == ["--source-name", "alpaca"]
 
     values["benchmark_symbol"] = "MSFT"
     with pytest.raises(ValueError, match="included in symbols"):

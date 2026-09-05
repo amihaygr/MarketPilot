@@ -13,10 +13,10 @@
 .data-diagnostic[hidden] { display: none; }
 .data-diagnostic h2, .data-diagnostic p { margin: 0; }
 .data-diagnostic > p { color: var(--muted); font-size: 13px; line-height: 1.6; }
-.diagnostic-facts { display: flex; gap: 20px; margin: 0; }
+.diagnostic-facts { display: grid; grid-template-columns: repeat(3, minmax(96px, auto)); gap: 20px; margin: 0; }
 .diagnostic-facts div { min-width: 70px; }
 .diagnostic-facts dt { color: var(--muted); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
-.diagnostic-facts dd { margin: 4px 0 0; color: var(--amber); font-size: 20px; font-weight: 800; }
+.diagnostic-facts dd { margin: 4px 0 0; color: var(--amber); font-size: 20px; font-weight: 800; white-space: nowrap; }
 .backtest-metrics { margin-top: 20px; }
 .backtest-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(300px, .72fr); gap: 20px; align-items: start; margin-top: 20px; }
 .chart-panel, .methodology-panel, .results-panel { padding: 24px; }
@@ -41,6 +41,8 @@
 .metric-value.positive { color: var(--accent); }
 .metric-value.negative { color: var(--danger); }
 .result-symbol { color: var(--accent); font-weight: 800; }
-@media (max-width: 900px) { .run-controls, .backtest-grid, .data-diagnostic { grid-template-columns: 1fr; } .assumption-strip { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 1150px) { .data-diagnostic { grid-template-columns: minmax(220px, .8fr) minmax(0, 1.4fr); } .diagnostic-facts { grid-column: 1 / -1; grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 900px) { .run-controls, .backtest-grid, .data-diagnostic { grid-template-columns: 1fr; } .assumption-strip { grid-template-columns: repeat(2, 1fr); } .diagnostic-facts { grid-column: auto; } }
+@media (max-width: 680px) { .diagnostic-facts { grid-template-columns: 1fr; } }
 @media (max-width: 560px) { .run-context, .chart-panel, .methodology-panel, .results-panel { padding: 18px; } .assumption-strip { grid-template-columns: 1fr; } .backtest-chart { height: 230px; } }
 @media (prefers-reduced-motion: reduce) { .backtest-line { transition: none; } }
