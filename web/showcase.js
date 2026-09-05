@@ -17,6 +17,14 @@ const paths = {
     outcome: "Clean, lineage-bearing, certified Gold",
     nodes: ["Bronze", "Spark Batch", "Silver Parquet", "DQ gate", "Certified Gold"],
   },
+  historical: {
+    owner: "AIRFLOW · BOUNDED ACQUISITION + CERTIFICATION",
+    title: "Historical bars enter through the same evidence chain as live data.",
+    description:
+      "A bounded Airflow run pages through Alpaca IEX, archives exact source responses by SHA-256, publishes canonical events to an isolated Kafka topic, waits for every offset in Bronze, and only then starts the existing Spark certification and backtest chain.",
+    outcome: "Real historical data with raw evidence, quality gates, and reproducible lineage",
+    nodes: ["Alpaca IEX", "Historical Kafka", "Bronze barrier", "Certified Gold", "Backtest"],
+  },
   archive: {
     owner: "KAFKA SINK + BOUNDED OPERATIONS",
     title: "The serving database is never the only copy of history.",
@@ -62,6 +70,20 @@ const phases = {
     description:
       "The dashboard, architecture narrative, demo guide, verification record, and presentation package connect every claim to a running interface or a dated test result.",
     proof: "Proof: one guided demo traverses source, transport, storage, compute, orchestration, and serving.",
+  },
+  11: {
+    label: "PHASE 11",
+    title: "Certified history becomes a reproducible, bias-aware research result.",
+    description:
+      "A bounded Spark backtest applies each signal only to the next bar, includes explicit friction, stores detailed Parquet evidence, and serves bounded summaries through the API.",
+    proof: "Proof: one immutable run reconciles metrics, daily equity, parameters, code, and data versions.",
+  },
+  12: {
+    label: "PHASE 12",
+    title: "Real Alpaca history reaches the model without bypassing Kafka or Bronze.",
+    description:
+      "Twenty closed XNYS sessions pass through content-addressed source archive, an isolated historical topic, an offset-level Bronze barrier, Spark quality gates, Certified Gold, and the final backtest.",
+    proof: "Proof: 23,349 eligible rows were reconciled while 513 non-session audit rows were explicitly excluded.",
   },
 };
 

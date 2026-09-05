@@ -59,12 +59,18 @@ def test_presenter_console_packages_timed_routes_without_a_data_plane_connection
     assert 'data-mode="10"' in presenter
     assert 'data-mode="15"' in presenter
     assert 'data-mode="20"' in presenter
+    assert "presenter.js?v=final-demo-1" in presenter
+    assert 'href="/backtesting.html"' in presenter
     assert "fetch(" not in script
     assert ".innerHTML" not in script
     assert "replaceChildren" in script
     assert "[90, core.opening]" in script
     assert "[60, core.buffer]" in script
+    assert "core.historical" in script
+    assert "core.backtesting" in script
     assert 'href="/presenter.html"' in showcase
+    assert 'data-path="historical"' in showcase
+    assert 'data-phase="12"' in showcase
     assert "COPY web/presenter.html" in dockerfile
     assert "COPY web/presenter.css" in dockerfile
     assert "COPY web/presenter.js" in dockerfile

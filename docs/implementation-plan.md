@@ -268,8 +268,8 @@ for release evidence and the remaining manual visual-review note.
 ## Phase 11 - Historical backtesting
 
 Status: implemented and locally verified on 2026-08-29. See ADR-005 and
-`docs/phase11-verification.md`. Final visual acceptance remains manual because the
-local browser connector rejected its Trusted Path before navigation.
+`docs/phase11-verification.md`. The populated Backtesting Lab was later verified
+visually during the Phase 12 release-candidate gate.
 
 ### Scope
 
@@ -334,6 +334,18 @@ Status: proposed. Implementation remains gated by ADR-006 and a local resource m
 
 Candidate scope remains an optional Elasticsearch and Kibana Compose profile for
 operational logs only, with bounded retention and no dependency from the core platform.
+
+## Final release presentation refresh
+
+Status: implemented after the Phase 12 release candidate. This is a delivery
+refresh, not a new data path and not a replacement for the optional Phase 13 decision.
+
+- The canonical 15-minute scenario now covers Live, Historical Certification,
+  Backtesting, recovery evidence, decisions, limitations and learning.
+- The Presenter Console retains exact 10, 15 and 20-minute variants and remains
+  read-only.
+- Project Story evidence is dated and aligned with the 2026-09-05 release candidate.
+- Every live-interface segment has a safe documentary fallback.
 
 ## Required checkpoints
 

@@ -84,7 +84,7 @@
 
       <section class="architecture-section" id="architecture" aria-labelledby="architecture-title">
         <div class="section-intro">
-          <p class="story-eyebrow">ONE PLATFORM · THREE VALID PATHS</p>
+          <p class="story-eyebrow">ONE PLATFORM · FOUR VISIBLE DATA PATHS</p>
           <h2 id="architecture-title">Each workload has one clear owner.</h2>
           <p>
             Select a path to see its lifecycle and why it exists. Docker Compose owns long-running
@@ -98,6 +98,9 @@
           </button>
           <button type="button" role="tab" aria-selected="false" aria-controls="path-panel" data-path="certified">
             Certified path
+          </button>
+          <button type="button" role="tab" aria-selected="false" aria-controls="path-panel" data-path="historical">
+            Historical path
           </button>
           <button type="button" role="tab" aria-selected="false" aria-controls="path-panel" data-path="archive">
             Raw + archive
@@ -149,18 +152,20 @@
             <p class="story-eyebrow">MEASURED ON THE TARGET WORKSTATION</p>
             <h2 id="evidence-title">Evidence, not architecture theater.</h2>
           </div>
-          <p>Verification snapshots below were recorded during Phases 8–9 on 28 Aug 2026.</p>
+          <p>Release-candidate evidence below was recorded on 5 Sep 2026; live counts remain labelled separately.</p>
         </div>
         <div class="evidence-grid">
           <article class="evidence-lead">
             <strong>18 / 18</strong>
             <span>Compose services healthy in the reviewed runtime</span>
           </article>
-          <article><strong>69</strong><span>Unit and contract tests passing in the presentation delivery gate</span></article>
+          <article><strong>86</strong><span>Automated tests passing in the final release gate</span></article>
+          <article><strong>20</strong><span>Real XNYS sessions certified through the historical path</span></article>
+          <article><strong>23,349</strong><span>Certified observations reconciled in the final backtest manifest</span></article>
+          <article><strong>555</strong><span>Position changes across AAPL, MSFT and SPY</span></article>
+          <article><strong>513</strong><span>Non-session synthetic audit rows detected and excluded</span></article>
           <article><strong>5,106</strong><span>Gold rows exported into a verified Parquet archive drill</span></article>
           <article><strong>25</strong><span>Rows restored after re-hashing the complete archive inventory</span></article>
-          <article><strong>4,636</strong><span>Versioned Indicator rows in the reviewed live analytics snapshot</span></article>
-          <article><strong>273</strong><span>Explained Signal observations in that same atomic publication</span></article>
           <article><strong>0</strong><span>Duplicate business keys after reviewed idempotency reprocessing</span></article>
         </div>
         <p class="evidence-note">
@@ -171,7 +176,7 @@
       <section class="journey-section" id="journey" aria-labelledby="journey-title">
         <div class="section-intro">
           <p class="story-eyebrow">BUILD SEQUENCE</p>
-          <h2 id="journey-title">Ten phases, each ending in observable proof.</h2>
+          <h2 id="journey-title">Twelve phases, each ending in observable proof.</h2>
           <p>Choose a milestone to see what became verifiable at that point.</p>
         </div>
         <div class="journey-layout">
@@ -181,6 +186,8 @@
             <button type="button" class="phase-button" data-phase="6" aria-pressed="false">6–7 · Product</button>
             <button type="button" class="phase-button" data-phase="8" aria-pressed="false">8–9 · Trust</button>
             <button type="button" class="phase-button" data-phase="10" aria-pressed="false">10 · Showcase</button>
+            <button type="button" class="phase-button" data-phase="11" aria-pressed="false">11 · Backtesting</button>
+            <button type="button" class="phase-button" data-phase="12" aria-pressed="false">12 · Historical data</button>
           </div>
           <article class="phase-detail" aria-live="polite">
             <span id="phase-label">PHASES 0–2</span>
@@ -203,12 +210,13 @@
         <div class="demo-links">
           <a href="/presenter.html">00 · Presenter Console <span>Timer + speaker cues</span></a>
           <a href="/">01 · Dashboard <span>Gold + analytics</span></a>
-          <a href="http://localhost:8085/">02 · Kafka UI <span>Topic + consumer lag</span></a>
-          <a href="http://localhost:9001/">03 · MinIO <span>Bronze + Silver + archive</span></a>
-          <a href="http://localhost:8080/">04 · Airflow <span>Bounded workflows</span></a>
-          <a href="http://localhost:18080/">05 · Spark <span>Cluster + applications</span></a>
-          <a href="http://localhost:8086/">06 · Adminer <span>Gold tables</span></a>
-          <a href="http://localhost:8000/docs">07 · API docs <span>Read-only contract</span></a>
+          <a href="/backtesting.html">02 · Backtesting Lab <span>Certified historical evidence</span></a>
+          <a href="http://localhost:8085/">03 · Kafka UI <span>Live + historical topics</span></a>
+          <a href="http://localhost:9001/">04 · MinIO <span>Bronze + Silver + archive</span></a>
+          <a href="http://localhost:8080/">05 · Airflow <span>Bounded workflows</span></a>
+          <a href="http://localhost:18080/">06 · Spark <span>Cluster + applications</span></a>
+          <a href="http://localhost:8086/">07 · Adminer <span>Gold tables</span></a>
+          <a href="http://localhost:8000/docs">08 · API docs <span>Read-only contract</span></a>
         </div>
       </section>
     </main>

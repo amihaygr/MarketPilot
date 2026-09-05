@@ -58,6 +58,34 @@ publication states ו-DQ watermark."
 
 ## שאלות עומק
 
+### למה ה-Backfill ההיסטורי אינו כותב ישירות ל-MariaDB?
+
+כי היסטוריה חייבת לעבור את אותה שרשרת אמון. Phase 12 שומר source pages לפי
+SHA-256, מפרסם ל-Kafka, מוכיח Bronze לפי offset ורק אז מפעיל Silver, DQ ו-Gold.
+המחיר הוא תהליך איטי יותר; הרווח הוא replay ו-lineage אמיתיים.
+
+### למה יש Topic היסטורי נפרד?
+
+כדי ש-burst של אלפי bars היסטוריים לא ייכנס ל-Spark Streaming שמיועד ל-Live.
+`market.bars.1m.backfill.v1` נשמר ב-Bronze אך אינו נצרך ב-live application.
+
+### כיצד מנעת Look-ahead bias?
+
+ה-position שנובע מ-bar `t` מוחל רק על תשואת `t+1`. בנוסף רק Certified Gold
+נכנס לריצה, והפרמטרים, costs, slippage ו-code version נשמרים עם ה-run.
+
+### למה תוצאת ה-Backtest אינה מרשימה פיננסית?
+
+המטרה היא להוכיח pipeline נכון, לא לבצע curve fitting. ב-run הסופי AAPL הניב
+0.19% מול benchmark של 2.60%, ושתי סדרות אחרות היו שליליות. הצגת תוצאה מעורבת
+עם lineage עדיפה על הבטחת ביצועים שאינה נתמכת.
+
+### מה למדת מהתקלה של 513 הרשומות?
+
+למדתי ש-filter לפי תאריך בלבד אינו מספיק. הרשומות נשמרו ל-audit, אבל Spark
+מצרף input לחלונות XNYS חוקיים ומבודד `source=alpaca` ב-certification ההיסטורי.
+הבדיקה הוסיפה כלל ארכיטקטוני שניתן לאימות ולא תיקון ידני חד-פעמי.
+
 ### למה KRaft ולא ZooKeeper?
 
 הגרסה המקומית משתמשת ב-Kafka מודרני עם metadata quorum פנימי, ולכן אין צורך

@@ -22,7 +22,8 @@ With the local stack running, open:
 - **Backtesting Lab:** <http://localhost:3000/backtesting.html> — bounded historical
   strategy runs, assumptions, benchmark comparison and daily equity curves.
 - **Final Demo Guide:** [`docs/demo-guide.md`](docs/demo-guide.md) — the canonical
-  15-minute presentation path, with 10 and 20-minute variants.
+  15-minute presentation path through the Phase 12 release candidate, with 10 and
+  20-minute variants.
 - **Presenter learning aids:** [`docs/presentation/`](docs/presentation/) — architecture
   explanations, glossary, reviewer Q&A, rehearsal and failure recovery.
 
@@ -300,11 +301,11 @@ the existing read-only freshness API for its live proof. Static verification
 evidence is explicitly dated, and the Dashboard remains focused on exploration.
 
 Use [`docs/demo-guide.md`](docs/demo-guide.md) and the local Presenter Console to
-present one event across Kafka, MinIO, Spark, Airflow, MariaDB, the Backend API and
-the Web App. The 15-minute route is the canonical timing source; the guide includes
-10 and 20-minute variants, extensive learning aids, and safe failure fallbacks. It
-avoids displaying credentials and distinguishes current runtime state from recorded
-verification evidence.
+present the current system through the Phase 12 release candidate: one live event,
+the certified historical path, and the reproducible Backtesting result. The
+15-minute route is the canonical timing source; the guide includes 10 and 20-minute
+variants, learning aids, and safe failure fallbacks. It avoids displaying
+credentials and distinguishes current runtime state from recorded verification evidence.
 
 ## Phase 11 historical backtesting
 

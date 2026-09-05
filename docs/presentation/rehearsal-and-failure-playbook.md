@@ -4,7 +4,7 @@
 
 ### חזרה 1 - הבנה ללא מסכים
 
-- הסבר בקול את ארבעת המסלולים ללא פתיחת מחשב.
+- הסבר בקול את Live, Raw, Certified, Historical ו-SEC ללא פתיחת מחשב.
 - הגדר Kafka, Spark, Airflow, Bronze, Gold ו-idempotency במשפט אחד כל אחד.
 - אם נתקעת, חזור לחוברת המסביר; אל תשנן את תסריט הלחיצות.
 
@@ -35,7 +35,7 @@
 ## תנאי מוכנות
 
 - שתי ריצות רצופות של 15 דקות בטווח של 45 שניות.
-- ארבעת המסלולים מוסברים ללא הערות.
+- חמשת המסלולים מוסברים ללא הערות.
 - עשר שאלות החובה נענות ישירות.
 - מעבר ל-fallback אחד בלי לחץ ובלי שינוי נתונים.
 - שלוש מגבלות נאמרות יחד עם דרך ההרחבה שלהן.
@@ -47,9 +47,10 @@
 
 - [ ] מחשב מחובר לחשמל ומצב שינה מבוטל.
 - [ ] `docker compose ps` מציג את השירותים הנדרשים כבריאים.
-- [ ] Project Story, Presenter Console ו-Dashboard מחזירים HTTP 200.
+- [ ] Project Story, Presenter Console, Dashboard ו-Backtesting Lab מחזירים HTTP 200.
 - [ ] נבחר Symbol עם נתונים.
-- [ ] Kafka Topic, Bronze object ו-Airflow DAG פתוחים מראש.
+- [ ] שני Kafka Topics, Bronze object וה-Airflow run הסופי פתוחים מראש.
+- [ ] Backtesting Lab מציג 20 sessions, 23,349 observations ו-555 trades.
 - [ ] זום הדפדפן ו-resolution מאפשרים קריאה מרחוק.
 - [ ] התראות, Teams, WhatsApp ודואר מושתקים.
 
@@ -65,7 +66,7 @@
 - [ ] מצב 15 דקות נבחר ב-Presenter Console.
 - [ ] טיימר מאופס.
 - [ ] משפט הפתיחה והסיום נמצאים בכרטיס הראשון והאחרון.
-- [ ] PDF הארכיטקטורה ו-verification files זמינים כגיבוי.
+- [ ] מסמך הארכיטקטורה ו-`docs/phase12-verification.md` זמינים כגיבוי.
 
 ## Failure playbook
 
@@ -116,6 +117,13 @@
 1. Project Story עדיין מציג ראיות מתוארכות ומסמן live proof כ-unavailable.
 2. הצג Phase 7 verification ואת גבול ה-SELECT-only identity.
 3. אל תעקוף את ה-API באמצעות חיבור UI ישיר למסד.
+
+### Backtesting Lab אינו עולה או מציג run ישן
+
+1. אל תריץ Backtest חדש מול הקהל.
+2. פתח את טבלת `Final published results` ב-`docs/phase12-verification.md`.
+3. ציין את run ID `48cf39e5-ccb0...`, את code version `bed1fb7` ואת תאריך האימות.
+4. הסבר שה-UI הוא read model; ה-Parquet וה-manifest הם ראיית השחזור המלאה.
 
 ## ניסוחים טובים בזמן תקלה
 

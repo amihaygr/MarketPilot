@@ -1,193 +1,216 @@
-# MarketPilot - מסלול הדגמה רשמי
+# MarketPilot - תרחיש ההצגה הסופי
 
-זהו מקור האמת לזמני ההצגה. המסלול הראשי הוא 15 דקות, עם גרסאות מכוונות של
-10 ו-20 דקות. המטרה אינה לפתוח את כל הכלים, אלא להוכיח סיפור אחד:
+זהו מקור האמת היחיד לזמני ההצגה לאחר Phase 12. ברירת המחדל היא 15 דקות;
+קיימות גם גרסאות של 10 ו-20 דקות ב-`Presenter Console`.
 
-> MarketPilot הופך אירוע שוק לנתון מהיר, גולמי, מאושר וניתן להצגה - תוך שמירה
-> על replay, איכות, lineage, התאוששות וגבול API מאובטח.
+> המסר המרכזי: MarketPilot מכניס נתוני שוק חיים והיסטוריים דרך מסלולים ניתנים
+> לשחזור, מפריד בין מהיר למאושר, והופך Certified Gold ל-Analytics ול-Backtesting
+> בלי לעקוף את Kafka, Bronze, Data Quality או גבול ה-API.
 
-## בחירת מסלול
+## המספרים שמותר להציג
 
-| מסלול | מתי לבחור | מה נשאר תמיד |
-|---|---|---|
-| 10 דקות | הזמן קוצר או שיש שאלות רבות | הבעיה, תרשים אחד, אירוע מקצה לקצה, Dashboard והוכחת אמינות אחת |
-| 15 דקות | ברירת המחדל המומלצת | כל הסיפור המרכזי עם הוכחה חיה וזמן ניווט |
-| 20 דקות | ניתנה מסגרת רחבה במפורש | SEC, Airflow לעומק, DQ, archive/restore, lineage ו-tradeoffs |
+אלה תוצאות Release Candidate מתאריך 2026-09-05, ולא מצב Production חי:
+
+- 18 מתוך 18 שירותי Compose היו healthy.
+- 86 בדיקות עברו; 7 בדיקות Docker אופציונליות דולגו אך הגבולות שלהן נבדקו בריצה המלאה.
+- 20 ימי מסחר תקינים לפי לוח XNYS, מ-2026-08-03 עד 2026-08-28.
+- 23,349 observations ו-555 שינויי פוזיציה ב-Backtest הסופי.
+- 513 רשומות synthetic מסוף שבוע זוהו, נשמרו ל-audit והוחרגו מהחישוב.
+- Run סופי: `48cf39e5-ccb0-5df6-9149-df5bc8741469`; code version: `bed1fb7`.
+
+תוצאות האסטרטגיה הן ראיית Engineering בלבד. אין להציג אותן כהמלצה או כהבטחת תשואה.
 
 ## טבלת הזמן הקנונית - 15 דקות
 
-| זמן | מקטע | מסך ראשי | תוצאה רצויה |
+| זמן | מקטע | מסך | המסר שחייב לעבור |
 |---:|---|---|---|
-| 00:00-01:30 | הבעיה, ההיקף וההבטחה | Project Story | הקהל מבין מה נבנה ולמי |
-| 01:30-04:00 | הארכיטקטורה וארבעת המסלולים | מסמך/Project Story | הקהל מבין Live, Raw, Certified ו-SEC |
-| 04:00-09:30 | הוכחה מקצה לקצה | Dashboard, Kafka, MinIO | אירוע עובר ממקור עד מוצר עם lineage |
-| 09:30-11:30 | Batch, איכות והתאוששות | Airflow, Spark, verification | ברור למה נתון מהיר עדיין אינו Certified |
-| 11:30-13:00 | Analytics והערך למשתמש | Dashboard | הנתונים הופכים להסבר ולא רק לטבלה |
-| 13:00-14:00 | בגרות הנדסית וסיכום | Evidence | בדיקות, אבטחה, archive וגבולות |
-| 14:00-15:00 | מרווח ניווט או שאלה | המסך הנוכחי | לא ממהרים ולא חורגים מהזמן |
+| 00:00-01:30 | בעיה והבטחה | Project Story | מהיר, אבל גם גולמי, מאושר וניתן לשחזור |
+| 01:30-03:30 | ארכיטקטורה | Project Story | לכל workload יש מסלול ובעלים |
+| 03:30-06:00 | Live event | Dashboard, Kafka, MinIO | אירוע אחד מגיע למוצר ונשמר כראיית מקור |
+| 06:00-08:30 | Historical to Certified | Airflow | היסטוריה אמיתית אינה עוקפת את Medallion |
+| 08:30-10:30 | Backtesting | Backtesting Lab | רק Certified, ללא look-ahead, עם lineage |
+| 10:30-12:00 | אמינות והתאוששות | Project Story Evidence | DQ, idempotency, checkpoint, archive ו-restore |
+| 12:00-14:00 | החלטות וסיכום | Project Story | מה החלטתי, מה למדתי ומה הגבולות |
+| 14:00-15:00 | מרווח | המסך הנוכחי | ניווט, שאלה קצרה או סיום רגוע |
 
-## הכנה לפני ההצגה
+## לפני שנכנסים לחדר
 
-1. הרץ `docker compose ps` וודא שכל השירותים הנדרשים בריאים.
+1. הרץ `docker compose ps` וודא שכל 18 השירותים healthy.
 2. פתח מראש, בסדר הזה:
-   - Presenter Console: <http://localhost:3000/presenter.html>
-   - Project Story: <http://localhost:3000/showcase.html>
-   - Dashboard: <http://localhost:3000/>
-   - Kafka UI: <http://localhost:8085/>
-   - MinIO: <http://localhost:9001/>
-   - Airflow: <http://localhost:8080/>
-   - Spark: <http://localhost:18080/>
-   - Adminer: <http://localhost:8086/>
-   - Backend API: <http://localhost:8000/docs>
-3. בחר מראש Symbol עם נתונים בטווח שבעת הימים האחרונים, בדרך כלל `AAPL`.
-4. פתח מראש אובייקט Bronze אחד, Topic אחד ו-DAG אחד. אל תחפש בזמן אמת מול הקהל.
-5. אל תפתח `.env`, אל תציג סיסמאות ואל תפעיל Backfill או Archive בזמן הדמו.
+   - <http://localhost:3000/presenter.html>
+   - <http://localhost:3000/showcase.html>
+   - <http://localhost:3000/>
+   - <http://localhost:8085/>
+   - אובייקט Bronze מוכן תחת <http://localhost:9001/>
+   - ה-run `phase12_month_lineage_final_20260905` תחת <http://localhost:8080/>
+   - <http://localhost:3000/backtesting.html>
+3. ב-Dashboard בחר `AAPL`; ב-Backtesting Lab ודא שה-run החדש ביותר נבחר.
+4. סגור `.env`, טרמינלים עם secrets וכל clipboard שמכיל credentials.
+5. אל תפעיל Backfill, Archive, SQL write או event ידני בזמן ההצגה.
+6. בחר מצב 15 דקות ב-Presenter Console ואפס את הטיימר.
 
-## המסלול המלא - מה לומר ומה להראות
+## תסריט מלא: מה לומר ומה לעשות
 
-### 00:00-01:30 - הבעיה והפתרון
-
-**אמור:**
-
-> MarketPilot הוא פרויקט Data Engineering מקומי שמרכז נתוני שוק ו-SEC עבור
-> 11 נכסים. האתגר הוא לספק נתון מהר, אבל גם לשמור מקור גולמי ולבנות גרסה
-> מאושרת שאפשר להסביר ולשחזר. לכן המערכת מפרידה בין Live, Raw ו-Certified.
-
-**הראה:** כותרת ה-Project Story וארבעת עקרונות הפרויקט.
-
-**הקהל צריך להבין:** זו פלטפורמת נתונים ו-Analytics, לא מערכת לביצוע מסחר.
-
-**מעבר:** "כדי להשיג גם מהירות וגם אמינות, לכל סוג עבודה יש מסלול ובעלים ברורים."
-
-### 01:30-04:00 - הארכיטקטורה
-
-הצג את התרשים המלא או את בורר המסלולים ב-Project Story.
-
-**Live:** `Alpaca -> market-producer -> Kafka -> Spark Streaming -> Gold PROVISIONAL`
-
-**Raw:** `Kafka -> raw-archive-sink -> MinIO Bronze`
-
-**Certified:** `Bronze -> Spark Batch -> Silver -> DQ -> Spark Batch -> Gold CERTIFIED`
-
-**SEC:** `SEC EDGAR -> SEC adapter -> Bronze + Gold metadata`
+### 00:00-01:30 - הבעיה וההבטחה
 
 **אמור:**
 
-> Docker Compose מנהל שירותים שחיים כל הזמן. Airflow מנהל רק עבודות שמתחילות
-> ומסתיימות. זו הסיבה ש-Spark Streaming אינו Task של Airflow.
+> MarketPilot הוא פרויקט Data Engineering מקומי עבור 11 נכסים ונתוני SEC.
+> רציתי לפתור מתח אמיתי: להציג מידע מהר, בלי לוותר על מקור גולמי, איכות,
+> שחזור ויכולת להסביר מאיפה כל תוצאה הגיעה. זו פלטפורמת Analytics ומחקר,
+> לא מערכת לביצוע מסחר ולא הבטחת תשואה.
 
-**הבחנה שחייבים לזכור:** MinIO מחזיק חומר גלם, Parquet וארכיון; MariaDB מחזיק
-Gold שמוכן לשאילתות היישום.
+**הראה:** כותרת וארבעת עקרונות ה-Project Story.
 
-### 04:00-09:30 - הוכחה של אירוע מקצה לקצה
+**חשוב שיבינו:** לא בנית אוסף containers; בנית שרשרת אמון בנתונים.
 
-#### Dashboard
+**מעבר:** “כדי להשיג גם מהירות וגם אמינות, נתתי לכל סוג עבודה מסלול ובעלים ברורים.”
 
-- בחר `AAPL` וטווח `7D`.
-- הצג Freshness, מצב Certification, גרף Close וקו SMA 20.
-- הצג Indicator אחד ו-Signal מוסבר אחד.
+### 01:30-03:30 - הארכיטקטורה
 
-**אמור:** "המשתמש רואה רק נתונים שמגיעים דרך Backend API. הדפדפן אינו מכיר
-כתובת או סיסמה של MariaDB או MinIO."
+עבור בין ארבעת ה-tabs ב-Project Story.
 
-#### Kafka UI
-
-- פתח `market.bars.1m.v1`.
-- הצג key של Symbol, partition, offset ו-consumer groups.
-
-**אמור:** "Kafka מפריד בין המפיק לצרכנים. אותו אירוע יכול להגיע גם למסלול
-Streaming וגם למסלול הארכיון בלי שהמפיק יכיר את שניהם."
-
-#### MinIO Bronze
-
-- פתח אובייקט תחת `source=alpaca` או `source=synthetic`.
-- הצג `event_id`, זמן מקור, `ingested_at_utc` ו-schema version.
-- הצג את partition/offset בשם האובייקט או הנתיב.
-
-**אמור:** "ה-JSON הוא גוף האירוע. מיקום Kafka נשמר בנתיב כדי לתמוך ב-lineage,
-idempotency ו-replay. האובייקט נכתב לפני שה-consumer מאשר את ה-offset."
-
-**מעבר:** "עד כאן הוכחנו נתון מהיר ומקור גולמי. עכשיו נראה כיצד יום סגור הופך
-לנתון מאושר."
-
-### 09:30-11:30 - Certified, איכות והתאוששות
-
-#### Airflow
-
-- הצג `daily_market_close`.
-- עקוב אחר הסדר Bronze -> Silver -> DQ -> Gold -> Analytics.
-- הצג `max_active_runs=1` ואת DAG ה-Backfill הפרמטרי.
-
-#### Spark
-
-- הצג Master ו-Worker בריאים.
-- הסבר ש-Airflow שולח Spark Batch מוגבל בזמן, בעוד Streaming נשאר פעיל תחת Docker.
+- Live: `Alpaca -> Producer -> Kafka -> Spark Streaming -> Gold PROVISIONAL`
+- Raw: `Kafka -> raw-archive-sink -> MinIO Bronze`
+- Certified: `Bronze -> Spark Batch -> Silver -> DQ -> Gold CERTIFIED`
+- Historical: `Alpaca IEX -> Historical Kafka -> Bronze barrier -> Certified -> Backtest`
+- SEC, במשפט: `SEC EDGAR -> raw Bronze + deduplicated Gold metadata`
 
 **אמור:**
 
-> Batch בונה מחדש את המחיצה מ-Bronze. רק אם בדיקות freshness, completeness,
-> duplicates, nulls ו-OHLC עוברות, מתקדמים ל-CERTIFIED. כשל אינו מוחק את
-> ה-Certified הקודם ואינו מקדם watermark.
+> Docker Compose מנהל שירותים ארוכי חיים. Airflow מנהל רק jobs שמתחילים
+> ומסתיימים. Spark מבצע את החישוב; Airflow מסדר, מתזמן ומנטר אותו. MinIO
+> מחזיק raw ו-Parquet, ואילו MariaDB מחזיק Gold שמוכן ל-API.
 
-**ראיית גיבוי:** `docs/phase4-verification.md` מתעד 1,881 רשומות, עשר בדיקות
-חוסמות וריצה שלילית שלא שינתה את Gold הקודם.
+**מעבר:** “עכשיו אוכיח שהתרשים הזה הוא מערכת עובדת, לא architecture theater.”
 
-### 11:30-13:00 - Analytics והערך למשתמש
+### 03:30-06:00 - אירוע Live מקצה לקצה
 
-חזור ל-Dashboard.
-
-- הצג SMA 20, RSI 14, Realized Volatility ו-Volume Ratio.
-- הצג הסבר של Signal, לא רק את הכיוון שלו.
-
-**אמור:**
-
-> שכבת Analytics אינה נותנת המלצת מסחר. היא מספקת context מוסבר ומתועד.
-> כל Indicator ו-Signal נושא version, run, code, data ו-certification lineage.
-
-### 13:00-14:00 - בגרות הנדסית וסיכום
-
-חזור לאזור Evidence ב-Project Story.
+1. ב-Dashboard הצג `AAPL`, freshness, certification, Close ו-SMA.
+2. ב-Kafka UI פתח `market.bars.1m.v1` והצבע על key, partition ו-offset.
+3. ב-MinIO פתח Bronze JSON מוכן והצבע על `event_id`, זמן מקור,
+   `ingested_at_utc` ו-`schema_version`; ה-partition וה-offset נמצאים בנתיב.
 
 **אמור:**
 
-> מעבר ל-Happy Path, בדקתי restart מ-checkpoint, idempotency, הרשאת SELECT בלבד,
-> DQ חוסם, compaction, archive עם SHA-256 ושחזור מבודד. המערכת אינה טוענת
-> ל-exactly once מקצה לקצה; היא משיגה נכונות עסקית באמצעות replay, keys ו-upserts.
+> אותו event משרת שני צרכנים עצמאיים. Spark Streaming מעדכן Gold כ-Provisional,
+> ו-raw-archive-sink שומר Bronze לפני commit של ה-offset. הדפדפן אינו מכיר
+> MariaDB או MinIO; הוא קורא רק דרך Backend API מוגבל.
 
-סיים במשפט:
+**מעבר:** “ה-Live נותן מהירות. עכשיו אראה איך הכנסתי עבר אמיתי וקיבלתי אמון.”
 
-> MarketPilot מדגים כיצד בונים Data Platform קטנה אבל שלמה: מהמקור, דרך transport,
-> storage ו-compute, ועד API, Analytics וחוויית משתמש שניתנת להסבר ולשחזור.
+### 06:00-08:30 - Historical to Certified
+
+ב-Airflow פתח את `phase12_month_lineage_final_20260905` ב-DAG
+`historical_market_backfill`. הצבע על הרצף:
+
+`acquire -> Bronze barrier -> Bronze to Silver -> DQ -> Certified Gold -> Backtest`
+
+**אמור:**
+
+> לא כתבתי היסטוריה ישירות ל-MariaDB. כל response של Alpaca נשמר לפי SHA-256,
+> וכל bar עבר topic היסטורי נפרד. Barrier מוכיח שכל partition ו-offset הגיעו
+> ל-Bronze לפני ש-Spark מתחיל. לאחר מכן משתמשים באותו מסלול Certification.
+> הריצה הסופית עיבדה 20 sessions אמיתיים לפי לוח XNYS.
+
+**החלטה להדגיש:** topic היסטורי נפרד מונע burst של Backfill במסלול Streaming החי.
+
+**מעבר:** “כעת יש היסטוריה אמיתית, מאושרת ובעלת lineage; אפשר לבחון עליה רעיון.”
+
+### 08:30-10:30 - Backtesting
+
+ב-Backtesting Lab בחר את ה-run שמתחיל `48cf39e5` ואת `AAPL`.
+
+**אמור:**
+
+> זה Spark Batch תחום בזמן, ורק Certified Gold רשאי להיכנס. אות שחושב ב-bar
+> מסוים משפיע רק מה-bar הבא, כדי למנוע look-ahead bias. Costs ו-slippage
+> מפורשים, והפלט המלא נשמר כ-Parquet עם run, data, code ו-schema versions.
+
+הצג: 20 sessions, 23,349 observations, 555 trades, Equity Curve וטבלת ההשוואה.
+
+**אמור על התוצאה:**
+
+> AAPL החזיר 0.19% מול benchmark של 2.60%. MSFT ו-SPY באסטרטגיה היו שליליים.
+> איני מסתיר תוצאה לא מחמיאה: ההצלחה כאן היא pipeline אמין ושחזור מלא,
+> לא התאמת אסטרטגיה בדיעבד.
+
+**מעבר:** “תוצאה אמינה חשובה יותר מתוצאה יפה. עכשיו אראה מה המערכת עושה כשמשהו אינו נקי.”
+
+### 10:30-12:00 - אמינות והתאוששות
+
+חזור ל-Evidence ב-Project Story.
+
+**אמור:**
+
+> בדקתי restart מ-checkpoint, retries, idempotent upserts, DQ חוסם, משתמש API
+> עם SELECT בלבד, archive עם SHA-256 ושחזור לסכמה מבודדת. בריצת החודש זוהו
+> 513 רשומות synthetic מסוף שבוע. הן לא נמחקו כדי לשמור audit trail, אבל
+> הוחרגו ב-Spark SQL לפי sessions של XNYS.
+
+הדגש: אין טענת exactly-once מקצה לקצה. הנכונות העסקית נבנית מ-offsets,
+checkpoints, business keys, upserts ופרסום אטומי.
+
+### 12:00-14:00 - החלטות, למידה וסיכום
+
+**אמור:**
+
+> שלוש ההחלטות המרכזיות שלי היו: לא להפוך את Airflow ל-service supervisor;
+> להפריד בין Provisional מהיר ל-Certified סמכותי; ולשמור raw מחוץ למסד ה-serving.
+> למדתי ש-Data Engineering אינו רק להעביר נתון. צריך להגדיר חוזים, בעלות על
+> processes, semantics של retry, איכות, lineage ויכולת restore.
+
+**מגבלות בכנות:** broker יחיד, IEX אינו feed מאוחד מלא, אין end-user auth/TLS,
+אין capacity benchmark ל-Production, והאסטרטגיה אינה מודל השקעה.
+
+**משפט סיום:**
+
+> MarketPilot היא Data Platform מקומית אבל שלמה: ממקור חי והיסטורי, דרך
+> transport, storage, compute ו-quality gates, ועד API, Analytics ו-Backtesting
+> שאני יכול להסביר, לבדוק ולשחזר. תודה, אשמח לשאלות.
 
 ### 14:00-15:00 - מרווח
 
-אל תוסיף נושא חדש. השתמש בזמן כדי לעבור מסך, לענות על שאלה קצרה או לחזור למשפט
-הסיום. אם הקדמת, עצור בביטחון; אין צורך למלא כל שנייה.
+אל תפתח נושא חדש. השלם מעבר מסך, ענה על שאלה קצרה או סיים מוקדם ובביטחון.
 
-## קיצור ל-10 דקות
+## גרסת 10 דקות
 
-השאר: פתיחה, תרשים אחד, Dashboard, Kafka, Bronze, משפט על Airflow/DQ וסיכום.
+שמור את הסיבתיות, לא את כל המסכים:
 
-דלג על: Spark UI, Adminer, SEC לעומק, archive numbers, פירוט כל Indicator.
+- 1:00 פתיחה
+- 1:30 ארכיטקטורה
+- 2:30 Live event
+- 2:00 Historical to Certified
+- 1:30 Backtesting
+- 1:00 אמינות
+- 0:30 סיכום
 
-חלוקה: 1:00 פתיחה, 1:30 ארכיטקטורה, 4:00 אירוע, 1:30 אמינות, 1:30 Dashboard,
-0:30 סיכום.
+דלג על Spark UI, Adminer, SEC לעומק ופרטי Archive. הצג Bronze או Kafka, לא את שניהם.
 
-## הרחבה ל-20 דקות
+## גרסת 20 דקות
 
-הוסף בלבד:
+הרחב בלבד:
 
-- SEC: User-Agent, throttling, accession number ו-raw JSON ב-Bronze;
-- Adminer: Gold tables, watermarks ו-DQ results;
-- archive/restore: manifest, SHA-256 ושחזור לסכמה מבודדת;
-- tradeoffs: LocalExecutor, Kafka יחיד, localhost security והדרך לענן.
+- SEC: User-Agent, throttling, accession number ו-raw JSON.
+- MinIO: source pages content-addressed ו-session manifest.
+- Data Quality: completeness, duplicates, nulls, OHLC ו-expected bars.
+- Archive/restore: inventory SHA-256 ושחזור לסכמה מבודדת.
+- Tradeoffs: LocalExecutor, broker יחיד, IEX coverage והמעבר העתידי ל-S3.
 
-אל תחזור פעמיים על אותו מסלול נתונים.
+## חלופות כשמסך לא עובד
 
-## כללי בטיחות להצגה
+| מסך שנפל | חלופה בטוחה | מה לומר |
+|---|---|---|
+| Dashboard | Project Story + `docs/phase9-verification.md` | “זו ראיה מתוארכת, לא מצב חי.” |
+| Kafka UI | Bronze object + `docs/phase12-verification.md` | “ה-offset נשמר בנתיב ומוכיח lineage.” |
+| MinIO | Historical tab + Phase 12 verification | “ה-UI הוא כלי צפייה; ה-manifest הוא הראיה.” |
+| Airflow | `docs/phase12-verification.md` | “הריצה הסופית הסתיימה ב-success; איני מפעיל DAG לצורך אפקט.” |
+| Backtesting Lab | טבלת Final published results ב-Phase 12 | “המספרים מתוארכים ומקושרים ל-run ול-code version.” |
+| Backend API | Phase 7 verification | “איני עוקף את גבול ה-API באמצעות חיבור UI ישיר למסד.” |
 
-- אין להציג `.env`, credentials או connection strings.
-- אין לבצע כתיבות ידניות למסד לצורך אפקט.
-- אין להפעיל DAG תחזוקתי ללא הכנה ואישור.
-- מספרים מ-Verification מוצגים עם תאריך; מספרים מה-API מוצגים כמצב חי.
-- אם ממשק אינו זמין, אומרים זאת במפורש ועוברים לראיה מתועדת.
+## משפטי חירום שכדאי לזכור
+
+- “הממשק המקומי אינו זמין כרגע, ולכן אעבור לראיית verification מתוארכת.”
+- “אני מפריד בין מצב live לבין snapshot שנמדד.”
+- “לא אשנה נתונים כדי לתקן דמו; אשתמש במסלול הגיבוי שהוכן מראש.”
+- “אני לא יודע בוודאות; אומר מה נמדד ואיך הייתי בודק את השאר.”

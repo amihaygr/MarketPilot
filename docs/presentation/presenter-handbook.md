@@ -9,15 +9,17 @@
 MarketPilot מקבל נתוני שוק ו-SEC, שומר מקור גולמי שניתן לשחזור, מעבד נתונים
 במסלול חי ובמסלול Batch מאושר, ומציג Gold ו-Analytics למשתמש דרך API מוגבל.
 
-## הסיפור בחמישה משפטים
+## הסיפור בשבעה משפטים
 
 1. Alpaca שולח bars של דקה, וה-producer מתרגם אותם לחוזה `MarketBarV1`.
 2. Kafka מפריד בין המקור לצרכנים ושומר סדר ומיקום באמצעות partition ו-offset.
 3. Spark Streaming מפרסם מהר ל-Gold כ-PROVISIONAL, ובמקביל raw-archive-sink שומר Bronze ב-MinIO.
 4. Airflow מפעיל עבודות Spark Batch מוגבלות בזמן שבונות Silver ומפרסמות CERTIFIED רק אחרי DQ.
 5. ה-Dashboard קורא רק דרך Backend API עם משתמש MariaDB בעל SELECT בלבד.
+6. Historical Backfill מכניס Alpaca IEX דרך topic נפרד, Bronze barrier ואותו מסלול Certification.
+7. Backtesting משתמש רק ב-Certified Gold ושומר תוצאה מלאה, הנחות ו-lineage שניתנים לשחזור.
 
-## ארבעת המסלולים שאתה חייב להסביר ללא דף
+## חמשת המסלולים שאתה חייב להסביר ללא דף
 
 ### Live
 
@@ -151,11 +153,37 @@ lineage, אפשר לחזור ל-Bronze במקום להסתמך רק על מה ש
 - **למה חשוב:** backup שלא שוחזר הוא רק תקווה, לא הוכחת התאוששות.
 - **הבחנה:** archive אינו purge; ה-MVP אינו מוחק אוטומטית היסטוריה מ-MariaDB.
 
+### Historical Acquisition ו-Bronze Barrier
+
+- **במשפט:** Backfill היסטורי תחום בזמן שמוכיח שהמקור נשמר לפני תחילת העיבוד.
+- **ב-MarketPilot:** Alpaca IEX נשמר כ-source pages לפי SHA-256, bars מפורסמים ל-topic נפרד, ו-Airflow ממתין לכל offset ב-Bronze.
+- **למה לא לדלג:** כתיבה ישירה ל-MariaDB הייתה עוקפת Kafka, raw evidence, DQ ו-lineage.
+- **מה להראות:** `historical_market_backfill` והמעבר מ-acquisition ל-Bronze barrier ורק אחר כך ל-Spark.
+- **בלבול נפוץ:** Historical Backfill אינו ה-Streaming החי ואינו נשלח ל-topic החי.
+- **עומק:** run identities ו-session manifests דטרמיניסטיים מאפשרים retry בלי לפרסם שוב עבודה שכבר הושלמה.
+
+### Backtesting
+
+- **במשפט:** סימולציה היסטורית תחומה ומבוקרת של strategy מוגדרת מראש.
+- **ב-MarketPilot:** Spark Batch קורא Certified Gold, מפעיל SMA crossover, friction ו-next-bar position, ושומר Parquet מלא וסיכומי Gold.
+- **למה לא לדלג:** הוא מוכיח שהפלטפורמה מסוגלת להפוך lineage לתוצאה אנליטית שניתנת לביקורת.
+- **מה להראות:** run, parameters, observations, trades, Equity Curve והשוואה ל-SPY.
+- **בלבול נפוץ:** Backtest אינו ביצוע מסחר, ותוצאה היסטורית אינה הבטחת תשואה.
+- **עומק:** אות מ-bar `t` מוחל רק על תשואת `t+1`; אחרת המודל משתמש במידע שלא היה זמין בזמן ההחלטה.
+
+### IEX ו-XNYS
+
+- **IEX:** feed נגיש של Alpaca שמייצג מסחר בבורסה אחת ולא consolidated SIP מלא.
+- **XNYS:** לוח המסחר של New York Stock Exchange, כולל חגים וסגירות מוקדמות.
+- **ב-MarketPilot:** coverage של IEX נבדק במפורש, ו-XNYS קובע אילו דקות וסשנים חוקיים לחישוב.
+- **ראיה:** 513 רשומות synthetic של שבת נשמרו ל-audit אך הוחרגו מה-Backtest.
+
 ## שלוש החלטות שאתה צריך לייחס לעצמך
 
 1. **הפרדת Lifecycle:** בחרת לא להפעיל Streaming מ-Airflow כי task אינסופי מטשטש retries ומסכן consumers כפולים.
 2. **שני סוגי Gold:** בחרת Freshness מיידי לצד Certification מאוחר כדי לא להעמיד פנים שנתון חי כבר עבר יום מלא של DQ.
 3. **Raw מחוץ ל-MariaDB:** בחרת MinIO ל-replay, Parquet וארכיון, תוך השארת MariaDB כשכבת serving ממוקדת.
+4. **Historical ללא קיצור דרך:** בחרת topic נפרד ו-Bronze barrier במקום load ישיר למסד.
 
 ## מגבלות שאפשר לומר בביטחון
 
