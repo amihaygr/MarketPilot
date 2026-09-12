@@ -1,38 +1,38 @@
 <div dir="rtl" align="right">
 
-# MarketPilot — מאגר שאלות ותשובות
+# `MarketPilot` — מאגר שאלות ותשובות
 
 בכל תשובה: משפט ישיר, ראיה מהפרויקט, הסיבה להחלטה ולבסוף מגבלה אם קיימת.
 
 ## עשר שאלות שחייבים לדעת
 
-### 1. למה Kafka אם נפח הנתונים קטן?
+### 1. למה `Kafka` אם נפח הנתונים קטן?
 
 Kafka אינו נבחר רק בגלל scale. הוא מפריד producer מצרכנים, שומר offsets ומאפשר
 ל-Streaming ול-archive לצרוך אותו event בנפרד. ב-MVP broker יחיד מספיק; cluster
 גדול יותר מוצדק רק לאחר מדידה.
 
-### 2. למה גם MinIO וגם MariaDB?
+### 2. למה גם `MinIO` וגם `MariaDB`?
 
 MariaDB הוא Gold serving לשאילתות היישום. MinIO מחזיק raw immutable, Silver
 Parquet וארכיון. שמירת הכול רק ב-MariaDB הייתה מחלישה replay, compression ו-restore.
 
-### 3. למה Airflow אינו מפעיל Streaming?
+### 3. למה `Airflow` אינו מפעיל `Streaming`?
 
 Streaming הוא process שאינו אמור להסתיים. Docker מנהל lifecycle ו-restart;
 Airflow מנהל dependencies ו-retries של jobs תחומים. ההפרדה מתועדת ב-ADR-002.
 
-### 4. האם המערכת exactly once?
+### 4. האם המערכת `exactly once`?
 
 לא קיימת טענת exactly-once בין כל הגבולות. Kafka, Spark ומסד יכולים לבצע retry.
 הנכונות נשמרת באמצעות deterministic event IDs, checkpoints, unique keys ו-upserts.
 
-### 5. מה ההבדל בין Provisional ל-Certified?
+### 5. מה ההבדל בין `Provisional` ל־`Certified`?
 
 Provisional נכתב מהר מ-Streaming. Certified נבנה מחדש מ-Bronze עבור מחיצה סגורה
 ורק לאחר DQ חוסם. הכשל ב-Batch אינו מסתיר את ה-Certified הקודם.
 
-### 6. מה קורה אם Spark Streaming נופל?
+### 6. מה קורה אם `Spark Streaming` נופל?
 
 Docker מפעיל אותו מחדש, והוא ממשיך מה-checkpoint וה-Kafka progress השמורים.
 Phase 3 אימת restart של driver ו-worker בלי כפילות במפתחות העסקיים.
@@ -60,7 +60,7 @@ publication states ו-DQ watermark."
 
 ## שאלות עומק
 
-### למה ה-Backfill ההיסטורי אינו כותב ישירות ל-MariaDB?
+### למה ה־`Backfill` ההיסטורי אינו כותב ישירות ל־`MariaDB`?
 
 כי היסטוריה חייבת לעבור את אותה שרשרת אמון. Phase 12 שומר source pages לפי
 SHA-256, מפרסם ל-Kafka, מוכיח Bronze לפי offset ורק אז מפעיל Silver, DQ ו-Gold.

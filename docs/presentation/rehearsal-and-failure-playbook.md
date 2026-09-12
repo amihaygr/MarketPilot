@@ -1,6 +1,6 @@
 <div dir="rtl" align="right">
 
-# MarketPilot — חזרות ותרחישי תקלה
+# `MarketPilot` — חזרות ותרחישי תקלה
 
 ## תכנית חזרות
 

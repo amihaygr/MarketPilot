@@ -1,6 +1,6 @@
 <div dir="rtl" align="right">
 
-# MarketPilot — חוברת המסביר
+# `MarketPilot` — חוברת המסביר
 
 המטרה של החוברת היא שלא רק תדע מה ללחוץ, אלא תבין מה אתה מציג ותוכל להסביר
 אותו במילים שלך. אין צורך לשנן את כל הטקסט. למד קודם את המודלים המחשבתיים ואת
@@ -53,7 +53,7 @@ lineage, אפשר לחזור ל-Bronze במקום להסתמך רק על מה ש
 
 ## כרטיסי הסבר לרכיבים מרכזיים
 
-### Kafka
+### `Kafka`
 
 - **במשפט:** מערכת תורים מבוזרת שמעבירה events בין producers ל-consumers.
 - **ב-MarketPilot:** מקבלת MarketBarV1 ומאפשרת ל-Streaming ול-archive לצרוך בנפרד.
@@ -62,7 +62,7 @@ lineage, אפשר לחזור ל-Bronze במקום להסתמך רק על מה ש
 - **בלבול נפוץ:** Kafka אינו מסד הנתונים העסקי; הוא transport ו-log של events.
 - **עומק:** אין טענה ל-exactly once בין כל המערכות; offset ו-idempotency מגנים על הנכונות.
 
-### Spark Structured Streaming
+### `Spark Structured Streaming`
 
 - **במשפט:** מנוע שמעבד stream כמיקרו-batches מתמשכים.
 - **ב-MarketPilot:** קורא Kafka, מאמת events, משתמש ב-event time ומבצע upsert ל-Gold.
@@ -71,7 +71,7 @@ lineage, אפשר לחזור ל-Bronze במקום להסתמך רק על מה ש
 - **בלבול נפוץ:** Streaming אינו מופעל כל בוקר מ-Airflow; הוא שירות ארוך חיים.
 - **עומק:** checkpoint מכיל offset והתקדמות state ולכן הוא state קריטי שאסור למחוק סתם.
 
-### Spark Batch
+### `Spark Batch`
 
 - **במשפט:** עבודת עיבוד שמתחילה, מעבדת קלט תחום ומסתיימת.
 - **ב-MarketPilot:** מבצעת Bronze to Silver, Silver to Gold, analytics, backfill ותחזוקה.
@@ -80,7 +80,7 @@ lineage, אפשר לחזור ל-Bronze במקום להסתמך רק על מה ש
 - **בלבול נפוץ:** Spark הוא מנוע החישוב; Airflow הוא מנהל סדר העבודה.
 - **עומק:** פרסום Gold נעשה בגבול אטומי ורק לאחר DQ חוסם.
 
-### Airflow
+### `Airflow`
 
 - **במשפט:** Orchestrator לעבודות בעלות התחלה וסיום.
 - **ב-MarketPilot:** מתזמן SEC, Batch, DQ, backfill, compaction ו-archive.
@@ -89,7 +89,7 @@ lineage, אפשר לחזור ל-Bronze במקום להסתמך רק על מה ש
 - **בלבול נפוץ:** Airflow אינו supervisor של Kafka, Streaming, MariaDB או Web App.
 - **עומק:** `SparkSubmitOperator` שולח job ל-Spark Master ומחכה ל-terminal state.
 
-### MinIO, Bronze ו-Silver
+### `MinIO`, ‏`Bronze` ו־`Silver`
 
 - **במשפט:** MinIO הוא object storage מקומי תואם S3.
 - **ב-MarketPilot:** Bronze שומר raw immutable; Silver שומר Parquet נקי וקנוני.
@@ -98,7 +98,7 @@ lineage, אפשר לחזור ל-Bronze במקום להסתמך רק על מה ש
 - **בלבול נפוץ:** Bronze אינו טבלה נקייה; הוא ראיית המקור. Silver אינו שכבת היישום.
 - **עומק:** S3 הוא החלופה העתידית בלי לשנות את התפקיד הלוגי של השכבה.
 
-### MariaDB Gold
+### `MariaDB Gold`
 
 - **במשפט:** מסד ה-serving שמחזיק מודלים מוכנים ליישום.
 - **ב-MarketPilot:** bars, indicators, signals, SEC metadata, DQ, watermarks ו-manifests.
@@ -107,55 +107,55 @@ lineage, אפשר לחזור ל-Bronze במקום להסתמך רק על מה ש
 - **בלבול נפוץ:** Gold אינו העותק היחיד של ההיסטוריה.
 - **עומק:** business keys ו-upserts הופכים retries לבטוחים.
 
-### Provisional לעומת Certified
+### `Provisional` לעומת `Certified`
 
 - **Provisional:** טרי, נכתב מ-Streaming, מתאים לתצוגה בזמן שה-session פתוח.
 - **Certified:** נבנה מחדש מ-Bronze, עבר DQ ומייצג מחיצה סגורה וסמכותית.
 - **למה שניהם:** בלי Provisional אין freshness; בלי Certified אין אמון מלא ביום הסגור.
 - **המשפט לזכור:** "Streaming אומר מה ידוע עכשיו; Batch קובע מה מאושר לאחר הסגירה."
 
-### Data Quality
+### `Data Quality`
 
 - **במשפט:** בדיקות שמחליטות אם partition ראוי לפרסום.
 - **בדיקות:** freshness, completeness, duplicates, nulls, OHLC, expected bars ו-schema.
 - **מה קורה בכשל:** אין watermark חדש, staging מתנקה וה-Certified הקודם נשאר.
 - **למה חשוב:** מערכת יכולה להיות זמינה טכנית ועדיין לפרסם נתון שגוי.
 
-### Idempotency
+### `Idempotency`
 
 - **במשפט:** אותה פעולה יכולה לרוץ שוב בלי ליצור תוצאה עסקית כפולה.
 - **ב-MarketPilot:** event IDs דטרמיניסטיים, unique keys, upserts והחלפת partition אטומית.
 - **דוגמה:** שליחה כפולה של AAPL באותו timestamp משאירה רשומה עסקית אחת.
 - **המשפט לזכור:** "אנחנו לא מונעים כל retry; אנחנו הופכים retry לבטוח."
 
-### Checkpoint
+### `Checkpoint`
 
 - **במשפט:** מצב שמאפשר ל-Streaming לדעת מאיפה להמשיך לאחר restart.
 - **ב-MarketPilot:** נשמר ב-named volume ומשותף ל-driver ול-worker לפי הצורך.
 - **למה חשוב:** בלעדיו process שחזר עלול להתחיל מחדש או לאבד state.
 - **זהירות:** לא מוחקים checkpoint כדי 'לתקן' תקלה בלי תכנית replay מפורשת.
 
-### Lineage
+### `Lineage`
 
 - **במשפט:** היכולת להסביר מאיפה הגיעה רשומה ואיזה תהליך יצר אותה.
 - **ב-MarketPilot:** source, event ID, Kafka position, run, code, data ו-schema/model versions.
 - **למה חשוב:** מאפשר debugging, audit, replay והשוואה בין Provisional ל-Certified.
 
-### Backend API והגבול לדפדפן
+### `Backend API` והגבול לדפדפן
 
 - **במשפט:** שכבת שירות מבוקרת בין UI למסד.
 - **ב-MarketPilot:** validation, pagination, טווחים מוגבלים ו-response models ללא שדות פנימיים.
 - **הוכחה:** משתמש `marketpilot_app` קורא ב-SELECT וניסיון UPDATE נדחה.
 - **מגבלה:** לפני חשיפה לאינטרנט דרושים authentication, TLS ו-rate limiting.
 
-### Archive ו-Restore
+### `Archive` ו־`Restore`
 
 - **במשפט:** היסטוריה סגורה מיוצאת ל-Parquet עם manifest ו-hashes שניתנים לאימות.
 - **ב-MarketPilot:** SHA-256 לכל object, inventory checksum ושחזור לסכמה מבודדת.
 - **למה חשוב:** backup שלא שוחזר הוא רק תקווה, לא הוכחת התאוששות.
 - **הבחנה:** archive אינו purge; ה-MVP אינו מוחק אוטומטית היסטוריה מ-MariaDB.
 
-### Historical Acquisition ו-Bronze Barrier
+### `Historical Acquisition` ו־`Bronze Barrier`
 
 - **במשפט:** Backfill היסטורי תחום בזמן שמוכיח שהמקור נשמר לפני תחילת העיבוד.
 - **ב-MarketPilot:** Alpaca IEX נשמר כ-source pages לפי SHA-256, bars מפורסמים ל-topic נפרד, ו-Airflow ממתין לכל offset ב-Bronze.
@@ -164,7 +164,7 @@ lineage, אפשר לחזור ל-Bronze במקום להסתמך רק על מה ש
 - **בלבול נפוץ:** Historical Backfill אינו ה-Streaming החי ואינו נשלח ל-topic החי.
 - **עומק:** run identities ו-session manifests דטרמיניסטיים מאפשרים retry בלי לפרסם שוב עבודה שכבר הושלמה.
 
-### Backtesting
+### `Backtesting`
 
 - **במשפט:** סימולציה היסטורית תחומה ומבוקרת של strategy מוגדרת מראש.
 - **ב-MarketPilot:** Spark Batch קורא Certified Gold, מפעיל SMA crossover, friction ו-next-bar position, ושומר Parquet מלא וסיכומי Gold.
@@ -173,7 +173,7 @@ lineage, אפשר לחזור ל-Bronze במקום להסתמך רק על מה ש
 - **בלבול נפוץ:** Backtest אינו ביצוע מסחר, ותוצאה היסטורית אינה הבטחת תשואה.
 - **עומק:** אות מ-bar `t` מוחל רק על תשואת `t+1`; אחרת המודל משתמש במידע שלא היה זמין בזמן ההחלטה.
 
-### IEX ו-XNYS
+### `IEX` ו־`XNYS`
 
 - **IEX:** feed נגיש של Alpaca שמייצג מסחר בבורסה אחת ולא consolidated SIP מלא.
 - **XNYS:** לוח המסחר של New York Stock Exchange, כולל חגים וסגירות מוקדמות.
