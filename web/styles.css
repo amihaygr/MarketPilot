@@ -350,10 +350,27 @@ h2 {
 
 .filter-bar {
   display: grid;
-  grid-template-columns: 1.1fr repeat(3, minmax(125px, 1fr)) auto;
+  grid-template-columns: 1.1fr repeat(4, minmax(125px, 1fr)) auto;
   gap: 10px;
   align-items: end;
   margin-bottom: 21px;
+}
+
+.data-scope-note {
+  margin: -2px 0 14px;
+  padding: 9px 12px;
+  border: 1px solid rgb(82 214 190 / 20%);
+  border-radius: 8px;
+  background: rgb(82 214 190 / 6%);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.data-scope-note.audit-warning {
+  border-color: rgb(255 180 73 / 32%);
+  background: rgb(255 180 73 / 8%);
+  color: #ffc66d;
 }
 
 .explorer-toolbar {

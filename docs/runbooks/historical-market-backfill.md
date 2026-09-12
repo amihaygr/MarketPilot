@@ -26,6 +26,12 @@ Never paste credentials into Airflow parameters, logs, screenshots, or Git.
 6. Trigger once and follow tasks in order: acquisition, Bronze-to-Silver, quality,
    Gold Certified, then backtest.
 
+Each run is intentionally limited to 31 calendar days. For a richer chart, run
+adjacent, non-overlapping monthly windows and include all configured symbols plus
+`SPY`. Start with three to six months, verify each run, and only then extend the
+history. The workflow is idempotent, so retrying the same successful scope does
+not create duplicate business rows.
+
 ## Evidence to inspect
 
 - Kafka UI: `market.bars.1m.backfill.v1` contains canonical events.
@@ -33,6 +39,8 @@ Never paste credentials into Airflow parameters, logs, screenshots, or Git.
 - Airflow: every mapped session is green; no Gold task ran before its quality gate.
 - MariaDB: requested dates are `CERTIFIED`; the newest backtest run is `SUCCEEDED`.
 - Backtesting Lab: select the newest run and confirm non-flat market-dependent results.
+- Dashboard: the default `Alpaca market data` source excludes synthetic audit rows;
+  selecting `All sources (audit)` must show an explicit mixed-source warning.
 
 ## Failure handling
 

@@ -27,6 +27,7 @@ class ReadRepository(Protocol):
         start_utc: datetime,
         end_utc: datetime,
         certification_status: str | None,
+        source_name: str | None,
         page: int,
         page_size: int,
     ) -> Row: ...
@@ -145,6 +146,7 @@ class MariaDbReadRepository:
         start_utc: datetime,
         end_utc: datetime,
         certification_status: str | None,
+        source_name: str | None,
         page: int,
         page_size: int,
     ) -> Row:
@@ -157,6 +159,9 @@ class MariaDbReadRepository:
         if certification_status:
             predicates.append("bars.certification_status = %s")
             parameters.append(certification_status)
+        if source_name:
+            predicates.append("bars.source_name = %s")
+            parameters.append(source_name)
         where_clause = " AND ".join(predicates)
         count_sql = f"""
             SELECT COUNT(*) AS total

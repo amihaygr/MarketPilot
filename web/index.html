@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="MarketPilot market data serving dashboard" />
     <title>MarketPilot | Data Command Center</title>
-    <link rel="stylesheet" href="/styles.css?v=phase9-bi-1" />
-    <script src="/app.js?v=phase9-bi-2" defer></script>
+    <link rel="stylesheet" href="/styles.css?v=market-truth-1" />
+    <script src="/app.js?v=market-truth-1" defer></script>
   </head>
   <body>
     <div class="app-shell">
@@ -112,11 +112,23 @@
                   <option value="CERTIFIED">Certified</option>
                 </select>
               </label>
+              <label>
+                <span>Source</span>
+                <select id="source-filter" name="source">
+                  <option value="alpaca" selected>Alpaca market data</option>
+                  <option value="">All sources (audit)</option>
+                  <option value="synthetic">Synthetic test data</option>
+                </select>
+              </label>
               <button type="submit" id="apply-filters">
                 <span class="button-label">Apply filters</span>
                 <span class="button-loader" aria-hidden="true"></span>
               </button>
             </form>
+
+            <p class="data-scope-note" id="data-scope-note">
+              Showing Alpaca observations only. Missing periods are left as gaps; test data is excluded.
+            </p>
 
             <div class="market-snapshot" aria-label="Visible range summary">
               <div>
@@ -183,6 +195,7 @@
                     <th>Low</th>
                     <th>Close</th>
                     <th>Volume</th>
+                    <th>Source</th>
                     <th>Status</th>
                   </tr>
                 </thead>

@@ -236,6 +236,7 @@ def test_market_bars_enforce_filters_pagination_and_aware_bounds() -> None:
             "start_utc": "2026-08-20T00:00:00Z",
             "end_utc": "2026-08-27T00:00:00Z",
             "certification_status": "PROVISIONAL",
+            "source": "alpaca",
         },
     )
 
@@ -244,6 +245,7 @@ def test_market_bars_enforce_filters_pagination_and_aware_bounds() -> None:
     assert repository.market_query is not None
     assert repository.market_query["symbol"] == "AAPL"
     assert repository.market_query["certification_status"] == "PROVISIONAL"
+    assert repository.market_query["source_name"] == "alpaca"
     assert (
         client.get(
             "/api/v1/market-bars",
@@ -256,6 +258,13 @@ def test_market_bars_enforce_filters_pagination_and_aware_bounds() -> None:
         == 422
     )
     assert client.get("/api/v1/market-bars", params={"symbol": "bad symbol"}).status_code == 422
+    assert (
+        client.get(
+            "/api/v1/market-bars",
+            params={"symbol": "AAPL", "source": "unknown"},
+        ).status_code
+        == 422
+    )
     assert (
         client.get("/api/v1/market-bars", params={"symbol": "AAPL", "page_size": 201}).status_code
         == 422

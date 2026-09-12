@@ -147,6 +147,7 @@ def create_app(
             default=None,
             pattern=r"^(PROVISIONAL|CERTIFIED)$",
         ),
+        source: str | None = Query(default=None, pattern=r"^(alpaca|synthetic)$"),
         page: int = Query(default=1, ge=1, le=MAX_PAGE),
         page_size: int = Query(default=50, ge=1, le=MAX_PAGE_SIZE),
     ) -> MarketBarPage:
@@ -164,6 +165,7 @@ def create_app(
             start_utc=start,
             end_utc=end,
             certification_status=certification_status,
+            source_name=source,
             page=page,
             page_size=page_size,
         )

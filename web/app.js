@@ -44,6 +44,8 @@ function captureElements() {
     "start-date",
     "end-date",
     "status-filter",
+    "source-filter",
+    "data-scope-note",
     "market-filters",
     "apply-filters",
     "bar-result-count",
@@ -168,6 +170,7 @@ async function loadDashboard() {
     ]);
     renderSymbols(symbols.items);
     renderFreshness(freshness);
+    setMarketDates(freshness.market.latest_event_time_utc);
     renderFilings(filings.items);
     await loadBars();
     setSystemState("ready", "API healthy");
@@ -194,6 +197,9 @@ async function loadBars() {
   });
   const status = elements["status-filter"].value;
   if (status) parameters.set("certification_status", status);
+  const source = elements["source-filter"].value;
+  if (source) parameters.set("source", source);
+  renderDataScope(source);
   setLoading(true);
   try {
     const chartParameters = new URLSearchParams(parameters);
@@ -351,6 +357,7 @@ function renderBars(result) {
       cell(price(bar.low)),
       cell(price(bar.close)),
       cell(number(bar.volume)),
+      cell(bar.source),
       statusCell(bar.certification_status),
     );
     elements["bars-body"].append(row);
@@ -372,8 +379,11 @@ function renderChart(bars, indicators) {
   }
   elements["chart-empty"].hidden = true;
   const closeValues = ordered.map((bar) => Number(bar.close));
+  const barTimes = new Set(ordered.map((bar) => new Date(bar.event_time_utc).getTime()));
   const smaByTime = new Map(
-    indicators.map((item) => [new Date(item.event_time_utc).getTime(), Number(item.value)]),
+    indicators
+      .filter((item) => barTimes.has(new Date(item.event_time_utc).getTime()))
+      .map((item) => [new Date(item.event_time_utc).getTime(), Number(item.value)]),
   );
   const smaValues = ordered
     .map((bar) => smaByTime.get(new Date(bar.event_time_utc).getTime()))
@@ -398,21 +408,27 @@ function renderChart(bars, indicators) {
     bar: ordered[index],
     sma: smaByTime.get(new Date(ordered[index].event_time_utc).getTime()),
   }));
-  const line = points
-    .map((point, index) => `${index === 0 ? "M" : "L"}${point.x.toFixed(2)},${point.y.toFixed(2)}`)
+  const segments = splitChartSegments(points);
+  const line = segments.map((segment) => chartSegmentPath(segment)).join(" ");
+  const area = segments
+    .map((segment) => {
+      const path = chartSegmentPath(segment);
+      return `${path} L${segment.at(-1).x.toFixed(2)},225 L${segment[0].x.toFixed(2)},225 Z`;
+    })
     .join(" ");
-  const area = `${line} L${x(closeValues.length - 1).toFixed(2)},225 L20,225 Z`;
   elements["price-line"].setAttribute("d", line);
   elements["price-area"].setAttribute("d", area);
   const smaPoints = ordered
     .map((bar, index) => {
       const value = smaByTime.get(new Date(bar.event_time_utc).getTime());
-      return value === undefined ? null : `${x(index).toFixed(2)},${y(value).toFixed(2)}`;
+      return value === undefined
+        ? null
+        : { x: x(index), y: y(value), bar };
     })
-    .filter(Boolean);
+    .filter((point) => point !== null);
   elements["sma-line"].setAttribute(
     "d",
-    smaPoints.map((point, index) => `${index === 0 ? "M" : "L"}${point}`).join(" "),
+    splitChartSegments(smaPoints).map((segment) => chartSegmentPath(segment)).join(" "),
   );
   elements["price-line"].hidden = !state.series.price;
   elements["price-area"].hidden = !state.series.price;
@@ -420,6 +436,36 @@ function renderChart(bars, indicators) {
   elements["chart-last-price"].textContent = `$${price(ordered.at(-1).close)}`;
   state.chartModel = { points };
   state.chartFocusIndex = points.length - 1;
+}
+
+function splitChartSegments(points) {
+  const segments = [];
+  points.forEach((point) => {
+    const active = segments.at(-1);
+    const previous = active?.at(-1);
+    const gapMinutes = previous
+      ? (new Date(point.bar.event_time_utc) - new Date(previous.bar.event_time_utc)) / 60000
+      : 0;
+    if (!active || gapMinutes > 15) segments.push([point]);
+    else active.push(point);
+  });
+  return segments;
+}
+
+function chartSegmentPath(segment) {
+  return segment
+    .map((point, index) => `${index === 0 ? "M" : "L"}${point.x.toFixed(2)},${point.y.toFixed(2)}`)
+    .join(" ");
+}
+
+function renderDataScope(source) {
+  const note = elements["data-scope-note"];
+  note.classList.toggle("audit-warning", !source || source === "synthetic");
+  note.textContent = source === "alpaca"
+    ? "Showing Alpaca observations only. Missing periods are left as gaps; test data is excluded."
+    : source === "synthetic"
+      ? "Audit view: synthetic test observations only. These are not real market prices."
+      : "Audit view: sources are mixed. Synthetic test observations can distort prices and returns.";
 }
 
 function renderAnalytics(indicators, signals) {
@@ -511,7 +557,9 @@ function renderSignals() {
 }
 
 function applyRangePreset(days) {
-  const end = new Date();
+  const end = elements["end-date"].value
+    ? new Date(`${elements["end-date"].value}T00:00:00Z`)
+    : new Date();
   const start = new Date(end);
   start.setUTCDate(start.getUTCDate() - Math.max(0, days - 1));
   elements["start-date"].value = dateInput(start);
@@ -524,6 +572,15 @@ function applyRangePreset(days) {
   state.page = 1;
   updateSelectedAsset();
   loadBars();
+}
+
+function setMarketDates(latestEventTime) {
+  if (!latestEventTime) return;
+  const end = new Date(latestEventTime);
+  const start = new Date(end);
+  start.setUTCDate(start.getUTCDate() - 6);
+  elements["start-date"].value = dateInput(start);
+  elements["end-date"].value = dateInput(end);
 }
 
 function selectAsset(symbol) {

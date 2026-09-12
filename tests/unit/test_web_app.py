@@ -14,8 +14,8 @@ def test_hidden_error_toast_cannot_be_forced_visible_by_component_styles() -> No
 def test_dashboard_assets_are_versioned_and_interactive_controls_are_accessible() -> None:
     html = (PROJECT_ROOT / "web" / "index.html").read_text(encoding="utf-8")
 
-    assert "styles.css?v=phase9-bi-1" in html
-    assert "app.js?v=phase9-bi-2" in html
+    assert "styles.css?v=market-truth-1" in html
+    assert "app.js?v=market-truth-1" in html
     assert 'id="price-chart"' in html
     assert 'tabindex="0"' in html
     assert 'aria-label="Quick date ranges"' in html
@@ -29,8 +29,12 @@ def test_dashboard_uses_safe_dom_rendering_for_api_content() -> None:
     assert "textContent" in script
     assert "fetchAllPages" in script
     assert "PAGE_BATCH_SIZE = 6" in script
-    assert 'fetchAllPages(`${API}/market-bars`' in script
-    assert 'fetchAllPages(`${API}/indicators`' in script
+    assert "fetchAllPages(`${API}/market-bars`" in script
+    assert "fetchAllPages(`${API}/indicators`" in script
+    assert 'parameters.set("source", source)' in script
+    assert "splitChartSegments" in script
+    assert "setMarketDates(freshness.market.latest_event_time_utc)" in script
+    assert 'id="source-filter"' in (PROJECT_ROOT / "web" / "index.html").read_text(encoding="utf-8")
 
 
 def test_phase10_showcase_is_packaged_and_uses_the_existing_api_boundary() -> None:
