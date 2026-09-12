@@ -1,4 +1,6 @@
-# MarketPilot - חזרות ותרחישי תקלה
+<div dir="rtl" align="right">
+
+# MarketPilot — חזרות ותרחישי תקלה
 
 ## תכנית חזרות
 
@@ -41,7 +43,7 @@
 - שלוש מגבלות נאמרות יחד עם דרך ההרחבה שלהן.
 - משפט פתיחה ומשפט סיום נאמרים באופן טבעי.
 
-## Preflight ביום ההצגה
+## בדיקה מקדימה (Preflight) ביום ההצגה
 
 ### טכני
 
@@ -68,7 +70,7 @@
 - [ ] משפט הפתיחה והסיום נמצאים בכרטיס הראשון והאחרון.
 - [ ] מסמך הארכיטקטורה ו-`docs/phase12-verification.md` זמינים כגיבוי.
 
-## Failure playbook
+## תרחישי תקלה ודרך התאוששות
 
 ### Dashboard אינו עולה
 
@@ -139,3 +141,5 @@
 - "זה production ready" בלי authentication, TLS ו-capacity testing.
 - "Airflow מריץ את כל המערכת" - הוא מריץ רק bounded workflows.
 - "MariaDB שומר הכול" - Raw, Silver ו-Archive נמצאים ב-object storage.
+
+</div>

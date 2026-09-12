@@ -1,4 +1,6 @@
-# MarketPilot - מאגר שאלות ותשובות
+<div dir="rtl" align="right">
+
+# MarketPilot — מאגר שאלות ותשובות
 
 בכל תשובה: משפט ישיר, ראיה מהפרויקט, הסיבה להחלטה ולבסוף מגבלה אם קיימת.
 
@@ -159,3 +161,5 @@ processes, חוזים, זמני event, retry semantics, איכות, lineage וי
 Authentication, TLS, rate limiting, shared secret management, multi-broker Kafka,
 centralized logs, capacity testing ו-disaster recovery רחב. המערכת הנוכחית מיועדת
 ל-localhost ומוכיחה את העקרונות והגבולות.
+
+</div>

@@ -1,59 +1,45 @@
-# Final Presentation Verification
+<div dir="rtl" align="right">
 
-- Verification date: 2026-09-05
-- Scope: post-Phase 12 demo and learning package
-- Canonical route: 15 minutes
-- Optional routes: 10 and 20 minutes
+# אימות סופי של חומרי ההצגה
 
-## Delivered
+- תאריך האימות: 12 בספטמבר 2026
+- היקף: חבילת ההדגמה והלמידה בעברית לאחר Phase 12
+- המסלול המרכזי: 15 דקות
+- מסלולים חלופיים: 10 או 20 דקות
 
-- The Presenter Console now covers Live, Historical Certification, Backtesting,
-  recovery evidence, engineering decisions, limitations and a closing statement.
-- Project Story includes a Historical path, Phase 11 and Phase 12 milestones, and
-  dated release-candidate evidence.
-- `docs/demo-guide.md` is the single timing source and contains exact Hebrew
-  speaker text, clicks, transitions, safety rules and fallbacks.
-- The handbook, glossary, reviewer Q&A and rehearsal playbook cover historical
-  acquisition, Bronze barrier, XNYS filtering, IEX limits and look-ahead bias.
+## מה נמסר
 
-## Automated validation
+- מסך העזר למציג (Presenter Console) מכסה נתונים חיים, אישור נתונים היסטוריים, בדיקה היסטורית, התאוששות מתקלות, החלטות הנדסיות, מגבלות ומשפט סיום.
+- סיפור הפרויקט (Project Story) כולל את המסלול ההיסטורי, אבני דרך של Phase 11 ו־Phase 12 וראיות מתוארכות מגרסת המועמדת להפצה.
+- הקובץ `docs/demo-guide.md` הוא מקור האמת היחיד לזמני ההצגה וכולל טקסט מדויק בעברית, לחיצות, משפטי מעבר, כללי בטיחות וחלופות במקרה תקלה.
+- חוברת המסביר, המילון, מאגר השאלות ותוכנית החזרות מכסים רכישת נתונים היסטוריים, מחסום Bronze, סינון לפי XNYS, מגבלות IEX והטיית הסתכלות קדימה (Look-ahead bias).
 
-- Full Python suite: 86 passed, 7 opt-in integration tests skipped, one dependency
-  deprecation warning.
-- Ruff lint: passed.
-- Ruff format check: 111 Python files already formatted.
-- JavaScript syntax: passed for `presenter.js` and `showcase.js`.
-- `docker compose --env-file .env config --quiet`: passed.
-- Presenter, Project Story, Backtesting Lab and both updated JavaScript assets:
-  HTTP 200 after rebuilding the Web App.
+## בדיקות אוטומטיות
 
-The skipped suites require explicit Docker integration flags. Their Kafka, MinIO,
-Spark, MariaDB, Airflow, serving and browser boundaries were already exercised by
-the successful Phase 12 release-candidate run and were not mutated for this
-read-only presentation refresh.
+- חבילת Python מלאה: 86 בדיקות עברו, 7 בדיקות Integration אופציונליות דולגו והתקבלה אזהרת Deprecation אחת מתלות חיצונית.
+- בדיקת Ruff: עברה.
+- בדיקת עיצוב Ruff: כל 111 קובצי Python כבר מעוצבים.
+- בדיקת תחביר JavaScript: עברה עבור `presenter.js` ו־`showcase.js`.
+- אימות `docker compose --env-file .env config --quiet`: עבר.
+- מסך המציג, סיפור הפרויקט, מעבדת ה־Backtesting ושני קובצי JavaScript המעודכנים החזירו HTTP 200 לאחר בנייה מחדש של ה־Web App.
 
-## Runtime and visual verification
+הבדיקות שדולגו דורשות הפעלה מפורשת של בדיקות Integration ב־Docker. גבולות Kafka, MinIO, Spark, MariaDB, Airflow, שכבת ההגשה והדפדפן כבר נבדקו בהצלחה בריצת המועמדת להפצה של Phase 12, ולא שונו במסגרת רענון חומרי ההצגה לקריאה בלבד.
 
-- All 18 long-running Compose services reported healthy after the Web App restart.
-- Presenter Console loaded in RTL with the 15-minute route selected and exact
-  10:00, 15:00 and 20:00 plans.
-- The Backtesting cue opened the correct local route and displayed the final
-  20-session, 23,349-observation and 555-trade evidence.
-- Project Story loaded current API proof, rendered the Historical path, and changed
-  the journey card to Phase 12 when selected.
-- Browser console inspection found no warnings or errors on either presentation page.
+## אימות סביבת הריצה והמראה החזותי
 
-## Known runtime condition
+- כל 18 שירותי Docker Compose ארוכי־החיים דיווחו על מצב תקין לאחר הפעלה מחדש של ה־Web App.
+- מסך המציג נטען ב־RTL, כאשר מסלול 15 הדקות מסומן וזמינים מסלולים מדויקים של 10, 15 ו־20 דקות.
+- כרטיס ה־Backtesting פתח את הנתיב המקומי הנכון והציג ראיות של 20 ימי מסחר, 23,349 תצפיות ו־555 שינויי פוזיציה.
+- סיפור הפרויקט טען ראיה עדכנית דרך ה־API, הציג את המסלול ההיסטורי ושינה את כרטיס המסע ל־Phase 12 לאחר בחירה.
+- בדיקת Console בדפדפן לא מצאה אזהרות או שגיאות באף אחד מדפי ההצגה.
+- סיפור הפרויקט נבדק חזותית ב־RTL; מונחים באנגלית מבודדים בכיוון LTR ושורת אנגלית מלאה מוצגת בנפרד משמאל לימין.
 
-The operational monitor correctly reports a market-freshness warning because the
-latest live observation is older than the configured 96-hour threshold. Kafka,
-MinIO, MariaDB and the Backend API probes remain healthy. The threshold was not
-weakened for presentation purposes. If this warning is visible during the demo,
-present it as evidence that health and freshness are intentionally separate.
+## מצב ידוע בסביבת הריצה
 
-## Presentation boundary
+מנגנון הניטור מציג בצדק אזהרת טריות, מכיוון שהתצפית החיה האחרונה ישנה מסף 96 השעות שהוגדר. בדיקות Kafka, MinIO, MariaDB ו־Backend API נשארות תקינות. הסף לא הוחלש לצורכי ההצגה. אם האזהרה מופיעה בזמן ההדגמה, יש להציג אותה כראיה לכך שתקינות השירותים וטריות הנתונים הן שתי בדיקות נפרדות במכוון.
 
-No data was created, backfilled, deleted or modified for the demo refresh. The
-Presenter Console is read-only, Project Story reads only the bounded freshness API,
-and all dated metrics remain labelled as verification evidence rather than live
-production claims.
+## גבולות ההצגה
+
+לא נוצרו, הושלמו לאחור, נמחקו או שונו נתונים לצורך רענון ההדגמה. מסך המציג מיועד לקריאה בלבד, סיפור הפרויקט קורא רק מ־Freshness API התחום, וכל המדדים המתוארכים מסומנים כראיות אימות ולא כטענות על סביבת Production חיה.
+
+</div>

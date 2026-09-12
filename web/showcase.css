@@ -33,6 +33,36 @@ body {
   color: var(--text);
 }
 
+/* Hebrew drives the page; technical names are isolated so BiDi stays readable. */
+p,
+h1,
+h2,
+h3,
+li,
+small,
+.path-explanation,
+.phase-detail,
+.demo-links a {
+  unicode-bidi: plaintext;
+}
+
+bdi,
+code,
+.story-brand,
+.flow-node,
+.proof-number strong,
+.proof-meta strong,
+#phase-label {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+[dir="ltr"] {
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: left;
+}
+
 a,
 button {
   font: inherit;

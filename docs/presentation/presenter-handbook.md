@@ -1,4 +1,6 @@
-# MarketPilot - חוברת המסביר
+<div dir="rtl" align="right">
+
+# MarketPilot — חוברת המסביר
 
 המטרה של החוברת היא שלא רק תדע מה ללחוץ, אלא תבין מה אתה מציג ותוכל להסביר
 אותו במילים שלך. אין צורך לשנן את כל הטקסט. למד קודם את המודלים המחשבתיים ואת
@@ -21,21 +23,21 @@ MarketPilot מקבל נתוני שוק ו-SEC, שומר מקור גולמי שנ
 
 ## חמשת המסלולים שאתה חייב להסביר ללא דף
 
-### Live
+### המסלול החי (Live)
 
 `Alpaca -> Producer -> Kafka -> Spark Streaming -> MariaDB Gold PROVISIONAL`
 
 מטרתו לתת נתון טרי. הוא מהיר, אך יום שעדיין פתוח עלול לקבל אירועים מאוחרים או
 תיקונים. לכן התוצאה מסומנת Provisional.
 
-### Raw
+### המסלול הגולמי (Raw)
 
 `Kafka -> raw-archive-sink -> MinIO Bronze`
 
 מטרתו לשמור את העובדות המקוריות. אם צריך לתקן קוד, לבצע backfill או להוכיח
 lineage, אפשר לחזור ל-Bronze במקום להסתמך רק על מה שכבר עובד.
 
-### Certified
+### המסלול המאושר (Certified)
 
 `Bronze -> Spark Batch -> Silver -> DQ -> Spark Batch -> Gold CERTIFIED`
 
@@ -194,3 +196,5 @@ lineage, אפשר לחזור ל-Bronze במקום להסתמך רק על מה ש
 - S3, TLS, centralized logging ופריסה משותפת הם שלבי המשך.
 
 הצגת מגבלה עם מנגנון שדרוג מוכיחה שיקול דעת; היא אינה מחלישה את הפרויקט.
+
+</div>
