@@ -24,6 +24,9 @@ With the local stack running, open:
 - **Final Demo Guide:** [`docs/demo-guide.md`](docs/demo-guide.md) — the canonical
   15-minute presentation path through the Phase 12 release candidate, with 10 and
   20-minute variants.
+- **Simple Hebrew demo companion:**
+  [`docs/presentation/demo-day-step-by-step-he.md`](docs/presentation/demo-day-step-by-step-he.md)
+  — exact page order, clicks, content to show and natural Hebrew speaker text.
 - **Presenter learning aids:** [`docs/presentation/`](docs/presentation/) — architecture
   explanations, glossary, reviewer Q&A, rehearsal and failure recovery.
 

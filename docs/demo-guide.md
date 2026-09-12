@@ -3,6 +3,9 @@
 זהו מקור האמת היחיד לזמני ההצגה לאחר Phase 12. ברירת המחדל היא 15 דקות;
 קיימות גם גרסאות של 10 ו-20 דקות ב-`Presenter Console`.
 
+אם אתה רוצה דף אחד ופשוט להחזיק מולך בזמן ההצגה, השתמש ב־
+[`docs/presentation/demo-day-step-by-step-he.md`](presentation/demo-day-step-by-step-he.md).
+
 > המסר המרכזי: MarketPilot מכניס נתוני שוק חיים והיסטוריים דרך מסלולים ניתנים
 > לשחזור, מפריד בין מהיר למאושר, והופך Certified Gold ל-Analytics ול-Backtesting
 > בלי לעקוף את Kafka, Bronze, Data Quality או גבול ה-API.
