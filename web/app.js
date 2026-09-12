@@ -2,6 +2,8 @@
 
 const API = "/api/v1";
 const PAGE_SIZE = 50;
+const CHART_PAGE_SIZE = 200;
+const PAGE_BATCH_SIZE = 6;
 const state = {
   page: 1,
   totalPages: 0,
@@ -196,7 +198,7 @@ async function loadBars() {
   try {
     const chartParameters = new URLSearchParams(parameters);
     chartParameters.set("page", "1");
-    chartParameters.set("page_size", "200");
+    chartParameters.set("page_size", String(CHART_PAGE_SIZE));
     const analyticsParameters = new URLSearchParams({
       symbol,
       start_utc: `${elements["start-date"].value}T00:00:00Z`,
@@ -210,9 +212,9 @@ async function loadBars() {
     smaParameters.set("indicator_code", "SMA_20");
     const [result, chartResult, indicators, smaIndicators, signals] = await Promise.all([
       fetchJson(`${API}/market-bars?${parameters.toString()}`),
-      fetchJson(`${API}/market-bars?${chartParameters.toString()}`),
+      fetchAllPages(`${API}/market-bars`, chartParameters, requestSequence),
       fetchJson(`${API}/indicators?${analyticsParameters.toString()}`),
-      fetchJson(`${API}/indicators?${smaParameters.toString()}`),
+      fetchAllPages(`${API}/indicators`, smaParameters, requestSequence),
       fetchJson(`${API}/signals?${signalParameters.toString()}`),
     ]);
     if (requestSequence !== state.requestSequence) return;
@@ -232,6 +234,31 @@ async function loadBars() {
   } finally {
     if (requestSequence === state.requestSequence) setLoading(false);
   }
+}
+
+async function fetchAllPages(endpoint, baseParameters, requestSequence) {
+  const firstParameters = new URLSearchParams(baseParameters);
+  firstParameters.set("page", "1");
+  firstParameters.set("page_size", String(CHART_PAGE_SIZE));
+  const firstPage = await fetchJson(`${endpoint}?${firstParameters.toString()}`);
+  const items = [...firstPage.items];
+  const totalPages = firstPage.pagination.total_pages;
+
+  for (let firstPageNumber = 2; firstPageNumber <= totalPages; firstPageNumber += PAGE_BATCH_SIZE) {
+    if (requestSequence !== state.requestSequence) return { ...firstPage, items: [] };
+    const lastPageNumber = Math.min(totalPages, firstPageNumber + PAGE_BATCH_SIZE - 1);
+    const requests = [];
+    for (let page = firstPageNumber; page <= lastPageNumber; page += 1) {
+      const pageParameters = new URLSearchParams(baseParameters);
+      pageParameters.set("page", String(page));
+      pageParameters.set("page_size", String(CHART_PAGE_SIZE));
+      requests.push(fetchJson(`${endpoint}?${pageParameters.toString()}`));
+    }
+    const pages = await Promise.all(requests);
+    pages.forEach((page) => items.push(...page.items));
+  }
+
+  return { ...firstPage, items };
 }
 
 async function fetchJson(url) {
