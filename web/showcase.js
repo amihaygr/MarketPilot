@@ -122,7 +122,8 @@ function renderPath(pathName) {
       const connector = document.createElement("span");
       connector.className = "flow-connector";
       connector.setAttribute("aria-hidden", "true");
-      connector.textContent = "→";
+      // Desktop RTL flow reads 01 from the right toward 02 on its left.
+      connector.textContent = "←";
       flow.append(connector);
     }
   });

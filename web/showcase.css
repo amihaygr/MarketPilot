@@ -827,7 +827,8 @@ h1 {
   .flow-connector {
     padding: 6px 0;
     text-align: center;
-    transform: rotate(90deg);
+    /* Turn the desktop left arrow into a downward mobile flow arrow. */
+    transform: rotate(-90deg);
   }
 
   .path-explanation,

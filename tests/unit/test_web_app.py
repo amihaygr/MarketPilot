@@ -42,6 +42,10 @@ def test_phase10_showcase_is_packaged_and_uses_the_existing_api_boundary() -> No
     assert "showcase.js?v=phase10-1" in showcase
     assert 'fetch("/api/v1/freshness"' in script
     assert ".innerHTML" not in script
+    assert 'connector.textContent = "←"' in script
+    assert "transform: rotate(-90deg)" in (PROJECT_ROOT / "web" / "showcase.css").read_text(
+        encoding="utf-8"
+    )
     assert "COPY web/showcase.html" in dockerfile
     assert "COPY web/showcase.css" in dockerfile
     assert "COPY web/showcase.js" in dockerfile
