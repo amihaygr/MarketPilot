@@ -20,6 +20,10 @@ class ReadRepository(Protocol):
 
     def list_symbols(self) -> list[Row]: ...
 
+    def list_opportunities(self, *, symbols: list[str] | None = None) -> list[Row]: ...
+
+    def opportunity_history(self, *, symbol: str, limit: int) -> list[Row]: ...
+
     def list_market_bars(
         self,
         *,
@@ -138,6 +142,55 @@ class MariaDbReadRepository:
             """
         )
         return [_normalize_datetimes(row) for row in rows]
+
+    def list_opportunities(self, *, symbols: list[str] | None = None) -> list[Row]:
+        parameters: tuple[Any, ...] = ()
+        symbol_filter = ""
+        if symbols:
+            placeholders = ",".join(["%s"] * len(symbols))
+            symbol_filter = f"AND symbols.symbol IN ({placeholders})"
+            parameters = tuple(symbols)
+        rows = self._fetch_all(
+            f"""
+            SELECT r.recommendation_id, symbols.symbol, r.as_of_utc,
+                   r.market_data_time_utc, r.fundamentals_as_of_utc, r.action,
+                   r.actionable, r.lifecycle_status, r.technical_score,
+                   r.fundamental_score, r.opportunity_score, r.confidence,
+                   r.market_price, r.buy_zone_low, r.buy_zone_high, r.stop_price,
+                   r.target_1, r.target_2, r.risk_reward_1, r.risk_reward_2,
+                   r.potential_profit_1_pct, r.potential_profit_2_pct,
+                   r.valid_until_utc, r.feed_name, r.model_version, r.explanation_json
+            FROM fact_opportunity_recommendation r
+            JOIN dim_symbol symbols ON symbols.symbol_id=r.symbol_id
+            JOIN (
+                SELECT symbol_id, MAX(as_of_utc) AS latest
+                FROM fact_opportunity_recommendation GROUP BY symbol_id
+            ) latest ON latest.symbol_id=r.symbol_id AND latest.latest=r.as_of_utc
+            WHERE 1=1 {symbol_filter}
+            ORDER BY r.opportunity_score DESC, symbols.symbol
+            """,
+            parameters,
+        )
+        return [_public_opportunity(row) for row in rows]
+
+    def opportunity_history(self, *, symbol: str, limit: int) -> list[Row]:
+        rows = self._fetch_all(
+            """
+            SELECT r.recommendation_id, symbols.symbol, r.as_of_utc,
+                   r.market_data_time_utc, r.fundamentals_as_of_utc, r.action,
+                   r.actionable, r.lifecycle_status, r.technical_score,
+                   r.fundamental_score, r.opportunity_score, r.confidence,
+                   r.market_price, r.buy_zone_low, r.buy_zone_high, r.stop_price,
+                   r.target_1, r.target_2, r.risk_reward_1, r.risk_reward_2,
+                   r.potential_profit_1_pct, r.potential_profit_2_pct,
+                   r.valid_until_utc, r.feed_name, r.model_version, r.explanation_json
+            FROM fact_opportunity_recommendation r
+            JOIN dim_symbol symbols ON symbols.symbol_id=r.symbol_id
+            WHERE symbols.symbol=%s ORDER BY r.as_of_utc DESC LIMIT %s
+            """,
+            (symbol, limit),
+        )
+        return [_public_opportunity(row) for row in rows]
 
     def list_market_bars(
         self,
@@ -516,4 +569,11 @@ def _normalize_datetimes(row: Row) -> Row:
 def _public_backtest_run(row: Row) -> Row:
     public = dict(row)
     public["symbols"] = [value for value in str(public.pop("symbols_csv")).split(",") if value]
+    return public
+
+
+def _public_opportunity(row: Row) -> Row:
+    public = _normalize_datetimes(row)
+    raw = public.pop("explanation_json", "[]")
+    public["explanations"] = raw if isinstance(raw, list) else __import__("json").loads(raw)
     return public

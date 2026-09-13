@@ -4,6 +4,9 @@ COPY infrastructure/nginx/web-app.conf /etc/nginx/conf.d/default.conf
 COPY web/index.html /usr/share/nginx/html/index.html
 COPY web/styles.css /usr/share/nginx/html/styles.css
 COPY web/app.js /usr/share/nginx/html/app.js
+COPY web/opportunities.html /usr/share/nginx/html/opportunities.html
+COPY web/opportunities.css /usr/share/nginx/html/opportunities.css
+COPY web/opportunities.js /usr/share/nginx/html/opportunities.js
 COPY web/backtesting.html /usr/share/nginx/html/backtesting.html
 COPY web/backtesting.css /usr/share/nginx/html/backtesting.css
 COPY web/backtesting.js /usr/share/nginx/html/backtesting.js

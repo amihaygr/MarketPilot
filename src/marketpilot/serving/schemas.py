@@ -39,6 +39,40 @@ class SymbolListResponse(ApiModel):
     total: int = Field(ge=0)
 
 
+class OpportunityRead(ApiModel):
+    recommendation_id: str
+    symbol: str
+    as_of_utc: datetime
+    market_data_time_utc: datetime
+    fundamentals_as_of_utc: datetime | None
+    action: Literal["BUY ZONE", "WAIT", "WATCH BREAKOUT", "AVOID", "INSUFFICIENT DATA"]
+    actionable: bool
+    lifecycle_status: Literal["PROVISIONAL", "CERTIFIED", "STALE", "INSUFFICIENT_DATA"]
+    technical_score: Decimal = Field(ge=0, le=100)
+    fundamental_score: Decimal = Field(ge=0, le=100)
+    opportunity_score: Decimal = Field(ge=0, le=100)
+    confidence: Decimal = Field(ge=0, le=100)
+    market_price: Decimal
+    buy_zone_low: Decimal
+    buy_zone_high: Decimal
+    stop_price: Decimal
+    target_1: Decimal
+    target_2: Decimal
+    risk_reward_1: Decimal
+    risk_reward_2: Decimal
+    potential_profit_1_pct: Decimal
+    potential_profit_2_pct: Decimal
+    valid_until_utc: datetime
+    feed_name: str
+    model_version: str
+    explanations: list[str]
+
+
+class OpportunityListResponse(ApiModel):
+    items: list[OpportunityRead]
+    total: int = Field(ge=0)
+
+
 class PageMetadata(ApiModel):
     page: int = Field(ge=1)
     page_size: int = Field(ge=1, le=200)

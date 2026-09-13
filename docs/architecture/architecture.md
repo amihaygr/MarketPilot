@@ -282,6 +282,25 @@ disabled by default.
 
 ## 18. Capacity assumptions
 
+## 18. Decision Intelligence
+
+Phase 14 adds an application-facing decision-support layer without changing the source-of-truth
+paths. Certified bars are resampled into 5-minute, 15-minute, hourly and daily feature windows;
+SEC Company Facts are archived raw, normalized and published as versioned Gold fundamentals.
+Corporate actions must be applied before return and level calculations.
+
+The live Structured Streaming path may publish `PROVISIONAL` snapshots only after a closed
+15-minute window. The bounded post-market Spark job publishes authoritative `CERTIFIED` snapshots
+after market, fundamental and quality gates. Each snapshot includes its input window, feed,
+formula/model version, lineage, expiry and explanation. The first 20 sessions are Shadow Mode and
+therefore never actionable. See ADR-008.
+
+The browser reads recommendations only through the Backend API. Manual watchlist and portfolio
+writes require a separate, least-privilege identity; the existing market-data API identity remains
+read-only. No component submits an order or reads an Alpaca brokerage balance.
+
+## 19. Capacity assumptions
+
 The MVP workload is small, but the local stack is resource-heavy. A practical workstation target is:
 
 - 8 CPU cores preferred;

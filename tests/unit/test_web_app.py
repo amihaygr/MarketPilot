@@ -118,3 +118,17 @@ def test_phase11_backtesting_experience_uses_only_bounded_backend_endpoints() ->
     assert "constant closing prices" in script
     assert "singlePointPath" in script
     assert "COPY web/backtesting.html" in dockerfile
+
+
+def test_phase14_opportunity_center_is_real_api_driven_and_shadow_safe() -> None:
+    page = (PROJECT_ROOT / "web" / "opportunities.html").read_text(encoding="utf-8")
+    script = (PROJECT_ROOT / "web" / "opportunities.js").read_text(encoding="utf-8")
+    dockerfile = (PROJECT_ROOT / "infrastructure" / "docker" / "Dockerfile.web").read_text(
+        encoding="utf-8"
+    )
+    assert "SHADOW MODE" in page
+    assert 'fetch(`${API}/opportunities`' in script
+    assert ".innerHTML" not in script
+    assert "No placeholder recommendation is shown" in page
+    assert "does not guarantee profit" in page
+    assert "COPY web/opportunities.html" in dockerfile

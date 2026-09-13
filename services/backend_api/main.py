@@ -23,6 +23,7 @@ from marketpilot.serving.schemas import (
     HealthResponse,
     IndicatorPage,
     MarketBarPage,
+    OpportunityListResponse,
     SecFilingPage,
     SignalPage,
     SymbolListResponse,
@@ -170,6 +171,35 @@ def create_app(
             page_size=page_size,
         )
         return MarketBarPage.model_validate(result)
+
+    @app.get("/api/v1/opportunities", response_model=OpportunityListResponse, tags=["decisions"])
+    def opportunities(
+        symbols: str | None = Query(default=None, max_length=200),
+    ) -> OpportunityListResponse:
+        selected = None
+        if symbols:
+            selected = [value.strip().upper() for value in symbols.split(",") if value.strip()]
+            if not selected or len(selected) > 20 or any(
+                not __import__("re").fullmatch(r"[A-Z][A-Z0-9.-]{0,15}", value)
+                for value in selected
+            ):
+                raise HTTPException(status_code=422, detail="invalid symbols")
+        items = resolved_repository.list_opportunities(symbols=selected)
+        return OpportunityListResponse(items=items, total=len(items))
+
+    @app.get(
+        "/api/v1/opportunities/{symbol}/history",
+        response_model=OpportunityListResponse,
+        tags=["decisions"],
+    )
+    def opportunity_history(
+        symbol: str,
+        limit: int = Query(default=30, ge=1, le=200),
+    ) -> OpportunityListResponse:
+        if not __import__("re").fullmatch(r"[A-Z][A-Z0-9.-]{0,15}", symbol):
+            raise HTTPException(status_code=422, detail="invalid symbol")
+        items = resolved_repository.opportunity_history(symbol=symbol, limit=limit)
+        return OpportunityListResponse(items=items, total=len(items))
 
     @app.get("/api/v1/sec-filings", response_model=SecFilingPage, tags=["sec"])
     def sec_filings(

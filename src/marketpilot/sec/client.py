@@ -79,6 +79,14 @@ class SecClient:
             raise ValueError("SEC submissions response must be a JSON object")
         return url, payload, decoded
 
+    def company_facts(self, cik: str) -> tuple[str, bytes, dict[str, Any]]:
+        url = f"{self.base_url}/api/xbrl/companyfacts/CIK{cik}.json"
+        payload = self._get(url)
+        decoded = json.loads(payload)
+        if not isinstance(decoded, dict) or not isinstance(decoded.get("facts"), dict):
+            raise ValueError("SEC Company Facts response must contain a facts object")
+        return url, payload, decoded
+
     def _get(self, url: str) -> bytes:
         for attempt in range(1, self.max_attempts + 1):
             self.rate_limiter.wait()

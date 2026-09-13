@@ -26,6 +26,44 @@ class FakeReadRepository:
             }
         ]
 
+    def list_opportunities(self, *, symbols: list[str] | None = None) -> list[dict[str, Any]]:
+        item = self._opportunity()
+        return [item] if not symbols or item["symbol"] in symbols else []
+
+    def opportunity_history(self, *, symbol: str, limit: int) -> list[dict[str, Any]]:
+        return [self._opportunity()] if symbol == "AAPL" and limit > 0 else []
+
+    @staticmethod
+    def _opportunity() -> dict[str, Any]:
+        return {
+            "recommendation_id": "22222222-2222-4222-8222-222222222222",
+            "symbol": "AAPL",
+            "as_of_utc": datetime(2026, 9, 13, 14, 0, tzinfo=UTC),
+            "market_data_time_utc": datetime(2026, 9, 13, 13, 59, tzinfo=UTC),
+            "fundamentals_as_of_utc": datetime(2026, 8, 1, tzinfo=UTC),
+            "action": "BUY ZONE",
+            "actionable": False,
+            "lifecycle_status": "CERTIFIED",
+            "technical_score": "75",
+            "fundamental_score": "70",
+            "opportunity_score": "72.5",
+            "confidence": "65",
+            "market_price": "230",
+            "buy_zone_low": "228",
+            "buy_zone_high": "231",
+            "stop_price": "222",
+            "target_1": "243",
+            "target_2": "250",
+            "risk_reward_1": "2",
+            "risk_reward_2": "3",
+            "potential_profit_1_pct": "5.9",
+            "potential_profit_2_pct": "8.9",
+            "valid_until_utc": datetime(2026, 9, 13, 14, 29, tzinfo=UTC),
+            "feed_name": "iex",
+            "model_version": "decision-intelligence-v1",
+            "explanations": ["תרחיש מחקר בלבד"],
+        }
+
     def list_market_bars(self, **parameters: Any) -> dict[str, Any]:
         self.market_query = parameters
         return {
@@ -224,6 +262,16 @@ def test_health_symbols_and_cors_are_read_only() -> None:
     assert symbols.json()["items"][0]["symbol"] == "AAPL"
     assert symbols.headers["access-control-allow-origin"] == "http://localhost:3000"
     assert client.post("/api/v1/symbols").status_code == 405
+
+
+def test_phase14_opportunities_are_bounded_and_shadow_mode_is_explicit() -> None:
+    client = TestClient(create_app(settings(), FakeReadRepository()))
+    response = client.get("/api/v1/opportunities?symbols=AAPL")
+    assert response.status_code == 200
+    item = response.json()["items"][0]
+    assert item["action"] == "BUY ZONE"
+    assert item["actionable"] is False
+    assert client.get("/api/v1/opportunities?symbols=AAPL,DROP TABLE").status_code == 422
 
 
 def test_market_bars_enforce_filters_pagination_and_aware_bounds() -> None:

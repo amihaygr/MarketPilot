@@ -366,3 +366,8 @@ Recommended Git checkpoints:
 13. `add backtest orchestration and serving`
 14. `add interactive backtesting experience`
 15. `add certified alpaca historical backfill`
+# Phase 14 — Decision Intelligence (in progress)
+
+MarketPilot adds an explainable, shadow-mode swing decision layer. See ADR-008. Delivery is staged:
+versioned schema and deterministic rules; certified batch publication; provisional streaming state;
+Company Facts and corporate actions; bounded API and Opportunity Center; then 20-session evaluation.
