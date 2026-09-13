@@ -371,3 +371,14 @@ Recommended Git checkpoints:
 MarketPilot adds an explainable, shadow-mode swing decision layer. See ADR-008. Delivery is staged:
 versioned schema and deterministic rules; certified batch publication; provisional streaming state;
 Company Facts and corporate actions; bounded API and Opportunity Center; then 20-session evaluation.
+
+Implemented application checkpoint:
+
+- Persistent local portfolio and watchlist preferences through bounded `GET`/`PUT` endpoints.
+- A dedicated least-privilege MariaDB writer separated from the market-data read identity.
+- A saved Opportunity Center workspace with equity, available cash and watchlist controls.
+- Position sizing capped by configured per-trade risk, symbol exposure and available cash.
+- API, browser, transaction, validation and responsive-layout verification.
+
+Remaining release gates are corporate-action adjustment, provisional closed-15-minute publication,
+walk-forward evaluation and the 20-session Shadow Mode evidence window.

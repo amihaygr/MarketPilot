@@ -238,6 +238,25 @@ class FakeReadRepository:
         }
 
 
+class FakeUserRepository:
+    def __init__(self) -> None:
+        self.state = {
+            "equity": "10000",
+            "cash_balance": "9000",
+            "risk_per_trade_pct": "2",
+            "max_symbol_exposure_pct": "20",
+            "max_open_risk_pct": "6",
+            "symbols": ["AAPL", "SPY"],
+        }
+
+    def get(self) -> dict[str, Any]:
+        return self.state
+
+    def update(self, payload: dict[str, Any]) -> dict[str, Any]:
+        self.state = payload
+        return self.state
+
+
 def settings() -> ServingSettings:
     return ServingSettings.from_environ(
         {
@@ -272,6 +291,39 @@ def test_phase14_opportunities_are_bounded_and_shadow_mode_is_explicit() -> None
     assert item["action"] == "BUY ZONE"
     assert item["actionable"] is False
     assert client.get("/api/v1/opportunities?symbols=AAPL,DROP TABLE").status_code == 422
+
+
+def test_user_workspace_can_be_read_and_updated_with_bounded_input() -> None:
+    user_repository = FakeUserRepository()
+    client = TestClient(create_app(settings(), FakeReadRepository(), user_repository))
+
+    assert client.get("/api/v1/user-state").json()["symbols"] == ["AAPL", "SPY"]
+    response = client.put(
+        "/api/v1/user-state",
+        json={
+            "equity": 25000,
+            "cash_balance": 18000,
+            "risk_per_trade_pct": 1.5,
+            "max_symbol_exposure_pct": 15,
+            "max_open_risk_pct": 5,
+            "symbols": ["msft", "AAPL"],
+        },
+    )
+    assert response.status_code == 200
+    assert response.json()["symbols"] == ["MSFT", "AAPL"]
+    assert response.json()["equity"] == "25000"
+    invalid = client.put(
+        "/api/v1/user-state",
+        json={
+            "equity": 10000,
+            "cash_balance": 10000,
+            "risk_per_trade_pct": 2,
+            "max_symbol_exposure_pct": 20,
+            "max_open_risk_pct": 6,
+            "symbols": ["DROP TABLE"],
+        },
+    )
+    assert invalid.status_code == 422
 
 
 def test_market_bars_enforce_filters_pagination_and_aware_bounds() -> None:

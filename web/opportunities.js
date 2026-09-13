@@ -7,6 +7,7 @@ const detail = document.querySelector("#detail");
 const toast = document.querySelector("#toast");
 let items = [];
 let selected = null;
+let userState = {equity:10000,cash_balance:10000,risk_per_trade_pct:2,max_symbol_exposure_pct:20,max_open_risk_pct:6,symbols:["AAPL","MSFT","NVDA","SPY"]};
 
 function el(tag, className, text) { const node=document.createElement(tag); if(className) node.className=className; if(text!==undefined) node.textContent=text; return node; }
 function metric(label, value, tone="") { const node=el("article",`metric ${tone}`); node.append(el("span","",label),el("strong","",value)); return node; }
@@ -51,13 +52,21 @@ function renderSizing() {
   const equity=Math.max(0,Number(document.querySelector("#portfolio-equity").value)||0);
   const entry=(Number(selected.buy_zone_low)+Number(selected.buy_zone_high))/2;
   const riskPerShare=Math.max(.01,entry-Number(selected.stop_price));
-  const shares=Math.max(0,Math.min(Math.floor(equity*.02/riskPerShare),Math.floor(equity*.20/entry)));
+  const riskLimit=Number(userState.risk_per_trade_pct||2)/100;
+  const exposureLimit=Number(userState.max_symbol_exposure_pct||20)/100;
+  const cash=Math.max(0,Number(document.querySelector("#portfolio-cash").value)||0);
+  const shares=Math.max(0,Math.min(Math.floor(equity*riskLimit/riskPerShare),Math.floor(equity*exposureLimit/entry),Math.floor(cash/entry)));
   document.querySelector("#sizing-symbol").textContent=selected.symbol;
   document.querySelector("#sizing-shares").textContent=number.format(shares);
   document.querySelector("#sizing-risk").textContent=money.format(shares*riskPerShare);
   document.querySelector("#sizing-value").textContent=money.format(shares*entry);
 }
-async function load() { toast.hidden=true; try { const response=await fetch(`${API}/opportunities`,{headers:{Accept:"application/json"}}); if(!response.ok) throw new Error(`API returned ${response.status}`); const payload=await response.json(); items=payload.items; document.querySelector("#tracked").textContent=items.length; document.querySelector("#buy-count").textContent=items.filter(x=>x.action==="BUY ZONE").length; document.querySelector("#certified-count").textContent=items.filter(x=>x.lifecycle_status==="CERTIFIED").length; document.querySelector("#fresh-count").textContent=items.filter(x=>new Date(x.valid_until_utc)>new Date()).length; renderWatchlist(); } catch(error) { items=[]; renderWatchlist(); showError(`Opportunity data unavailable: ${error.message}`); } }
+function applyUserState(state) { userState=state; document.querySelector("#portfolio-equity").value=state.equity; document.querySelector("#portfolio-cash").value=state.cash_balance; document.querySelector("#portfolio-symbols").value=state.symbols.join(", "); document.querySelector("#save-status").textContent=`Saved locally · ${state.risk_per_trade_pct}% risk per trade · ${state.max_symbol_exposure_pct}% max exposure`; renderSizing(); }
+async function loadUserState() { try { const response=await fetch(`${API}/user-state`); if(!response.ok) throw new Error(`API returned ${response.status}`); applyUserState(await response.json()); } catch(error) { document.querySelector("#save-status").textContent="Saved workspace unavailable; simulator is still usable."; showError(`User workspace unavailable: ${error.message}`); } }
+async function saveUserState() { const button=document.querySelector("#save-preferences"); const status=document.querySelector("#save-status"); const symbols=[...new Set(document.querySelector("#portfolio-symbols").value.split(",").map(value=>value.trim().toUpperCase()).filter(Boolean))]; button.disabled=true; status.textContent="Saving…"; try { const payload={...userState,equity:Number(document.querySelector("#portfolio-equity").value),cash_balance:Number(document.querySelector("#portfolio-cash").value),symbols}; const response=await fetch(`${API}/user-state`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)}); const result=await response.json(); if(!response.ok) throw new Error(result.detail||`API returned ${response.status}`); applyUserState(result); status.textContent="Workspace saved. Re-run the decision pipeline after adding a new symbol."; } catch(error) { status.textContent=`Save failed: ${error.message}`; showError(`Could not save workspace: ${error.message}`); } finally { button.disabled=false; } }
+async function load() { toast.hidden=true; try { const symbolQuery=userState.symbols.length?`?symbols=${encodeURIComponent(userState.symbols.join(","))}`:""; const response=await fetch(`${API}/opportunities${symbolQuery}`,{headers:{Accept:"application/json"}}); if(!response.ok) throw new Error(`API returned ${response.status}`); const payload=await response.json(); items=payload.items; document.querySelector("#tracked").textContent=items.length; document.querySelector("#buy-count").textContent=items.filter(x=>x.action==="BUY ZONE").length; document.querySelector("#certified-count").textContent=items.filter(x=>x.lifecycle_status==="CERTIFIED").length; document.querySelector("#fresh-count").textContent=items.filter(x=>new Date(x.valid_until_utc)>new Date()).length; renderWatchlist(); } catch(error) { items=[]; renderWatchlist(); showError(`Opportunity data unavailable: ${error.message}`); } }
 document.querySelector("#refresh").addEventListener("click",load);
 document.querySelector("#portfolio-equity").addEventListener("input",renderSizing);
-load();
+document.querySelector("#portfolio-cash").addEventListener("input",renderSizing);
+document.querySelector("#save-preferences").addEventListener("click",saveUserState);
+loadUserState().finally(load);

@@ -1,16 +1,29 @@
 .simulator {
   display: grid;
-  grid-template-columns: 2fr 1fr repeat(4, 1fr);
+  grid-template-columns: minmax(260px, 2fr) repeat(2, minmax(140px, 1fr));
   gap: 16px;
-  align-items: center;
-  min-height: 0;
+  align-items: end;
+  min-height: auto;
   margin-bottom: 18px;
-  padding: 18px 22px;
+  padding: 20px 22px;
 }
 .simulator h2 { margin: 0; }
-.simulator p { margin: 5px 0; color: #8fb1cc; }
-.simulator label span, .simulator article span { display: block; color: #8fb1cc; font-size: 11px; }
-.simulator input { width: 100%; margin-top: 5px; border: 1px solid #203853; border-radius: 8px; background: #071523; color: #edf7ff; padding: 10px; }
-.simulator strong { font-size: 18px; }
-@media (max-width: 1100px) { .simulator { grid-template-columns: repeat(3, 1fr); } .simulator > div { grid-column: 1 / -1; } }
-@media (max-width: 560px) { .simulator { grid-template-columns: 1fr 1fr; } }
+.simulator p { margin: 5px 0; color: var(--muted); }
+.simulator label { display: grid; gap: 7px; color: var(--muted); font-size: 12px; }
+.simulator input { width: 100%; border: 1px solid var(--line); border-radius: 9px; background: #081625; color: var(--text); padding: 11px 12px; font: inherit; }
+.simulator input:focus { outline: 2px solid #4edcc055; border-color: var(--mint); }
+.simulator article { padding: 11px 0; }
+.simulator article span { display: block; color: var(--muted); font-size: 11px; }
+.simulator article strong { font-size: 18px; }
+.watchlist-input { grid-column: span 2; }
+.simulator button { border: 1px solid #2b8e7e; background: var(--mint); color: #04130f; padding: 11px 15px; border-radius: 9px; font-weight: 800; cursor: pointer; }
+.simulator button:disabled { opacity: .55; cursor: wait; }
+.save-status { grid-column: span 2; color: var(--muted); font-size: 12px; align-self: center; }
+@media (max-width: 1000px) {
+  .simulator { grid-template-columns: repeat(2, 1fr); }
+  .simulator > div, .watchlist-input { grid-column: span 2; }
+}
+@media (max-width: 560px) {
+  .simulator { grid-template-columns: 1fr; }
+  .simulator > div, .watchlist-input, .save-status { grid-column: auto; }
+}

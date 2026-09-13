@@ -127,14 +127,16 @@ def test_phase14_opportunity_center_is_real_api_driven_and_shadow_safe() -> None
         encoding="utf-8"
     )
     assert "SHADOW MODE" in page
-    assert 'fetch(`${API}/opportunities`' in script
+    assert "fetch(`${API}/opportunities${symbolQuery}`" in script
     assert ".innerHTML" not in script
     assert "No placeholder recommendation is shown" in page
     assert "does not guarantee profit" in page
     assert "COPY web/opportunities.html" in dockerfile
     assert 'id="portfolio-equity"' in page
     assert "riskPerShare" in script
-    assert "Nothing is saved and no order is sent" in page
+    assert "No order is ever sent" in page
+    assert 'id="save-preferences"' in page
+    assert "loadUserState" in script
     assert "COPY web/opportunities-simulator.css" in dockerfile
     assert 'id="decision-chart"' in page
     assert "/history?limit=20" in script

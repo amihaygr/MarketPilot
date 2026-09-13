@@ -14,6 +14,8 @@ class ServingSettings:
     mariadb_database: str
     mariadb_user: str
     mariadb_password: str
+    mariadb_write_user: str
+    mariadb_write_password: str
     cors_origins: tuple[str, ...]
     max_market_range_days: int
     max_filing_range_days: int
@@ -36,6 +38,8 @@ class ServingSettings:
             mariadb_database=_required(source, "MARIADB_DATABASE"),
             mariadb_user=_required(source, "MARIADB_APP_USER"),
             mariadb_password=_required(source, "MARIADB_APP_PASSWORD"),
+            mariadb_write_user=source.get("MARIADB_USER_WRITE_USER", "").strip(),
+            mariadb_write_password=source.get("MARIADB_USER_WRITE_PASSWORD", "").strip(),
             cors_origins=origins,
             max_market_range_days=_positive_int(
                 source.get("API_MAX_MARKET_RANGE_DAYS", "31"),

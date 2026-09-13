@@ -73,6 +73,24 @@ class OpportunityListResponse(ApiModel):
     total: int = Field(ge=0)
 
 
+class PortfolioState(ApiModel):
+    equity: Decimal = Field(gt=0, le=1_000_000_000)
+    cash_balance: Decimal = Field(ge=0, le=1_000_000_000)
+    risk_per_trade_pct: Decimal = Field(gt=0, le=5)
+    max_symbol_exposure_pct: Decimal = Field(gt=0, le=100)
+    max_open_risk_pct: Decimal = Field(gt=0, le=20)
+    symbols: list[str]
+
+
+class PortfolioUpdate(ApiModel):
+    equity: Decimal = Field(gt=0, le=1_000_000_000)
+    cash_balance: Decimal = Field(ge=0, le=1_000_000_000)
+    risk_per_trade_pct: Decimal = Field(default=Decimal("2"), gt=0, le=5)
+    max_symbol_exposure_pct: Decimal = Field(default=Decimal("20"), gt=0, le=100)
+    max_open_risk_pct: Decimal = Field(default=Decimal("6"), gt=0, le=20)
+    symbols: list[str] = Field(min_length=1, max_length=21)
+
+
 class PageMetadata(ApiModel):
     page: int = Field(ge=1)
     page_size: int = Field(ge=1, le=200)

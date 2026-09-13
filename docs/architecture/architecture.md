@@ -297,7 +297,10 @@ therefore never actionable. See ADR-008.
 
 The browser reads recommendations only through the Backend API. Manual watchlist and portfolio
 writes require a separate, least-privilege identity; the existing market-data API identity remains
-read-only. No component submits an order or reads an Alpaca brokerage balance.
+read-only. The `marketpilot_user_write` identity can modify only the local portfolio, position and
+watchlist tables and can read only symbol identifiers needed for validation. Browser payloads are
+schema-bounded and symbol-validated before a transaction replaces the saved watchlist. No
+component submits an order or reads an Alpaca brokerage balance.
 
 ## 19. Capacity assumptions
 

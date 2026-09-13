@@ -1,9 +1,10 @@
-"""FastAPI entrypoint for read-only MarketPilot Gold data."""
+"""FastAPI entrypoint for bounded Gold reads and local user preferences."""
 
 from __future__ import annotations
 
 import json
 import logging
+import re
 from datetime import UTC, date, datetime
 from time import perf_counter
 from uuid import UUID, uuid4
@@ -24,11 +25,14 @@ from marketpilot.serving.schemas import (
     IndicatorPage,
     MarketBarPage,
     OpportunityListResponse,
+    PortfolioState,
+    PortfolioUpdate,
     SecFilingPage,
     SignalPage,
     SymbolListResponse,
 )
 from marketpilot.serving.settings import ServingSettings
+from marketpilot.serving.user_repository import MariaDbUserRepository, UserStateUnavailable
 from marketpilot.serving.validation import QueryRangeError, filing_date_range, market_time_range
 
 logger = logging.getLogger("marketpilot.backend_api")
@@ -69,9 +73,11 @@ def configure_logging() -> None:
 def create_app(
     settings: ServingSettings | None = None,
     repository: ReadRepository | None = None,
+    user_repository: MariaDbUserRepository | None = None,
 ) -> FastAPI:
     resolved_settings = settings or ServingSettings.from_environ()
     resolved_repository = repository or MariaDbReadRepository(resolved_settings)
+    resolved_user_repository = user_repository or MariaDbUserRepository(resolved_settings)
     app = FastAPI(
         title="MarketPilot Backend API",
         version="1.0.0",
@@ -83,7 +89,7 @@ def create_app(
         CORSMiddleware,
         allow_origins=list(resolved_settings.cors_origins),
         allow_credentials=False,
-        allow_methods=["GET", "OPTIONS"],
+        allow_methods=["GET", "PUT", "OPTIONS"],
         allow_headers=["Accept", "Content-Type", "X-Request-ID"],
     )
 
@@ -179,9 +185,10 @@ def create_app(
         selected = None
         if symbols:
             selected = [value.strip().upper() for value in symbols.split(",") if value.strip()]
-            if not selected or len(selected) > 20 or any(
-                not __import__("re").fullmatch(r"[A-Z][A-Z0-9.-]{0,15}", value)
-                for value in selected
+            if (
+                not selected
+                or len(selected) > 20
+                or any(re.fullmatch(r"[A-Z][A-Z0-9.-]{0,15}", value) is None for value in selected)
             ):
                 raise HTTPException(status_code=422, detail="invalid symbols")
         items = resolved_repository.list_opportunities(symbols=selected)
@@ -340,6 +347,29 @@ def create_app(
             generated_at_utc=datetime.now(UTC),
         )
         return FreshnessResponse.model_validate(result)
+
+    @app.get("/api/v1/user-state", response_model=PortfolioState, tags=["preferences"])
+    def user_state() -> PortfolioState:
+        try:
+            return PortfolioState.model_validate(resolved_user_repository.get())
+        except UserStateUnavailable as error:
+            raise HTTPException(status_code=503, detail=str(error)) from error
+
+    @app.put("/api/v1/user-state", response_model=PortfolioState, tags=["preferences"])
+    def update_user_state(payload: PortfolioUpdate) -> PortfolioState:
+        normalized = payload.model_dump()
+        normalized["symbols"] = [symbol.strip().upper() for symbol in payload.symbols]
+        if any(
+            re.fullmatch(r"[A-Z][A-Z0-9.-]{0,15}", symbol) is None
+            for symbol in normalized["symbols"]
+        ):
+            raise HTTPException(status_code=422, detail="invalid watchlist symbol")
+        try:
+            return PortfolioState.model_validate(resolved_user_repository.update(normalized))
+        except UserStateUnavailable as error:
+            raise HTTPException(status_code=503, detail=str(error)) from error
+        except ValueError as error:
+            raise HTTPException(status_code=422, detail=str(error)) from error
 
     return app
 
