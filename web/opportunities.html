@@ -6,6 +6,7 @@
   <meta name="description" content="MarketPilot explainable decision-support center" />
   <title>MarketPilot | Opportunity Center</title>
   <link rel="stylesheet" href="/opportunities.css?v=phase14-1" />
+  <link rel="stylesheet" href="/opportunities-simulator.css?v=phase14-2" />
   <script src="/opportunities.js?v=phase14-1" defer></script>
 </head>
 <body>
@@ -17,6 +18,14 @@
     </section>
     <section class="summary" aria-label="Opportunity summary">
       <article><span>Tracked</span><strong id="tracked">—</strong></article><article><span>Buy zones</span><strong id="buy-count">—</strong></article><article><span>Certified</span><strong id="certified-count">—</strong></article><article><span>Fresh</span><strong id="fresh-count">—</strong></article>
+    </section>
+    <section class="simulator panel" aria-labelledby="simulator-title">
+      <div><p class="eyebrow">PORTFOLIO SIMULATOR</p><h2 id="simulator-title">Position sizing sandbox</h2><p>Change capital to test the 2% risk and 20% exposure limits. Nothing is saved and no order is sent.</p></div>
+      <label><span>Portfolio equity</span><input id="portfolio-equity" type="number" min="100" step="100" value="10000" /></label>
+      <article><span>Selected</span><strong id="sizing-symbol">—</strong></article>
+      <article><span>Maximum shares</span><strong id="sizing-shares">—</strong></article>
+      <article><span>Planned risk</span><strong id="sizing-risk">—</strong></article>
+      <article><span>Position value</span><strong id="sizing-value">—</strong></article>
     </section>
     <section class="layout">
       <aside class="panel"><div class="panel-title"><div><p class="eyebrow">WATCHLIST</p><h2>Ranked opportunities</h2></div><button id="refresh">Refresh</button></div><div id="watchlist" class="watchlist" aria-live="polite"></div></aside>

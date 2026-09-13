@@ -9,6 +9,7 @@ from dataclasses import asdict, dataclass
 from datetime import UTC, datetime, timedelta
 from decimal import ROUND_FLOOR, Decimal
 from typing import Literal
+from zoneinfo import ZoneInfo
 
 Action = Literal["BUY ZONE", "WAIT", "WATCH BREAKOUT", "AVOID", "INSUFFICIENT DATA"]
 MODEL_VERSION = "decision-intelligence-v1"
@@ -90,6 +91,12 @@ def _q(value: Decimal) -> Decimal:
     return value.quantize(Decimal("0.01"))
 
 
+def _market_is_open(moment_utc: datetime) -> bool:
+    local = moment_utc.astimezone(ZoneInfo("America/New_York"))
+    minutes = local.hour * 60 + local.minute
+    return local.weekday() < 5 and 9 * 60 + 30 <= minutes < 16 * 60
+
+
 def _technical_score(data: DecisionInputs) -> Decimal:
     score = Decimal("50")
     score += Decimal(data.daily_trend) * Decimal("12")
@@ -138,7 +145,9 @@ def build_decision(data: DecisionInputs, portfolio: PortfolioRisk) -> DecisionOu
         or data.fundamentals_as_of_utc.tzinfo is None
         or data.as_of_utc - data.fundamentals_as_of_utc > timedelta(days=150)
     )
-    market_stale = data.as_of_utc - data.market_data_time_utc > timedelta(minutes=30)
+    market_stale = _market_is_open(data.as_of_utc) and (
+        data.as_of_utc - data.market_data_time_utc > timedelta(minutes=30)
+    )
     complete = fundamental is not None and not fundamentals_stale
     combined = _q((technical + (fundamental or Decimal())) / 2) if complete else technical
 
@@ -222,7 +231,11 @@ def build_decision(data: DecisionInputs, portfolio: PortfolioRisk) -> DecisionOu
         position_shares=shares,
         position_value=_q(entry * shares),
         planned_risk=_q(per_share_risk * shares),
-        valid_until_utc=data.market_data_time_utc.astimezone(UTC) + timedelta(minutes=30),
+        valid_until_utc=(
+            data.market_data_time_utc.astimezone(UTC) + timedelta(minutes=30)
+            if _market_is_open(data.as_of_utc)
+            else data.as_of_utc.astimezone(UTC) + timedelta(days=1)
+        ),
         model_version=MODEL_VERSION,
         explanation_he=tuple(explanations),
     )

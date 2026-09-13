@@ -7,6 +7,7 @@ from uuid import UUID
 import pymysql
 
 from marketpilot.contracts.sec_filing import SecFilingV1
+from marketpilot.sec.company_facts import FundamentalFact
 from marketpilot.sec.settings import SecSettings
 
 
@@ -15,6 +16,68 @@ class SecPublicationSummary:
     discovered: int
     inserted: int
     updated: int
+
+
+def publish_company_facts(
+    settings: SecSettings,
+    *,
+    symbol: str,
+    facts: tuple[FundamentalFact, ...],
+    bronze_uri: str,
+    run_id: UUID,
+) -> int:
+    """Idempotently publish normalized Company Facts to Gold."""
+    connection = pymysql.connect(
+        host=settings.mariadb_host,
+        port=settings.mariadb_port,
+        database=settings.mariadb_database,
+        user=settings.mariadb_user,
+        password=settings.mariadb_password,
+        charset="utf8mb4",
+        autocommit=False,
+        connect_timeout=10,
+    )
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("INSERT IGNORE INTO dim_symbol (symbol) VALUES (%s)", (symbol,))
+            cursor.executemany(
+                """
+                INSERT INTO fact_fundamental_metric (
+                    symbol_id, metric_code, period_end_date, period_type,
+                    value_decimal, unit, filed_at_utc, accession_number,
+                    bronze_uri, pipeline_run_id, code_version, data_version, schema_version
+                ) VALUES (
+                    (SELECT symbol_id FROM dim_symbol WHERE symbol=%s), %s, %s, %s,
+                    %s, %s, %s, %s, %s, %s, %s, 'sec-companyfacts-v1', 1
+                ) ON DUPLICATE KEY UPDATE
+                    value_decimal=VALUES(value_decimal), filed_at_utc=VALUES(filed_at_utc),
+                    accession_number=VALUES(accession_number), bronze_uri=VALUES(bronze_uri),
+                    pipeline_run_id=VALUES(pipeline_run_id), code_version=VALUES(code_version)
+                """,
+                [
+                    (
+                        symbol,
+                        fact.metric_code,
+                        fact.period_end,
+                        "ANNUAL" if fact.form == "10-K" else "QUARTER",
+                        fact.value,
+                        fact.unit,
+                        fact.filed_at_utc.replace(tzinfo=None),
+                        fact.accession_number,
+                        bronze_uri,
+                        str(run_id),
+                        settings.code_version,
+                    )
+                    for fact in facts
+                ],
+            )
+        connection.commit()
+        return len(facts)
+    except Exception:
+        connection.rollback()
+        raise
+    finally:
+        connection.close()
 
 
 def publish_sec_filings(

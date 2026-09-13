@@ -32,6 +32,90 @@ def _rsi(values: list[Decimal], period: int = 14) -> Decimal:
     return Decimal(100) if losses == 0 else Decimal(100) - Decimal(100) / (1 + gains / losses)
 
 
+def _growth(values: list[Decimal]) -> Decimal | None:
+    if len(values) < 2 or values[-2] == 0:
+        return None
+    return (values[-1] / values[-2] - 1) * 100
+
+
+def _aggregate(rows: list[dict[str, object]], minutes: int) -> list[dict[str, object]]:
+    buckets: dict[datetime, dict[str, object]] = {}
+    for row in rows:
+        timestamp = row["event_time_utc"]
+        if not isinstance(timestamp, datetime):
+            continue
+        bucket = timestamp.replace(
+            minute=(timestamp.minute // minutes) * minutes if minutes < 60 else 0,
+            hour=(timestamp.hour // (minutes // 60)) * (minutes // 60)
+            if minutes >= 60
+            else timestamp.hour,
+            second=0,
+            microsecond=0,
+        )
+        current = buckets.get(bucket)
+        if current is None:
+            buckets[bucket] = dict(row)
+            continue
+        current["high_price"] = max(Decimal(current["high_price"]), Decimal(row["high_price"]))
+        current["low_price"] = min(Decimal(current["low_price"]), Decimal(row["low_price"]))
+        current["close_price"] = row["close_price"]
+        current["volume"] = int(current["volume"]) + int(row["volume"])
+    return list(buckets.values())
+
+
+def _daily(rows: list[dict[str, object]]) -> list[dict[str, object]]:
+    buckets: dict[object, dict[str, object]] = {}
+    for row in rows:
+        timestamp = row["event_time_utc"]
+        if not isinstance(timestamp, datetime):
+            continue
+        key = timestamp.date()
+        current = buckets.get(key)
+        if current is None:
+            buckets[key] = dict(row)
+            continue
+        current["high_price"] = max(Decimal(current["high_price"]), Decimal(row["high_price"]))
+        current["low_price"] = min(Decimal(current["low_price"]), Decimal(row["low_price"]))
+        current["close_price"] = row["close_price"]
+        current["volume"] = int(current["volume"]) + int(row["volume"])
+    return list(buckets.values())
+
+
+def _fundamentals(cursor: DictCursor, symbol_id: int) -> dict[str, Decimal | datetime | None]:
+    cursor.execute(
+        """
+        SELECT metric_code, period_end_date, value_decimal, filed_at_utc
+        FROM fact_fundamental_metric
+        WHERE symbol_id=%s AND period_type='QUARTER'
+        ORDER BY period_end_date
+        """,
+        (symbol_id,),
+    )
+    series: dict[str, list[Decimal]] = {}
+    latest_filed: datetime | None = None
+    for row in cursor.fetchall():
+        series.setdefault(str(row["metric_code"]), []).append(Decimal(row["value_decimal"]))
+        latest_filed = max(latest_filed or row["filed_at_utc"], row["filed_at_utc"])
+    revenue = series.get("REVENUE", [])
+    income = series.get("NET_INCOME", [])
+    operating_cash = series.get("OPERATING_CASH_FLOW", [])
+    capex = series.get("CAPEX", [])
+    fcf = [cash - spend for cash, spend in zip(operating_cash, capex, strict=False)]
+    equity = series.get("EQUITY", [])
+    debt = series.get("DEBT", [])
+    return {
+        "as_of": latest_filed,
+        "revenue_growth": _growth(revenue),
+        "eps_growth": _growth(series.get("EPS_DILUTED", [])),
+        "fcf_growth": _growth(fcf),
+        "net_margin": income[-1] / revenue[-1] * 100
+        if income and revenue and revenue[-1]
+        else None,
+        "debt_to_equity": debt[-1] / equity[-1] if debt and equity and equity[-1] else None,
+        "dilution": _growth(series.get("SHARES_DILUTED", [])),
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--run-id", required=True)
@@ -81,27 +165,26 @@ def main() -> None:
                            close_price, volume, source_name
                     FROM fact_market_bar_1m
                     WHERE symbol_id=%s AND certification_status='CERTIFIED'
-                    ORDER BY event_time_utc DESC LIMIT 500
+                    ORDER BY event_time_utc DESC LIMIT 10000
                     """,
                     (symbol["symbol_id"],),
                 )
                 rows = list(reversed(cursor.fetchall()))
-                if len(rows) < 51:
+                bars_15m = _aggregate(rows, 15)
+                bars_1h = _aggregate(rows, 60)
+                bars_1d = _daily(rows)
+                if len(bars_15m) < 51 or len(bars_1h) < 20 or len(bars_1d) < 2:
                     continue
-                closes = [Decimal(row["close_price"]) for row in rows]
+                closes = [Decimal(row["close_price"]) for row in bars_15m]
+                hourly_closes = [Decimal(row["close_price"]) for row in bars_1h]
+                daily_closes = [Decimal(row["close_price"]) for row in bars_1d]
                 true_ranges = [
-                    Decimal(row["high_price"]) - Decimal(row["low_price"]) for row in rows[-14:]
+                    Decimal(row["high_price"]) - Decimal(row["low_price"]) for row in bars_15m[-14:]
                 ]
                 atr = sum(true_ranges, Decimal()) / len(true_ranges)
                 latest = rows[-1]
-                cursor.execute(
-                    """
-                    SELECT MAX(filed_at_utc) latest
-                    FROM fact_fundamental_metric WHERE symbol_id=%s
-                    """,
-                    (symbol["symbol_id"],),
-                )
-                fundamental_time = (cursor.fetchone() or {}).get("latest")
+                fundamentals = _fundamentals(cursor, int(symbol["symbol_id"]))
+                fundamental_time = fundamentals["as_of"]
                 inputs = DecisionInputs(
                     symbol=symbol["symbol"],
                     as_of_utc=as_of,
@@ -118,21 +201,21 @@ def main() -> None:
                     support=min(closes[-60:]),
                     resistance_1=max(closes[-30:]),
                     resistance_2=max(closes[-120:]),
-                    volume_ratio=Decimal(latest["volume"])
+                    volume_ratio=Decimal(bars_15m[-1]["volume"])
                     / max(
                         Decimal(1),
-                        sum((Decimal(r["volume"]) for r in rows[-21:-1]), Decimal()) / 20,
+                        sum((Decimal(r["volume"]) for r in bars_15m[-21:-1]), Decimal()) / 20,
                     ),
                     relative_strength_spy=Decimal(),
-                    daily_trend=1 if closes[-1] > _ema(closes[-120:], 50) else -1,
-                    hourly_trend=1 if closes[-1] > _ema(closes[-60:], 20) else -1,
-                    revenue_growth_pct=None,
-                    eps_growth_pct=None,
-                    fcf_growth_pct=None,
-                    net_margin_pct=None,
-                    debt_to_equity=None,
-                    dilution_pct=None,
-                    feed=str(latest["source_name"]),
+                    daily_trend=1 if daily_closes[-1] > daily_closes[-2] else -1,
+                    hourly_trend=1 if hourly_closes[-1] > _ema(hourly_closes, 20) else -1,
+                    revenue_growth_pct=fundamentals["revenue_growth"],
+                    eps_growth_pct=fundamentals["eps_growth"],
+                    fcf_growth_pct=fundamentals["fcf_growth"],
+                    net_margin_pct=fundamentals["net_margin"],
+                    debt_to_equity=fundamentals["debt_to_equity"],
+                    dilution_pct=fundamentals["dilution"],
+                    feed=os.environ.get("ALPACA_DATA_FEED", "iex"),
                     certification_status="CERTIFIED",
                     shadow_mode=True,
                 )
@@ -199,7 +282,13 @@ def main() -> None:
                         inputs.feed,
                         decision.model_version,
                         json.dumps(
-                            {"symbol": inputs.symbol, "window_bars": len(rows)},
+                            {
+                                "symbol": inputs.symbol,
+                                "source_rows": len(rows),
+                                "bars_15m": len(bars_15m),
+                                "bars_1h": len(bars_1h),
+                                "bars_1d": len(bars_1d),
+                            },
                             separators=(",", ":"),
                         ),
                         json.dumps(

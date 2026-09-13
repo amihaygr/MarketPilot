@@ -5,14 +5,16 @@ import json
 import logging
 from dataclasses import asdict
 from datetime import UTC, datetime
+from urllib.error import HTTPError
 from uuid import UUID, uuid4
 
 import boto3
 
 from marketpilot.contracts.sec_filing import SecFilingV1
-from marketpilot.sec.archive import archive_submissions_payload
+from marketpilot.sec.archive import archive_company_facts_payload, archive_submissions_payload
 from marketpilot.sec.client import SecClient
-from marketpilot.sec.mariadb import publish_sec_filings
+from marketpilot.sec.company_facts import normalize_company_facts
+from marketpilot.sec.mariadb import publish_company_facts, publish_sec_filings
 from marketpilot.sec.parsing import latest_filing_date, parse_recent_filings
 from marketpilot.sec.settings import SecSettings
 
@@ -39,6 +41,8 @@ def poll_sec(settings: SecSettings, run_id: UUID) -> dict[str, object]:
     ingested_at = datetime.now(UTC)
     filings: list[SecFilingV1] = []
     archived_payloads = 0
+    fundamental_facts = 0
+    company_facts_unavailable: list[str] = []
     for symbol, cik in settings.companies:
         _source_url, raw_payload, decoded = client.company_submissions(cik)
         bronze_uri, digest = archive_submissions_payload(
@@ -62,6 +66,29 @@ def poll_sec(settings: SecSettings, run_id: UUID) -> dict[str, object]:
                 ingested_at_utc=ingested_at,
             )
         )
+        try:
+            _facts_url, facts_payload, facts_decoded = client.company_facts(cik)
+        except HTTPError as error:
+            if error.code != 404:
+                raise
+            company_facts_unavailable.append(symbol)
+            logger.warning("SEC Company Facts unavailable symbol=%s cik=%s", symbol, cik)
+            continue
+        facts_uri, _facts_digest = archive_company_facts_payload(
+            s3,
+            bucket=settings.bronze_bucket,
+            cik=cik,
+            payload=facts_payload,
+            partition_date=ingested_at.date(),
+        )
+        archived_payloads += 1
+        fundamental_facts += publish_company_facts(
+            settings,
+            symbol=symbol,
+            facts=tuple(normalize_company_facts(facts_decoded)),
+            bronze_uri=facts_uri,
+            run_id=run_id,
+        )
     publication = publish_sec_filings(
         settings,
         tuple(filings),
@@ -73,6 +100,8 @@ def poll_sec(settings: SecSettings, run_id: UUID) -> dict[str, object]:
         "run_id": str(run_id),
         "companies_polled": len(settings.companies),
         "payloads_archived": archived_payloads,
+        "fundamental_facts_published": fundamental_facts,
+        "company_facts_unavailable": company_facts_unavailable,
         **asdict(publication),
     }
     logger.info(

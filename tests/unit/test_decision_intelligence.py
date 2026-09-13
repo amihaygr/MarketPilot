@@ -47,17 +47,17 @@ def test_decision_builds_reproducible_levels_and_shadow_gate():
 
 
 def test_stale_market_or_fundamentals_blocks_entry():
-    now = inputs().as_of_utc
+    now = datetime(2026, 9, 14, 14, 0, tzinfo=UTC)
     assert (
         build_decision(
-            inputs(market_data_time_utc=now - timedelta(minutes=31)),
+            inputs(as_of_utc=now, market_data_time_utc=now - timedelta(minutes=31)),
             PortfolioRisk(equity=Decimal("10000")),
         ).action
         == "INSUFFICIENT DATA"
     )
     assert (
         build_decision(
-            inputs(fundamentals_as_of_utc=now - timedelta(days=151)),
+            inputs(as_of_utc=now, fundamentals_as_of_utc=now - timedelta(days=151)),
             PortfolioRisk(equity=Decimal("10000")),
         ).action
         == "INSUFFICIENT DATA"
@@ -73,3 +73,12 @@ def test_open_risk_and_exposure_limit_position_size():
     result = build_decision(inputs(), portfolio)
     assert result.position_value <= Decimal("50")
     assert result.planned_risk <= Decimal("10")
+
+
+def test_old_bar_does_not_expire_certified_research_while_market_is_closed():
+    sunday = datetime(2026, 9, 13, 14, 0, tzinfo=UTC)
+    result = build_decision(
+        inputs(as_of_utc=sunday, market_data_time_utc=sunday - timedelta(days=2)),
+        PortfolioRisk(equity=Decimal("10000")),
+    )
+    assert result.action != "INSUFFICIENT DATA"
