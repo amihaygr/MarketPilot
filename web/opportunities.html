@@ -7,6 +7,7 @@
   <title>MarketPilot | Opportunity Center</title>
   <link rel="stylesheet" href="/opportunities.css?v=phase14-1" />
   <link rel="stylesheet" href="/opportunities-simulator.css?v=phase14-2" />
+  <link rel="stylesheet" href="/opportunities-analysis.css?v=phase14-3" />
   <script src="/opportunities.js?v=phase14-1" defer></script>
 </head>
 <body>
@@ -30,6 +31,10 @@
     <section class="layout">
       <aside class="panel"><div class="panel-title"><div><p class="eyebrow">WATCHLIST</p><h2>Ranked opportunities</h2></div><button id="refresh">Refresh</button></div><div id="watchlist" class="watchlist" aria-live="polite"></div></aside>
       <section class="panel detail" id="detail"><div class="empty"><strong>No decision snapshot yet</strong><p>Run the certified Phase 14 calculation after schema migration and SEC fundamentals ingestion. No placeholder recommendation is shown.</p></div></section>
+    </section>
+    <section class="analysis-grid">
+      <article class="panel chart-panel"><div class="panel-title"><div><p class="eyebrow">PRICE CONTEXT</p><h2>Decision map</h2></div><span id="chart-window" class="muted">Latest 200 bars</span></div><svg id="decision-chart" viewBox="0 0 900 360" role="img" aria-label="Price chart with decision levels"></svg><div id="chart-legend" class="chart-legend"></div></article>
+      <article class="panel journal-panel"><div class="panel-title"><div><p class="eyebrow">AUDIT TRAIL</p><h2>Recommendation journal</h2></div></div><div id="recommendation-journal" class="journal" aria-live="polite"></div></article>
     </section>
     <section class="disclaimer">All levels are mathematical scenarios derived from recorded inputs. MarketPilot does not guarantee profit, place orders or replace human judgment.</section>
   </main>
