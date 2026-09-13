@@ -280,20 +280,31 @@ read-only dependency and freshness probes, writes structured JSON logs, and emit
 only state transitions to avoid repeated alerts. A generic webhook is optional and
 disabled by default.
 
-## 18. Capacity assumptions
-
 ## 18. Decision Intelligence
 
 Phase 14 adds an application-facing decision-support layer without changing the source-of-truth
 paths. Certified bars are resampled into 5-minute, 15-minute, hourly and daily feature windows;
 SEC Company Facts are archived raw, normalized and published as versioned Gold fundamentals.
-Corporate actions must be applied before return and level calculations.
+Corporate actions are fetched by a bounded Airflow DAG, retained as exact content-addressed Bronze
+pages and normalized in Gold. Split factors are applied to analytical copies before return and
+level calculations; immutable raw bars are never rewritten. Cash-dividend events are retained for
+audit and future total-return models, while the current price-signal backtest does not credit cash
+distributions.
 
 The live Structured Streaming path may publish `PROVISIONAL` snapshots only after a closed
 15-minute window. The bounded post-market Spark job publishes authoritative `CERTIFIED` snapshots
 after market, fundamental and quality gates. Each snapshot includes its input window, feed,
 formula/model version, lineage, expiry and explanation. The first 20 sessions are Shadow Mode and
 therefore never actionable. See ADR-008.
+
+After every certified daily publication, a bounded evaluator measures recommendation outcomes at
+2, 5, 10 and 20 XNYS sessions. The conservative path rule records a stop when an aggregated path
+touches both a stop and a target and intrabar ordering is unknown. Promotion status advances only
+to `READY_FOR_REVIEW`; software never self-approves the model.
+
+In-app alerts are append-only transition events (`ENTERED_BUY_ZONE`, `ACTION_CHANGED`, stale-data
+or risk warnings). They are informational only and cannot trigger an order. The Shadow Mode gate,
+evaluation summary and alerts are exposed through bounded read-only API endpoints.
 
 The browser reads recommendations only through the Backend API. Manual watchlist and portfolio
 writes require a separate, least-privilege identity; the existing market-data API identity remains

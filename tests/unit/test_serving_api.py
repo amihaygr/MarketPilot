@@ -33,6 +33,32 @@ class FakeReadRepository:
     def opportunity_history(self, *, symbol: str, limit: int) -> list[dict[str, Any]]:
         return [self._opportunity()] if symbol == "AAPL" and limit > 0 else []
 
+    def decision_alerts(self, *, limit: int) -> list[dict[str, Any]]:
+        return [
+            {
+                "alert_id": "33333333-3333-4333-8333-333333333333",
+                "symbol": "AAPL",
+                "alert_type": "ENTERED_BUY_ZONE",
+                "severity": "WATCH",
+                "title": "AAPL: BUY ZONE",
+                "message": "התרחיש השתנה",
+                "created_at_utc": datetime(2026, 9, 13, 14, tzinfo=UTC),
+            }
+        ][:limit]
+
+    def decision_evaluation_status(self) -> dict[str, Any]:
+        return {
+            "model_version": "decision-intelligence-v1",
+            "required_sessions": 20,
+            "completed_sessions": 3,
+            "first_session_date": date(2026, 9, 9),
+            "latest_session_date": date(2026, 9, 11),
+            "promotion_status": "COLLECTING",
+            "evaluated_recommendations": 4,
+            "hit_rate_pct": "50",
+            "average_return_pct": "1.25",
+        }
+
     @staticmethod
     def _opportunity() -> dict[str, Any]:
         return {
@@ -324,6 +350,18 @@ def test_user_workspace_can_be_read_and_updated_with_bounded_input() -> None:
         },
     )
     assert invalid.status_code == 422
+
+
+def test_decision_alerts_and_shadow_progress_are_bounded() -> None:
+    client = TestClient(create_app(settings(), FakeReadRepository()))
+
+    alerts = client.get("/api/v1/decision-alerts?limit=10")
+    status = client.get("/api/v1/decision-evaluation/status")
+    assert alerts.status_code == 200
+    assert alerts.json()["items"][0]["alert_type"] == "ENTERED_BUY_ZONE"
+    assert status.status_code == 200
+    assert status.json()["completed_sessions"] == 3
+    assert client.get("/api/v1/decision-alerts?limit=101").status_code == 422
 
 
 def test_market_bars_enforce_filters_pagination_and_aware_bounds() -> None:

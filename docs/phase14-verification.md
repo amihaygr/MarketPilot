@@ -1,0 +1,49 @@
+# Phase 14 verification — Decision Intelligence
+
+Verification date: 2026-09-13
+
+## Release state
+
+The software delivery is complete and running locally. The model remains deliberately locked in
+`COLLECTING` Shadow Mode at **1 of 20** distinct certified market sessions. This is the expected
+state: twenty real sessions must elapse before a human review may approve Decision Support.
+
+## Verified behavior
+
+- Docker Compose configuration validates and all core services report healthy.
+- A certified bounded calculation published three watchlist snapshots.
+- A provisional calculation published one AAPL snapshot and remained non-actionable.
+- The Opportunity API returned four ranked symbols; two were in a mathematical `BUY ZONE`.
+- The Shadow status API returned `completed_sessions=1`, `required_sessions=20` and
+  `promotion_status=COLLECTING`.
+- The official Alpaca Corporate Actions adapter archived one exact page and normalized nine
+  actions idempotently.
+- Airflow loaded `corporate_actions` and `daily_market_close` with no import errors.
+- The outcome evaluator completed successfully and published zero rows because no requested
+  2/5/10/20-session horizon had elapsed yet. It did not invent future results.
+- Spark Structured Streaming restarted healthy with its durable checkpoint and both Gold/DLQ
+  queries active.
+- The Opportunity Center was visually inspected at desktop and mobile widths. Ranked selection,
+  AAPL/MSFT detail changes, position sizing, bilingual explanations, chart legend, journal and
+  Shadow Mode progress rendered correctly.
+
+## Quality gates
+
+```text
+ruff format --check .  -> passed (175 files)
+ruff check .           -> passed
+pytest -q              -> 99 passed, 7 integration suites opt-in skipped
+docker compose config  -> passed
+Airflow DAG imports    -> no errors
+```
+
+The skipped suites require their documented environment flags and live boundary setup; the same
+runtime boundaries were exercised directly during this verification.
+
+## Honest limitations
+
+- Alpaca IEX is a partial market feed and therefore lowers confidence.
+- Shadow Mode cannot finish before 20 real certified sessions exist.
+- Cash dividends are retained as Corporate Actions but are not credited in the current
+  price-signal backtest; split adjustment is active.
+- No recommendation guarantees return, reads a brokerage balance or places an order.

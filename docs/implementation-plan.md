@@ -366,7 +366,7 @@ Recommended Git checkpoints:
 13. `add backtest orchestration and serving`
 14. `add interactive backtesting experience`
 15. `add certified alpaca historical backfill`
-# Phase 14 — Decision Intelligence (in progress)
+# Phase 14 — Decision Intelligence (implemented; Shadow Mode collecting evidence)
 
 MarketPilot adds an explainable, shadow-mode swing decision layer. See ADR-008. Delivery is staged:
 versioned schema and deterministic rules; certified batch publication; provisional streaming state;
@@ -380,5 +380,19 @@ Implemented application checkpoint:
 - Position sizing capped by configured per-trade risk, symbol exposure and available cash.
 - API, browser, transaction, validation and responsive-layout verification.
 
-Remaining release gates are corporate-action adjustment, provisional closed-15-minute publication,
-walk-forward evaluation and the 20-session Shadow Mode evidence window.
+Implemented release capabilities:
+
+- Corporate Actions are archived exactly in Bronze, normalized idempotently in Gold and applied
+  as non-destructive split adjustments to Decision Intelligence and historical backtests.
+- The live Structured Streaming service recalculates `PROVISIONAL` recommendations only after a
+  closed 15-minute bar; the daily bounded path publishes authoritative `CERTIFIED` snapshots.
+- Technical scoring combines 5-minute confirmation, 15-minute entry context, hourly/daily trend,
+  EMA, RSI, MACD, ATR, volume and relative strength against SPY.
+- Recommendation outcomes are evaluated idempotently at 2, 5, 10 and 20 XNYS sessions.
+- The Opportunity Center exposes saved portfolio/watchlist settings, position sizing, ranked
+  scenarios, alerts, recommendation history and visible Shadow Mode progress through the API.
+
+The implementation is complete, but promotion is intentionally not complete. The model remains
+non-actionable until 20 distinct real certified market sessions have accumulated and a separate
+review records an explicit `APPROVED` decision. No test or backfill may fabricate that elapsed-time
+gate. Runtime evidence is in `docs/phase14-verification.md`.

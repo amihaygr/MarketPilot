@@ -73,6 +73,33 @@ class OpportunityListResponse(ApiModel):
     total: int = Field(ge=0)
 
 
+class DecisionAlertRead(ApiModel):
+    alert_id: str
+    symbol: str
+    alert_type: Literal["ENTERED_BUY_ZONE", "ACTION_CHANGED", "DATA_STALE", "RISK_BLOCKED"]
+    severity: Literal["INFO", "WATCH", "WARNING"]
+    title: str
+    message: str
+    created_at_utc: datetime
+
+
+class DecisionAlertListResponse(ApiModel):
+    items: list[DecisionAlertRead]
+    total: int = Field(ge=0)
+
+
+class DecisionEvaluationStatus(ApiModel):
+    model_version: str
+    required_sessions: int = Field(ge=1)
+    completed_sessions: int = Field(ge=0)
+    first_session_date: date | None
+    latest_session_date: date | None
+    promotion_status: Literal["COLLECTING", "READY_FOR_REVIEW", "APPROVED", "REJECTED"]
+    evaluated_recommendations: int = Field(ge=0)
+    hit_rate_pct: Decimal | None = Field(default=None, ge=0, le=100)
+    average_return_pct: Decimal | None = None
+
+
 class PortfolioState(ApiModel):
     equity: Decimal = Field(gt=0, le=1_000_000_000)
     cash_balance: Decimal = Field(ge=0, le=1_000_000_000)

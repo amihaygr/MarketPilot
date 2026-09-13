@@ -7,15 +7,15 @@
   <title>MarketPilot | Opportunity Center</title>
   <link rel="stylesheet" href="/opportunities.css?v=phase14-1" />
   <link rel="stylesheet" href="/opportunities-simulator.css?v=phase14-4" />
-  <link rel="stylesheet" href="/opportunities-analysis.css?v=phase14-3" />
-  <script src="/opportunities.js?v=phase14-4" defer></script>
+  <link rel="stylesheet" href="/opportunities-analysis.css?v=phase14-5" />
+  <script src="/opportunities.js?v=phase14-5" defer></script>
 </head>
 <body>
   <header class="topbar"><a href="/" class="brand">MP <span>MarketPilot</span></a><nav><a href="/">Data</a><a href="/backtesting.html">Backtesting</a></nav></header>
   <main>
     <section class="hero">
       <div><p class="eyebrow">PHASE 14 · DECISION INTELLIGENCE</p><h1>Opportunity Center</h1><p>Explainable swing scenarios for 2–20 trading days. Research support—not financial advice or order execution.</p></div>
-      <div class="shadow"><strong>SHADOW MODE</strong><span>20-session validation gate</span></div>
+      <div class="shadow"><strong id="shadow-label">SHADOW MODE</strong><span id="shadow-progress">Loading validation gate…</span><progress id="shadow-meter" max="20" value="0">0 of 20</progress></div>
     </section>
     <section class="summary" aria-label="Opportunity summary">
       <article><span>Tracked</span><strong id="tracked">—</strong></article><article><span>Buy zones</span><strong id="buy-count">—</strong></article><article><span>Certified</span><strong id="certified-count">—</strong></article><article><span>Fresh</span><strong id="fresh-count">—</strong></article>
@@ -39,6 +39,10 @@
     <section class="analysis-grid">
       <article class="panel chart-panel"><div class="panel-title"><div><p class="eyebrow">PRICE CONTEXT</p><h2>Decision map</h2></div><span id="chart-window" class="muted">Latest 200 bars</span></div><svg id="decision-chart" viewBox="0 0 900 360" role="img" aria-label="Price chart with decision levels"></svg><div id="chart-legend" class="chart-legend"></div></article>
       <article class="panel journal-panel"><div class="panel-title"><div><p class="eyebrow">AUDIT TRAIL</p><h2>Recommendation journal</h2></div></div><div id="recommendation-journal" class="journal" aria-live="polite"></div></article>
+    </section>
+    <section class="panel alerts-panel">
+      <div class="panel-title"><div><p class="eyebrow">LIVE CHANGES</p><h2>Decision alerts</h2></div><span class="muted">In-app only · no orders</span></div>
+      <div id="decision-alerts" class="alerts" aria-live="polite"><div class="empty">No decision transitions recorded yet.</div></div>
     </section>
     <section class="disclaimer">All levels are mathematical scenarios derived from recorded inputs. MarketPilot does not guarantee profit, place orders or replace human judgment.</section>
   </main>

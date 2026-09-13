@@ -192,6 +192,38 @@ class MariaDbReadRepository:
         )
         return [_public_opportunity(row) for row in rows]
 
+    def decision_alerts(self, *, limit: int) -> list[Row]:
+        rows = self._fetch_all(
+            """
+            SELECT a.alert_id,s.symbol,a.alert_type,a.severity,a.title,a.message,a.created_at_utc
+            FROM fact_decision_alert a JOIN dim_symbol s ON s.symbol_id=a.symbol_id
+            ORDER BY a.created_at_utc DESC LIMIT %s
+            """,
+            (limit,),
+        )
+        return [_normalize_datetimes(row) for row in rows]
+
+    def decision_evaluation_status(self) -> Row:
+        rows = self._fetch_all(
+            """
+            SELECT s.model_version,s.required_sessions,s.completed_sessions,
+                   s.first_session_date,s.latest_session_date,s.promotion_status,
+                   COUNT(e.recommendation_id) evaluated_recommendations,
+                   ROUND(100*AVG(e.outcome IN ('TARGET_1','TARGET_2')),2) hit_rate_pct,
+                   ROUND(AVG(e.realized_return_pct),4) average_return_pct
+            FROM shadow_mode_status s
+            LEFT JOIN fact_opportunity_recommendation r ON r.model_version=s.model_version
+            LEFT JOIN fact_recommendation_evaluation e ON e.recommendation_id=r.recommendation_id
+                AND e.horizon_sessions=5
+            WHERE s.model_version='decision-intelligence-v1'
+            GROUP BY s.model_version,s.required_sessions,s.completed_sessions,
+                     s.first_session_date,s.latest_session_date,s.promotion_status
+            """
+        )
+        if not rows:
+            raise RuntimeError("decision evaluation status is missing")
+        return _normalize_datetimes(rows[0])
+
     def list_market_bars(
         self,
         *,

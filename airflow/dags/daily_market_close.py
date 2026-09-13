@@ -124,6 +124,20 @@ with DAG(
         pool="spark_batch_pool",
         verbose=False,
     )
+    evaluate_decision_intelligence = SparkSubmitOperator(
+        task_id="evaluate_decision_intelligence",
+        application="/opt/marketpilot/spark/jobs/evaluate_decision_intelligence.py",
+        conn_id="spark_standalone",
+        application_args=[
+            "--run-id",
+            "{{ ti.xcom_pull(task_ids='exchange_session_gate')['run_id'] }}",
+            "--evaluation-date",
+            "{{ ti.xcom_pull(task_ids='exchange_session_gate')['logical_date'] }}",
+        ],
+        conf=SPARK_CONF,
+        pool="spark_batch_pool",
+        verbose=False,
+    )
 
     (
         session_gate
@@ -132,4 +146,5 @@ with DAG(
         >> silver_to_gold
         >> calculate_market_analytics
         >> calculate_decision_intelligence
+        >> evaluate_decision_intelligence
     )

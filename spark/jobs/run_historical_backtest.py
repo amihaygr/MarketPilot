@@ -85,13 +85,21 @@ def main() -> None:
     quoted_symbols = ",".join(f"'{symbol}'" for symbol in symbols)
     end_exclusive = scope.end_date + timedelta(days=1)
     query = f"""(
-        SELECT f.symbol_id, d.symbol, f.event_time_utc, f.close_price,
+        SELECT f.symbol_id, d.symbol, f.event_time_utc,
+               f.close_price * COALESCE(EXP(SUM(LOG(ca.old_rate / ca.new_rate))), 1)
+                   AS close_price,
                f.certification_status
         FROM fact_market_bar_1m f
         JOIN dim_symbol d ON d.symbol_id = f.symbol_id
+        LEFT JOIN fact_corporate_action ca
+          ON ca.symbol_id=f.symbol_id
+         AND ca.action_type IN ('forward_splits','reverse_splits')
+         AND ca.ex_date > DATE(f.event_time_utc)
+         AND ca.ex_date <= '{scope.end_date.isoformat()}'
         WHERE f.event_time_utc >= '{scope.start_date.isoformat()} 00:00:00'
           AND f.event_time_utc < '{end_exclusive.isoformat()} 00:00:00'
           AND d.symbol IN ({quoted_symbols})
+        GROUP BY f.symbol_id,d.symbol,f.event_time_utc,f.close_price,f.certification_status
     ) backtest_source"""
     spark = build_batch_spark_session("marketpilot-historical-backtest")
     spark.sparkContext.setLogLevel(os.environ.get("SPARK_LOG_LEVEL", "WARN"))
@@ -101,7 +109,7 @@ def main() -> None:
     detailed_uri = f"{output_root}/run_id={scope.run_id}/detail"
     location = parse_s3_uri(output_root)
     code_version = os.environ.get("MARKETPILOT_CODE_VERSION", "development")
-    data_version = "certified-gold-bars-v1"
+    data_version = "certified-gold-bars-split-adjusted-v2"
     try:
         raw_source = _read_source(spark, query).cache()
         raw_source_count = raw_source.count()

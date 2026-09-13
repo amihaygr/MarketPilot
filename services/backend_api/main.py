@@ -20,6 +20,8 @@ from marketpilot.serving.schemas import (
     BacktestEquityResponse,
     BacktestRunDetail,
     BacktestRunPage,
+    DecisionAlertListResponse,
+    DecisionEvaluationStatus,
     FreshnessResponse,
     HealthResponse,
     IndicatorPage,
@@ -203,10 +205,31 @@ def create_app(
         symbol: str,
         limit: int = Query(default=30, ge=1, le=200),
     ) -> OpportunityListResponse:
-        if not __import__("re").fullmatch(r"[A-Z][A-Z0-9.-]{0,15}", symbol):
+        if re.fullmatch(r"[A-Z][A-Z0-9.-]{0,15}", symbol) is None:
             raise HTTPException(status_code=422, detail="invalid symbol")
         items = resolved_repository.opportunity_history(symbol=symbol, limit=limit)
         return OpportunityListResponse(items=items, total=len(items))
+
+    @app.get(
+        "/api/v1/decision-alerts",
+        response_model=DecisionAlertListResponse,
+        tags=["decisions"],
+    )
+    def decision_alerts(
+        limit: int = Query(default=20, ge=1, le=100),
+    ) -> DecisionAlertListResponse:
+        items = resolved_repository.decision_alerts(limit=limit)
+        return DecisionAlertListResponse(items=items, total=len(items))
+
+    @app.get(
+        "/api/v1/decision-evaluation/status",
+        response_model=DecisionEvaluationStatus,
+        tags=["decisions"],
+    )
+    def decision_evaluation_status() -> DecisionEvaluationStatus:
+        return DecisionEvaluationStatus.model_validate(
+            resolved_repository.decision_evaluation_status()
+        )
 
     @app.get("/api/v1/sec-filings", response_model=SecFilingPage, tags=["sec"])
     def sec_filings(

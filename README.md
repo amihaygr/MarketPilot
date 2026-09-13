@@ -20,6 +20,8 @@ With the local stack running, open:
 - **Interactive Dashboard:** <http://localhost:3000/> — Gold market data, freshness,
   indicators and explained observations.
 - **Backtesting Lab:** <http://localhost:3000/backtesting.html> — bounded historical
+- **Opportunity Center:** <http://localhost:3000/opportunities.html> — explainable Phase 14
+  swing scenarios, portfolio risk sizing and Shadow Mode evidence
   strategy runs, assumptions, benchmark comparison and daily equity curves.
 - **Final Demo Guide:** [`docs/demo-guide.md`](docs/demo-guide.md) — the canonical
   15-minute presentation path through the Phase 12 release candidate, with 10 and

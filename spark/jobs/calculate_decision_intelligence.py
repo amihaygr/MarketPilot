@@ -5,14 +5,17 @@ from __future__ import annotations
 import argparse
 import json
 import os
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 from uuid import NAMESPACE_URL, uuid5
 
 import pymysql
 from pymysql.cursors import DictCursor
 
+from marketpilot.corporate_actions.adjustments import adjust_bars_for_splits
 from marketpilot.decision_intelligence.rules import DecisionInputs, PortfolioRisk, build_decision
+
+SPARK_UTC = timezone.utc  # noqa: UP017 -- Spark 3.5.8 image uses Python 3.10.
 
 
 def _ema(values: list[Decimal], period: int) -> Decimal:
@@ -81,6 +84,12 @@ def _daily(rows: list[dict[str, object]]) -> list[dict[str, object]]:
     return list(buckets.values())
 
 
+def _period_return(values: list[Decimal], periods: int = 20) -> Decimal:
+    if len(values) <= periods or values[-periods - 1] == 0:
+        return Decimal()
+    return (values[-1] / values[-periods - 1] - 1) * 100
+
+
 def _fundamentals(cursor: DictCursor, symbol_id: int) -> dict[str, Decimal | datetime | None]:
     cursor.execute(
         """
@@ -120,11 +129,15 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--as-of-utc")
+    parser.add_argument(
+        "--certification-status", choices=("PROVISIONAL", "CERTIFIED"), default="CERTIFIED"
+    )
+    parser.add_argument("--symbols")
     args = parser.parse_args()
     as_of = (
-        datetime.fromisoformat(args.as_of_utc).astimezone(UTC)
+        datetime.fromisoformat(args.as_of_utc).astimezone(SPARK_UTC)
         if args.as_of_utc
-        else datetime.now(UTC)
+        else datetime.now(SPARK_UTC)
     )
     connection = pymysql.connect(
         host=os.environ["MARIADB_HOST"],
@@ -150,6 +163,11 @@ def main() -> None:
             if not portfolio_row:
                 raise RuntimeError("local-default portfolio is missing")
             cursor.execute(
+                "SELECT promotion_status FROM shadow_mode_status WHERE model_version=%s",
+                ("decision-intelligence-v1",),
+            )
+            shadow_row = cursor.fetchone() or {"promotion_status": "COLLECTING"}
+            cursor.execute(
                 """
                 SELECT s.symbol_id, s.symbol FROM user_watchlist_symbol w
                 JOIN user_portfolio p ON p.portfolio_id=w.portfolio_id
@@ -158,18 +176,56 @@ def main() -> None:
                 """
             )
             symbols = cursor.fetchall()
+            status_filter = (
+                "certification_status IN ('PROVISIONAL','CERTIFIED')"
+                if args.certification_status == "PROVISIONAL"
+                else "certification_status='CERTIFIED'"
+            )
+            cursor.execute(
+                f"""
+                SELECT f.event_time_utc,f.open_price,f.high_price,f.low_price,
+                       f.close_price,f.volume,f.source_name
+                FROM fact_market_bar_1m f JOIN dim_symbol s ON s.symbol_id=f.symbol_id
+                WHERE s.symbol='SPY' AND {status_filter}
+                ORDER BY f.event_time_utc DESC LIMIT 10000
+                """
+            )
+            spy_rows = list(reversed(cursor.fetchall()))
+            spy_15m_closes = [Decimal(row["close_price"]) for row in _aggregate(spy_rows, 15)]
+            requested_symbols = {
+                value.strip().upper() for value in (args.symbols or "").split(",") if value.strip()
+            }
             for symbol in symbols:
+                if requested_symbols and symbol["symbol"] not in requested_symbols:
+                    continue
                 cursor.execute(
-                    """
+                    f"""
                     SELECT event_time_utc, open_price, high_price, low_price,
                            close_price, volume, source_name
                     FROM fact_market_bar_1m
-                    WHERE symbol_id=%s AND certification_status='CERTIFIED'
+                    WHERE symbol_id=%s AND {status_filter}
                     ORDER BY event_time_utc DESC LIMIT 10000
                     """,
                     (symbol["symbol_id"],),
                 )
                 rows = list(reversed(cursor.fetchall()))
+                if rows:
+                    cursor.execute(
+                        """
+                        SELECT action_type,ex_date,old_rate,new_rate
+                        FROM fact_corporate_action
+                        WHERE symbol_id=%s AND action_type IN ('forward_splits','reverse_splits')
+                          AND ex_date BETWEEN DATE(%s) AND DATE(%s)
+                        ORDER BY ex_date
+                        """,
+                        (
+                            symbol["symbol_id"],
+                            rows[0]["event_time_utc"],
+                            rows[-1]["event_time_utc"],
+                        ),
+                    )
+                    rows = adjust_bars_for_splits(rows, cursor.fetchall())
+                bars_5m = _aggregate(rows, 5)
                 bars_15m = _aggregate(rows, 15)
                 bars_1h = _aggregate(rows, 60)
                 bars_1d = _daily(rows)
@@ -178,6 +234,7 @@ def main() -> None:
                 closes = [Decimal(row["close_price"]) for row in bars_15m]
                 hourly_closes = [Decimal(row["close_price"]) for row in bars_1h]
                 daily_closes = [Decimal(row["close_price"]) for row in bars_1d]
+                five_minute_closes = [Decimal(row["close_price"]) for row in bars_5m]
                 true_ranges = [
                     Decimal(row["high_price"]) - Decimal(row["low_price"]) for row in bars_15m[-14:]
                 ]
@@ -188,8 +245,8 @@ def main() -> None:
                 inputs = DecisionInputs(
                     symbol=symbol["symbol"],
                     as_of_utc=as_of,
-                    market_data_time_utc=latest["event_time_utc"].replace(tzinfo=UTC),
-                    fundamentals_as_of_utc=fundamental_time.replace(tzinfo=UTC)
+                    market_data_time_utc=latest["event_time_utc"].replace(tzinfo=SPARK_UTC),
+                    fundamentals_as_of_utc=fundamental_time.replace(tzinfo=SPARK_UTC)
                     if fundamental_time
                     else None,
                     price=closes[-1],
@@ -206,9 +263,12 @@ def main() -> None:
                         Decimal(1),
                         sum((Decimal(r["volume"]) for r in bars_15m[-21:-1]), Decimal()) / 20,
                     ),
-                    relative_strength_spy=Decimal(),
+                    relative_strength_spy=_period_return(closes) - _period_return(spy_15m_closes),
                     daily_trend=1 if daily_closes[-1] > daily_closes[-2] else -1,
                     hourly_trend=1 if hourly_closes[-1] > _ema(hourly_closes, 20) else -1,
+                    five_minute_trend=(
+                        1 if five_minute_closes[-1] > _ema(five_minute_closes[-20:], 10) else -1
+                    ),
                     revenue_growth_pct=fundamentals["revenue_growth"],
                     eps_growth_pct=fundamentals["eps_growth"],
                     fcf_growth_pct=fundamentals["fcf_growth"],
@@ -216,8 +276,8 @@ def main() -> None:
                     debt_to_equity=fundamentals["debt_to_equity"],
                     dilution_pct=fundamentals["dilution"],
                     feed=os.environ.get("ALPACA_DATA_FEED", "iex"),
-                    certification_status="CERTIFIED",
-                    shadow_mode=True,
+                    certification_status=args.certification_status,
+                    shadow_mode=shadow_row["promotion_status"] != "APPROVED",
                 )
                 decision = build_decision(
                     inputs,
@@ -231,12 +291,23 @@ def main() -> None:
                 recommendation_id = str(
                     uuid5(
                         NAMESPACE_URL,
-                        f"marketpilot:{symbol['symbol']}:{as_of.isoformat()}:decision-intelligence-v1:CERTIFIED",
+                        f"marketpilot:{args.run_id}:{symbol['symbol']}:"
+                        f"decision-intelligence-v1:{args.certification_status}",
                     )
                 )
                 lifecycle = (
-                    "INSUFFICIENT_DATA" if decision.action == "INSUFFICIENT DATA" else "CERTIFIED"
+                    "INSUFFICIENT_DATA"
+                    if decision.action == "INSUFFICIENT DATA"
+                    else args.certification_status
                 )
+                cursor.execute(
+                    """
+                    SELECT action FROM fact_opportunity_recommendation
+                    WHERE symbol_id=%s ORDER BY as_of_utc DESC LIMIT 1
+                    """,
+                    (symbol["symbol_id"],),
+                )
+                previous = cursor.fetchone()
                 cursor.execute(
                     """
                     INSERT INTO fact_opportunity_recommendation (
@@ -285,6 +356,7 @@ def main() -> None:
                             {
                                 "symbol": inputs.symbol,
                                 "source_rows": len(rows),
+                                "bars_5m": len(bars_5m),
                                 "bars_15m": len(bars_15m),
                                 "bars_1h": len(bars_1h),
                                 "bars_1d": len(bars_1d),
@@ -298,7 +370,61 @@ def main() -> None:
                         os.environ.get("MARKETPILOT_CODE_VERSION", "development"),
                     ),
                 )
+                alert_type = None
+                if decision.action == "BUY ZONE" and (
+                    not previous or previous["action"] != "BUY ZONE"
+                ):
+                    alert_type = "ENTERED_BUY_ZONE"
+                elif previous and previous["action"] != decision.action:
+                    alert_type = "ACTION_CHANGED"
+                if alert_type:
+                    alert_id = str(uuid5(NAMESPACE_URL, f"{recommendation_id}:{alert_type}"))
+                    cursor.execute(
+                        """
+                        INSERT IGNORE INTO fact_decision_alert (
+                            alert_id,recommendation_id,symbol_id,alert_type,severity,title,
+                            message,created_at_utc
+                        ) VALUES (%s,%s,%s,%s,'WATCH',%s,%s,%s)
+                        """,
+                        (
+                            alert_id,
+                            recommendation_id,
+                            symbol["symbol_id"],
+                            alert_type,
+                            f"{symbol['symbol']}: {decision.action}",
+                            f"התרחיש השתנה ל-{decision.action}; יש לבדוק את רמות הסיכון והנתונים.",
+                            as_of.replace(tzinfo=None),
+                        ),
+                    )
                 published += 1
+            if args.certification_status == "CERTIFIED":
+                cursor.execute(
+                    """
+                SELECT COUNT(DISTINCT DATE(as_of_utc)) AS sessions,
+                       MIN(DATE(as_of_utc)) AS first_date,MAX(DATE(as_of_utc)) AS latest_date
+                FROM fact_opportunity_recommendation
+                WHERE model_version=%s AND lifecycle_status='CERTIFIED'
+                """,
+                    ("decision-intelligence-v1",),
+                )
+                progress = cursor.fetchone()
+                completed = min(20, int(progress["sessions"] or 0))
+                cursor.execute(
+                    """
+                UPDATE shadow_mode_status SET completed_sessions=%s,first_session_date=%s,
+                    latest_session_date=%s,
+                    promotion_status=IF(promotion_status IN ('APPROVED','REJECTED'),
+                        promotion_status,IF(%s>=required_sessions,'READY_FOR_REVIEW','COLLECTING'))
+                WHERE model_version=%s
+                """,
+                    (
+                        completed,
+                        progress["first_date"],
+                        progress["latest_date"],
+                        completed,
+                        "decision-intelligence-v1",
+                    ),
+                )
         connection.commit()
         print(
             json.dumps(

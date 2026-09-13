@@ -3,6 +3,8 @@
 import json
 import logging
 import os
+import subprocess
+import sys
 from functools import partial
 from pathlib import Path
 from uuid import NAMESPACE_URL, uuid5
@@ -16,6 +18,7 @@ from pyspark.sql.functions import (
     greatest,
     least,
     lit,
+    minute,
     struct,
     to_json,
     when,
@@ -153,6 +156,23 @@ def write_gold_batch(
     if enriched.isEmpty():
         return
     enriched.foreachPartition(partial(upsert_market_bar_partition, config=database))
+    closed_window = not enriched.filter((minute(col("event_time_utc")) % 15) == 14).isEmpty()
+    if closed_window:
+        symbols = [row["symbol"] for row in enriched.select("symbol").distinct().collect()]
+        subprocess.run(
+            [
+                sys.executable,
+                "/opt/marketpilot/spark/jobs/calculate_decision_intelligence.py",
+                "--run-id",
+                run_id,
+                "--certification-status",
+                "PROVISIONAL",
+                "--symbols",
+                ",".join(symbols),
+            ],
+            check=True,
+            timeout=120,
+        )
     logger.info(
         json.dumps(
             {"event": "gold_batch_committed", "batch_id": batch_id, "run_id": run_id},

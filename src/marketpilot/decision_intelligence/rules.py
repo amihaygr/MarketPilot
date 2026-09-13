@@ -6,10 +6,12 @@ These rules produce research scenarios, never orders or promised returns.
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from decimal import ROUND_FLOOR, Decimal
 from typing import Literal
 from zoneinfo import ZoneInfo
+
+COMPAT_UTC = timezone.utc  # noqa: UP017 -- also imported by Spark's Python 3.10 runtime.
 
 Action = Literal["BUY ZONE", "WAIT", "WATCH BREAKOUT", "AVOID", "INSUFFICIENT DATA"]
 MODEL_VERSION = "decision-intelligence-v1"
@@ -53,6 +55,7 @@ class DecisionInputs:
     feed: str = "iex"
     certification_status: Literal["PROVISIONAL", "CERTIFIED"] = "PROVISIONAL"
     shadow_mode: bool = True
+    five_minute_trend: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -101,6 +104,7 @@ def _technical_score(data: DecisionInputs) -> Decimal:
     score = Decimal("50")
     score += Decimal(data.daily_trend) * Decimal("12")
     score += Decimal(data.hourly_trend) * Decimal("8")
+    score += Decimal(data.five_minute_trend) * Decimal("3")
     score += Decimal("8") if data.ema20 > data.ema50 else Decimal("-8")
     score += Decimal("5") if data.macd_histogram > 0 else Decimal("-5")
     score += Decimal("5") if Decimal("40") <= data.rsi14 <= Decimal("65") else Decimal("-4")
@@ -232,9 +236,9 @@ def build_decision(data: DecisionInputs, portfolio: PortfolioRisk) -> DecisionOu
         position_value=_q(entry * shares),
         planned_risk=_q(per_share_risk * shares),
         valid_until_utc=(
-            data.market_data_time_utc.astimezone(UTC) + timedelta(minutes=30)
+            data.market_data_time_utc.astimezone(COMPAT_UTC) + timedelta(minutes=30)
             if _market_is_open(data.as_of_utc)
-            else data.as_of_utc.astimezone(UTC) + timedelta(days=1)
+            else data.as_of_utc.astimezone(COMPAT_UTC) + timedelta(days=1)
         ),
         model_version=MODEL_VERSION,
         explanation_he=tuple(explanations),
