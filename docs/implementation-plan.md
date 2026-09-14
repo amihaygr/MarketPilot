@@ -389,6 +389,9 @@ Implemented release capabilities:
 - Technical scoring combines 5-minute confirmation, 15-minute entry context, hourly/daily trend,
   EMA, RSI, MACD, ATR, volume and relative strength against SPY.
 - Recommendation outcomes are evaluated idempotently at 2, 5, 10 and 20 XNYS sessions.
+- The daily DAG ends with a fail-closed Shadow Mode preflight. It verifies that the processed
+  XNYS session produced certified recommendations, became the latest Shadow session and is
+  reflected exactly in the capped session counter.
 - The Opportunity Center exposes saved portfolio/watchlist settings, position sizing, ranked
   scenarios, alerts, recommendation history and visible Shadow Mode progress through the API.
 

@@ -1,6 +1,6 @@
 # Phase 14 verification — Decision Intelligence
 
-Verification date: 2026-09-13
+Verification date: 2026-09-14
 
 ## Release state
 
@@ -30,6 +30,10 @@ state: twenty real sessions must elapse before a human review may approve Decisi
   combined 2026-07-06 through 2026-08-28 backtest published 46,749 observations and 1,059
   position changes under run `2bf99281-ec93-5fec-9ce2-d72539021bea`.
 - Historical evidence remains separate from the live gate; Shadow Mode is still 1 of 20.
+- The orphaned scheduled run from 2026-08-25 was preserved and closed as `failed`; the
+  `daily_market_close` DAG was unpaused for the next real XNYS close.
+- A terminal `verify_shadow_mode_progress` task now fails the daily run unless its certified
+  recommendation date, Shadow latest date and capped session counter agree.
 
 ## Quality gates
 

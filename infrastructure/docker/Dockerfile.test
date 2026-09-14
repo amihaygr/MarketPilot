@@ -6,6 +6,7 @@ COPY pyproject.toml README.md ./
 COPY src ./src
 COPY services ./services
 COPY tests ./tests
+COPY docs/presentation ./docs/presentation
 COPY airflow/dags ./airflow/dags
 COPY spark/jobs ./spark/jobs
 COPY scripts ./scripts

@@ -12,6 +12,9 @@ airflow
 !airflow/dags/**
 api
 docs
+!docs
+!docs/presentation
+!docs/presentation/*.md
 spark
 !spark
 !spark/jobs

@@ -4,10 +4,11 @@ from datetime import timedelta
 
 import pendulum
 from airflow.providers.apache.spark.operators.spark_submit import SparkSubmitOperator
-from airflow.providers.standard.operators.python import ShortCircuitOperator
+from airflow.providers.standard.operators.python import PythonOperator, ShortCircuitOperator
 from airflow.sdk import DAG, get_current_context
 
 from marketpilot.orchestration.batch_scope import prepare_daily_scope
+from marketpilot.orchestration.shadow_preflight import verify_shadow_progress
 
 SPARK_CONF = {
     "spark.cores.max": "2",
@@ -138,6 +139,16 @@ with DAG(
         pool="spark_batch_pool",
         verbose=False,
     )
+    verify_shadow_mode_progress = PythonOperator(
+        task_id="verify_shadow_mode_progress",
+        python_callable=verify_shadow_progress,
+        op_kwargs={
+            "logical_date_value": (
+                "{{ ti.xcom_pull(task_ids='exchange_session_gate')['logical_date'] }}"
+            ),
+            "run_id": "{{ ti.xcom_pull(task_ids='exchange_session_gate')['run_id'] }}",
+        },
+    )
 
     (
         session_gate
@@ -147,4 +158,5 @@ with DAG(
         >> calculate_market_analytics
         >> calculate_decision_intelligence
         >> evaluate_decision_intelligence
+        >> verify_shadow_mode_progress
     )
