@@ -85,7 +85,7 @@
 ### למה תוצאת ה־<bdi dir="ltr">Backtest</bdi> אינה מרשימה פיננסית?
 
 המטרה היא להוכיח <bdi dir="ltr">pipeline</bdi> נכון, לא לבצע <bdi dir="ltr">curve fitting</bdi>. ב־<bdi dir="ltr">run</bdi> הסופי <bdi dir="ltr">AAPL</bdi> הניב
-1.36% מול <bdi dir="ltr">benchmark</bdi> של 2.67%, ושתי סדרות אחרות היו שליליות. הצגת תוצאה מעורבת
+<bdi dir="ltr">1.36%</bdi> מול <bdi dir="ltr">benchmark</bdi> של <bdi dir="ltr">2.67%</bdi>, ושתי סדרות אחרות היו שליליות. הצגת תוצאה מעורבת
 עם <bdi dir="ltr">lineage</bdi> עדיפה על הבטחת ביצועים שאינה נתמכת.
 
 ### מה למדת מהתקלה של 513 הרשומות?

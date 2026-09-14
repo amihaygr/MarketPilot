@@ -5,6 +5,10 @@ from pathlib import Path
 
 PRESENTATION_DIR = Path(__file__).parents[2] / "docs" / "presentation"
 LATIN_WORD = re.compile(r"[A-Za-z]{2,}")
+NUMERIC_DIRECTIONAL_RUN = re.compile(
+    r"[+\-−‎]?\d+(?:[.,:]\d+)*(?:[–—-]\d+(?:[.,:]\d+)*)+|"
+    r"[+\-−‎]?\d+(?:[.,]\d+)*%|\d+/\d+"
+)
 PROTECTED_FRAGMENT = re.compile(
     r"<bdi\b[^>]*>.*?</bdi>|<a\b[^>]*>.*?</a>|<[^>]+>|https?://[^)\s>]+"
 )
@@ -24,4 +28,7 @@ def test_hebrew_presentation_markdown_has_complete_rtl_isolation() -> None:
             unisolated = PROTECTED_FRAGMENT.sub("", line)
             assert not LATIN_WORD.search(unisolated), (
                 f"{path.name}:{line_number} contains an unisolated LTR term: {unisolated}"
+            )
+            assert not NUMERIC_DIRECTIONAL_RUN.search(unisolated), (
+                f"{path.name}:{line_number} contains an unisolated numeric run: {unisolated}"
             )
