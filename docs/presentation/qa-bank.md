@@ -1,171 +1,171 @@
 <div dir="rtl" align="right">
 
-# `MarketPilot` — מאגר שאלות ותשובות
+# <bdi dir="ltr"><code>MarketPilot</code></bdi> — מאגר שאלות ותשובות
 
 בכל תשובה: משפט ישיר, ראיה מהפרויקט, הסיבה להחלטה ולבסוף מגבלה אם קיימת.
 
 ## עשר שאלות שחייבים לדעת
 
-### למה נתונים היסטוריים אינם משלימים את 20 ימי ה־Shadow Mode?
+### למה נתונים היסטוריים אינם משלימים את 20 ימי ה־<bdi dir="ltr">Shadow Mode</bdi>?
 
-כי Backfill יודע את העבר מראש ואינו מדמה תפעול חי, freshness ותיקונים שמגיעים
-בזמן אמת. הוא ראיה טובה ל־Backtesting, אך שער ה־Shadow דורש 20 ימים עוקבים
+כי <bdi dir="ltr">Backfill</bdi> יודע את העבר מראש ואינו מדמה תפעול חי, <bdi dir="ltr">freshness</bdi> ותיקונים שמגיעים
+בזמן אמת. הוא ראיה טובה ל־<bdi dir="ltr">Backtesting</bdi>, אך שער ה־<bdi dir="ltr">Shadow</bdi> דורש 20 ימים עוקבים
 שבהם ההמלצה נוצרה לפני שהתוצאה הייתה ידועה. ההפרדה מוצגת במפורש בדשבורד.
 
-### 1. למה `Kafka` אם נפח הנתונים קטן?
+### 1. למה <bdi dir="ltr"><code>Kafka</code></bdi> אם נפח הנתונים קטן?
 
-Kafka אינו נבחר רק בגלל scale. הוא מפריד producer מצרכנים, שומר offsets ומאפשר
-ל-Streaming ול-archive לצרוך אותו event בנפרד. ב-MVP broker יחיד מספיק; cluster
+<bdi dir="ltr">Kafka</bdi> אינו נבחר רק בגלל <bdi dir="ltr">scale</bdi>. הוא מפריד <bdi dir="ltr">producer</bdi> מצרכנים, שומר <bdi dir="ltr">offsets</bdi> ומאפשר
+ל־<bdi dir="ltr">Streaming</bdi> ול־<bdi dir="ltr">archive</bdi> לצרוך אותו <bdi dir="ltr">event</bdi> בנפרד. ב־<bdi dir="ltr">MVP broker</bdi> יחיד מספיק; <bdi dir="ltr">cluster</bdi>
 גדול יותר מוצדק רק לאחר מדידה.
 
-### 2. למה גם `MinIO` וגם `MariaDB`?
+### 2. למה גם <bdi dir="ltr"><code>MinIO</code></bdi> וגם <bdi dir="ltr"><code>MariaDB</code></bdi>?
 
-MariaDB הוא Gold serving לשאילתות היישום. MinIO מחזיק raw immutable, Silver
-Parquet וארכיון. שמירת הכול רק ב-MariaDB הייתה מחלישה replay, compression ו-restore.
+<bdi dir="ltr">MariaDB</bdi> הוא <bdi dir="ltr">Gold serving</bdi> לשאילתות היישום. <bdi dir="ltr">MinIO</bdi> מחזיק <bdi dir="ltr">raw immutable</bdi>, <bdi dir="ltr">Silver</bdi>
+<bdi dir="ltr">Parquet</bdi> וארכיון. שמירת הכול רק ב־<bdi dir="ltr">MariaDB</bdi> הייתה מחלישה <bdi dir="ltr">replay</bdi>, <bdi dir="ltr">compression</bdi> ו־<bdi dir="ltr">restore</bdi>.
 
-### 3. למה `Airflow` אינו מפעיל `Streaming`?
+### 3. למה <bdi dir="ltr"><code>Airflow</code></bdi> אינו מפעיל <bdi dir="ltr"><code>Streaming</code></bdi>?
 
-Streaming הוא process שאינו אמור להסתיים. Docker מנהל lifecycle ו-restart;
-Airflow מנהל dependencies ו-retries של jobs תחומים. ההפרדה מתועדת ב-ADR-002.
+<bdi dir="ltr">Streaming</bdi> הוא <bdi dir="ltr">process</bdi> שאינו אמור להסתיים. <bdi dir="ltr">Docker</bdi> מנהל <bdi dir="ltr">lifecycle</bdi> ו־<bdi dir="ltr">restart</bdi>;
+<bdi dir="ltr">Airflow</bdi> מנהל <bdi dir="ltr">dependencies</bdi> ו־<bdi dir="ltr">retries</bdi> של <bdi dir="ltr">jobs</bdi> תחומים. ההפרדה מתועדת ב־<bdi dir="ltr">ADR-002</bdi>.
 
-### 4. האם המערכת `exactly once`?
+### 4. האם המערכת <bdi dir="ltr"><code>exactly once</code></bdi>?
 
-לא קיימת טענת exactly-once בין כל הגבולות. Kafka, Spark ומסד יכולים לבצע retry.
-הנכונות נשמרת באמצעות deterministic event IDs, checkpoints, unique keys ו-upserts.
+לא קיימת טענת <bdi dir="ltr">exactly-once</bdi> בין כל הגבולות. <bdi dir="ltr">Kafka</bdi>, <bdi dir="ltr">Spark</bdi> ומסד יכולים לבצע <bdi dir="ltr">retry</bdi>.
+הנכונות נשמרת באמצעות <bdi dir="ltr">deterministic event IDs</bdi>, <bdi dir="ltr">checkpoints</bdi>, <bdi dir="ltr">unique keys</bdi> ו־<bdi dir="ltr">upserts</bdi>.
 
-### 5. מה ההבדל בין `Provisional` ל־`Certified`?
+### 5. מה ההבדל בין <bdi dir="ltr"><code>Provisional</code></bdi> ל־<bdi dir="ltr"><code>Certified</code></bdi>?
 
-Provisional נכתב מהר מ-Streaming. Certified נבנה מחדש מ-Bronze עבור מחיצה סגורה
-ורק לאחר DQ חוסם. הכשל ב-Batch אינו מסתיר את ה-Certified הקודם.
+<bdi dir="ltr">Provisional</bdi> נכתב מהר מ־<bdi dir="ltr">Streaming. Certified</bdi> נבנה מחדש מ־<bdi dir="ltr">Bronze</bdi> עבור מחיצה סגורה
+ורק לאחר <bdi dir="ltr">DQ</bdi> חוסם. הכשל ב־<bdi dir="ltr">Batch</bdi> אינו מסתיר את ה־<bdi dir="ltr">Certified</bdi> הקודם.
 
-### 6. מה קורה אם `Spark Streaming` נופל?
+### 6. מה קורה אם <bdi dir="ltr"><code>Spark Streaming</code></bdi> נופל?
 
-Docker מפעיל אותו מחדש, והוא ממשיך מה-checkpoint וה-Kafka progress השמורים.
-Phase 3 אימת restart של driver ו-worker בלי כפילות במפתחות העסקיים.
+<bdi dir="ltr">Docker</bdi> מפעיל אותו מחדש, והוא ממשיך מה־<bdi dir="ltr">checkpoint</bdi> וה־<bdi dir="ltr">Kafka progress</bdi> השמורים.
+<bdi dir="ltr">Phase 3</bdi> אימת <bdi dir="ltr">restart</bdi> של <bdi dir="ltr">driver</bdi> ו־<bdi dir="ltr">worker</bdi> בלי כפילות במפתחות העסקיים.
 
 ### 7. כיצד מונעים כפילויות?
 
-Market bar מזוהה לפי Symbol, timestamp ו-interval; SEC לפי accession number.
-כתיבות Gold הן upserts ו-Batch מפרסם partition באופן דטרמיניסטי ואטומי.
+<bdi dir="ltr">Market bar</bdi> מזוהה לפי <bdi dir="ltr">Symbol</bdi>, <bdi dir="ltr">timestamp</bdi> ו־<bdi dir="ltr">interval</bdi>; <bdi dir="ltr">SEC</bdi> לפי <bdi dir="ltr">accession number</bdi>.
+כתיבות <bdi dir="ltr">Gold</bdi> הן <bdi dir="ltr">upserts</bdi> ו־<bdi dir="ltr">Batch</bdi> מפרסם <bdi dir="ltr">partition</bdi> באופן דטרמיניסטי ואטומי.
 
 ### 8. כיצד אתה יודע שהנתונים נכונים?
 
-הפרסום המאושר תלוי בבדיקות freshness, completeness, duplicates, nulls, OHLC,
-expected bars ו-schema. תוצאות DQ ו-watermarks נשמרות כראיה.
+הפרסום המאושר תלוי בבדיקות <bdi dir="ltr">freshness</bdi>, <bdi dir="ltr">completeness</bdi>, <bdi dir="ltr">duplicates</bdi>, <bdi dir="ltr">nulls</bdi>, <bdi dir="ltr">OHLC</bdi>,
+<bdi dir="ltr">expected bars</bdi> ו־<bdi dir="ltr">schema</bdi>. תוצאות <bdi dir="ltr">DQ</bdi> ו־<bdi dir="ltr">watermarks</bdi> נשמרות כראיה.
 
 ### 9. למה הדפדפן אינו פונה ישירות למסד?
 
-API מאפשר validation, pagination, טווחים מוגבלים ו-response model בטוח. זהות
-האפליקציה בעלת SELECT בלבד וניסיון UPDATE מבוקר נדחה עם MariaDB 1142.
+<bdi dir="ltr">API</bdi> מאפשר <bdi dir="ltr">validation</bdi>, <bdi dir="ltr">pagination</bdi>, טווחים מוגבלים ו־<bdi dir="ltr">response model</bdi> בטוח. זהות
+האפליקציה בעלת <bdi dir="ltr">SELECT</bdi> בלבד וניסיון <bdi dir="ltr">UPDATE</bdi> מבוקר נדחה עם <bdi dir="ltr">MariaDB 1142</bdi>.
 
 ### 10. מה היה האתגר ההנדסי המשמעותי ביותר?
 
-ניסוח מוצע: "שמירת ההפרדה בין מסלול חי למסלול מאושר בלי לאבד lineage או
-idempotency. פתרתי זאת באמצעות Bronze immutable, checkpoint, business keys,
-publication states ו-DQ watermark."
+ניסוח מוצע: "שמירת ההפרדה בין מסלול חי למסלול מאושר בלי לאבד <bdi dir="ltr">lineage</bdi> או
+<bdi dir="ltr">idempotency</bdi>. פתרתי זאת באמצעות <bdi dir="ltr">Bronze immutable</bdi>, <bdi dir="ltr">checkpoint</bdi>, <bdi dir="ltr">business keys</bdi>,
+<bdi dir="ltr">publication states</bdi> ו־<bdi dir="ltr">DQ watermark</bdi>."
 
 ## שאלות עומק
 
-### למה ה־`Backfill` ההיסטורי אינו כותב ישירות ל־`MariaDB`?
+### למה ה־<bdi dir="ltr"><code>Backfill</code></bdi> ההיסטורי אינו כותב ישירות ל־<bdi dir="ltr"><code>MariaDB</code></bdi>?
 
-כי היסטוריה חייבת לעבור את אותה שרשרת אמון. Phase 12 שומר source pages לפי
-SHA-256, מפרסם ל-Kafka, מוכיח Bronze לפי offset ורק אז מפעיל Silver, DQ ו-Gold.
-המחיר הוא תהליך איטי יותר; הרווח הוא replay ו-lineage אמיתיים.
+כי היסטוריה חייבת לעבור את אותה שרשרת אמון. <bdi dir="ltr">Phase 12</bdi> שומר <bdi dir="ltr">source pages</bdi> לפי
+<bdi dir="ltr">SHA-256</bdi>, מפרסם ל־<bdi dir="ltr">Kafka</bdi>, מוכיח <bdi dir="ltr">Bronze</bdi> לפי <bdi dir="ltr">offset</bdi> ורק אז מפעיל <bdi dir="ltr">Silver</bdi>, <bdi dir="ltr">DQ</bdi> ו־<bdi dir="ltr">Gold</bdi>.
+המחיר הוא תהליך איטי יותר; הרווח הוא <bdi dir="ltr">replay</bdi> ו־<bdi dir="ltr">lineage</bdi> אמיתיים.
 
-### למה יש Topic היסטורי נפרד?
+### למה יש <bdi dir="ltr">Topic</bdi> היסטורי נפרד?
 
-כדי ש-burst של אלפי bars היסטוריים לא ייכנס ל-Spark Streaming שמיועד ל-Live.
-`market.bars.1m.backfill.v1` נשמר ב-Bronze אך אינו נצרך ב-live application.
+כדי ש־<bdi dir="ltr">burst</bdi> של אלפי <bdi dir="ltr">bars</bdi> היסטוריים לא ייכנס ל־<bdi dir="ltr">Spark Streaming</bdi> שמיועד ל־<bdi dir="ltr">Live</bdi>.
+<bdi dir="ltr"><code>market.bars.1m.backfill.v1</code></bdi> נשמר ב־<bdi dir="ltr">Bronze</bdi> אך אינו נצרך ב־<bdi dir="ltr">live application</bdi>.
 
-### כיצד מנעת Look-ahead bias?
+### כיצד מנעת <bdi dir="ltr">Look-ahead bias</bdi>?
 
-ה-position שנובע מ-bar `t` מוחל רק על תשואת `t+1`. בנוסף רק Certified Gold
-נכנס לריצה, והפרמטרים, costs, slippage ו-code version נשמרים עם ה-run.
+ה־<bdi dir="ltr">position</bdi> שנובע מ־<bdi dir="ltr">bar</bdi> <bdi dir="ltr"><code>t</code></bdi> מוחל רק על תשואת <bdi dir="ltr"><code>t+1</code></bdi>. בנוסף רק <bdi dir="ltr">Certified Gold</bdi>
+נכנס לריצה, והפרמטרים, <bdi dir="ltr">costs</bdi>, <bdi dir="ltr">slippage</bdi> ו־<bdi dir="ltr">code version</bdi> נשמרים עם ה־<bdi dir="ltr">run</bdi>.
 
-### למה תוצאת ה-Backtest אינה מרשימה פיננסית?
+### למה תוצאת ה־<bdi dir="ltr">Backtest</bdi> אינה מרשימה פיננסית?
 
-המטרה היא להוכיח pipeline נכון, לא לבצע curve fitting. ב-run הסופי AAPL הניב
-1.36% מול benchmark של 2.67%, ושתי סדרות אחרות היו שליליות. הצגת תוצאה מעורבת
-עם lineage עדיפה על הבטחת ביצועים שאינה נתמכת.
+המטרה היא להוכיח <bdi dir="ltr">pipeline</bdi> נכון, לא לבצע <bdi dir="ltr">curve fitting</bdi>. ב־<bdi dir="ltr">run</bdi> הסופי <bdi dir="ltr">AAPL</bdi> הניב
+1.36% מול <bdi dir="ltr">benchmark</bdi> של 2.67%, ושתי סדרות אחרות היו שליליות. הצגת תוצאה מעורבת
+עם <bdi dir="ltr">lineage</bdi> עדיפה על הבטחת ביצועים שאינה נתמכת.
 
 ### מה למדת מהתקלה של 513 הרשומות?
 
-למדתי ש-filter לפי תאריך בלבד אינו מספיק. הרשומות נשמרו ל-audit, אבל Spark
-מצרף input לחלונות XNYS חוקיים ומבודד `source=alpaca` ב-certification ההיסטורי.
+למדתי ש־<bdi dir="ltr">filter</bdi> לפי תאריך בלבד אינו מספיק. הרשומות נשמרו ל־<bdi dir="ltr">audit</bdi>, אבל <bdi dir="ltr">Spark</bdi>
+מצרף <bdi dir="ltr">input</bdi> לחלונות <bdi dir="ltr">XNYS</bdi> חוקיים ומבודד <bdi dir="ltr"><code>source=alpaca</code></bdi> ב־<bdi dir="ltr">certification</bdi> ההיסטורי.
 הבדיקה הוסיפה כלל ארכיטקטוני שניתן לאימות ולא תיקון ידני חד-פעמי.
 
-### למה KRaft ולא ZooKeeper?
+### למה <bdi dir="ltr">KRaft</bdi> ולא <bdi dir="ltr">ZooKeeper</bdi>?
 
-הגרסה המקומית משתמשת ב-Kafka מודרני עם metadata quorum פנימי, ולכן אין צורך
-בשירות ZooKeeper נוסף. זה מקטין את מספר הרכיבים במחשב המקומי.
+הגרסה המקומית משתמשת ב־<bdi dir="ltr">Kafka</bdi> מודרני עם <bdi dir="ltr">metadata quorum</bdi> פנימי, ולכן אין צורך
+בשירות <bdi dir="ltr">ZooKeeper</bdi> נוסף. זה מקטין את מספר הרכיבים במחשב המקומי.
 
-### למה LocalExecutor ולא Celery?
+### למה <bdi dir="ltr">LocalExecutor</bdi> ולא <bdi dir="ltr">Celery</bdi>?
 
-נפח ה-MVP אינו מצדיק Redis ו-workers מבוזרים. LocalExecutor מספק parallelism
-מספיק תוך שמירה על תפעול פשוט. מעבר ל-Celery יישקל רק לאחר הוכחת צורך.
+נפח ה־<bdi dir="ltr">MVP</bdi> אינו מצדיק <bdi dir="ltr">Redis</bdi> ו־<bdi dir="ltr">workers</bdi> מבוזרים. <bdi dir="ltr">LocalExecutor</bdi> מספק <bdi dir="ltr">parallelism</bdi>
+מספיק תוך שמירה על תפעול פשוט. מעבר ל־<bdi dir="ltr">Celery</bdi> יישקל רק לאחר הוכחת צורך.
 
-### למה MariaDB ולא Data Warehouse?
+### למה <bdi dir="ltr">MariaDB</bdi> ולא <bdi dir="ltr">Data Warehouse</bdi>?
 
-היישום צריך serving SQL מקומי על נפח קטן יחסית. MariaDB מספק indexes, constraints
-ו-upserts. Parquet ב-MinIO משמש ל-analytics וארכיון; Warehouse מנוהל הוא הרחבה עתידית.
+היישום צריך <bdi dir="ltr">serving SQL</bdi> מקומי על נפח קטן יחסית. <bdi dir="ltr">MariaDB</bdi> מספק <bdi dir="ltr">indexes</bdi>, <bdi dir="ltr">constraints</bdi>
+ו־<bdi dir="ltr">upserts. Parquet</bdi> ב־<bdi dir="ltr">MinIO</bdi> משמש ל־<bdi dir="ltr">analytics</bdi> וארכיון; <bdi dir="ltr">Warehouse</bdi> מנוהל הוא הרחבה עתידית.
 
-### מה קורה לאירוע malformed?
+### מה קורה לאירוע <bdi dir="ltr">malformed</bdi>?
 
-הוא אינו נזרק בשקט ואינו מפיל את ה-stream. הוא נשלח ל-DLQ או quarantine עם reason
+הוא אינו נזרק בשקט ואינו מפיל את ה־<bdi dir="ltr">stream</bdi>. הוא נשלח ל־<bdi dir="ltr">DLQ</bdi> או <bdi dir="ltr">quarantine</bdi> עם <bdi dir="ltr">reason</bdi>
 ומטא-דאטה של המקור כדי שאפשר יהיה לחקור ולתקן.
 
 ### כיצד מטופלים חגים וסגירה מוקדמת?
 
-המערכת שומרת UTC אך משתמשת ב-`America/New_York` וב-exchange calendar של XNYS
-כדי לחשב session, holidays ו-early close. Offset UTC קבוע אינו מספיק בגלל DST.
+המערכת שומרת <bdi dir="ltr">UTC</bdi> אך משתמשת ב־<bdi dir="ltr"><code>America/New_York</code></bdi> וב־<bdi dir="ltr">exchange calendar</bdi> של <bdi dir="ltr">XNYS</bdi>
+כדי לחשב <bdi dir="ltr">session</bdi>, <bdi dir="ltr">holidays</bdi> ו־<bdi dir="ltr">early close. Offset UTC</bdi> קבוע אינו מספיק בגלל <bdi dir="ltr">DST</bdi>.
 
-### למה Backfill ידני ולא catchup של Airflow?
+### למה <bdi dir="ltr">Backfill</bdi> ידני ולא <bdi dir="ltr">catchup</bdi> של <bdi dir="ltr">Airflow</bdi>?
 
-Backfill דורש טווח וסמלים מפורשים ובדוקים. Catchup אוטומטי עלול ליצור ריצות רבות
-או חופפות. לכן יש DAG פרמטרי עם `max_active_runs=1`.
+<bdi dir="ltr">Backfill</bdi> דורש טווח וסמלים מפורשים ובדוקים. <bdi dir="ltr">Catchup</bdi> אוטומטי עלול ליצור ריצות רבות
+או חופפות. לכן יש <bdi dir="ltr">DAG</bdi> פרמטרי עם <bdi dir="ltr"><code>max_active_runs=1</code></bdi>.
 
-### איך SEC נשאר idempotent?
+### איך <bdi dir="ltr">SEC</bdi> נשאר <bdi dir="ltr">idempotent</bdi>?
 
-ה-client שומר raw JSON לפי content hash ו-Gold משתמש ב-accession number כמפתח.
-בריצה חיה שנייה נוצרו אפס inserts חדשים והעדכונים נשארו idempotent.
+ה־<bdi dir="ltr">client</bdi> שומר <bdi dir="ltr">raw JSON</bdi> לפי <bdi dir="ltr">content hash</bdi> ו־<bdi dir="ltr">Gold</bdi> משתמש ב־<bdi dir="ltr">accession number</bdi> כמפתח.
+בריצה חיה שנייה נוצרו אפס <bdi dir="ltr">inserts</bdi> חדשים והעדכונים נשארו <bdi dir="ltr">idempotent</bdi>.
 
-### מה ההבדל בין backup ל-archive?
+### מה ההבדל בין <bdi dir="ltr">backup</bdi> ל־<bdi dir="ltr">archive</bdi>?
 
-Backup משחזר את מסד הנתונים כיחידה תפעולית. Archive מייצא datasets סגורים ל-Parquet
-עם schema, inventory ו-hashes לקריאה ושימור ארוך טווח. שניהם עברו restore drill.
+<bdi dir="ltr">Backup</bdi> משחזר את מסד הנתונים כיחידה תפעולית. <bdi dir="ltr">Archive</bdi> מייצא <bdi dir="ltr">datasets</bdi> סגורים ל־<bdi dir="ltr">Parquet</bdi>
+עם <bdi dir="ltr">schema</bdi>, <bdi dir="ltr">inventory</bdi> ו־<bdi dir="ltr">hashes</bdi> לקריאה ושימור ארוך טווח. שניהם עברו <bdi dir="ltr">restore drill</bdi>.
 
-### למה אין Elasticsearch?
+### למה אין <bdi dir="ltr">Elasticsearch</bdi>?
 
-ה-MVP משתמש ב-structured JSON logs וב-operational monitor. Elasticsearch מוסיף
-עלות זיכרון ותפעול. הוא מתאים לשלב המשך של centralized log search, לא ליבת הנתונים.
+ה־<bdi dir="ltr">MVP</bdi> משתמש ב־<bdi dir="ltr">structured JSON logs</bdi> וב־<bdi dir="ltr">operational monitor. Elasticsearch</bdi> מוסיף
+עלות זיכרון ותפעול. הוא מתאים לשלב המשך של <bdi dir="ltr">centralized log search</bdi>, לא ליבת הנתונים.
 
 ### כיצד המערכת עוברת לענן?
 
-MinIO מוחלף ב-S3, Docker services יכולים לעבור לשירותים מנוהלים, וה-API יכול להיפרס
-מאחורי TLS ואימות. החוזים, הנתיבים הלוגיים, lineage והפרדת lifecycle נשארים.
+<bdi dir="ltr">MinIO</bdi> מוחלף ב־<bdi dir="ltr">S3</bdi>, <bdi dir="ltr">Docker services</bdi> יכולים לעבור לשירותים מנוהלים, וה־<bdi dir="ltr">API</bdi> יכול להיפרס
+מאחורי <bdi dir="ltr">TLS</bdi> ואימות. החוזים, הנתיבים הלוגיים, <bdi dir="ltr">lineage</bdi> והפרדת <bdi dir="ltr">lifecycle</bdi> נשארים.
 
 ## שאלות עליך ועל תהליך העבודה
 
 ### מה אתה למדת מהפרויקט?
 
-ניסוח מוצע: "למדתי ש-Data Engineering אינו רק להעביר נתון. צריך להגדיר בעלות על
-processes, חוזים, זמני event, retry semantics, איכות, lineage ויכולת restore."
+ניסוח מוצע: "למדתי ש־<bdi dir="ltr">Data Engineering</bdi> אינו רק להעביר נתון. צריך להגדיר בעלות על
+<bdi dir="ltr">processes</bdi>, חוזים, זמני <bdi dir="ltr">event</bdi>, <bdi dir="ltr">retry semantics</bdi>, איכות, <bdi dir="ltr">lineage</bdi> ויכולת <bdi dir="ltr">restore</bdi>."
 
 ### מה היית עושה אחרת בגרסה שנייה?
 
-ניסוח מוצע: "הייתי מוסיף מוקדם יותר observability אחיד ומפריד כבר בתחילת הדרך
-בין ראיה חיה לראיית verification. הארכיטקטורה הנוכחית מאפשרת להוסיף זאת בלי
+ניסוח מוצע: "הייתי מוסיף מוקדם יותר <bdi dir="ltr">observability</bdi> אחיד ומפריד כבר בתחילת הדרך
+בין ראיה חיה לראיית <bdi dir="ltr">verification</bdi>. הארכיטקטורה הנוכחית מאפשרת להוסיף זאת בלי
 לשנות את מסלולי הנתונים."
 
 ### איזה חלק הוא החלטה שלך ולא רק שימוש בכלי?
 
-הדגש את ADR-002 ו-ADR-004: הפרדת Docker/Airflow והבחנה Provisional/Certified.
+הדגש את <bdi dir="ltr">ADR-002</bdi> ו־<bdi dir="ltr">ADR-004</bdi>: הפרדת <bdi dir="ltr">Docker/Airflow</bdi> והבחנה <bdi dir="ltr">Provisional/Certified</bdi>.
 אלה החלטות ארכיטקטוניות שמסבירות מדוע הכלים מחוברים כך, לא רשימת טכנולוגיות.
 
-### מה טרם Production-ready?
+### מה טרם <bdi dir="ltr">Production-ready</bdi>?
 
-Authentication, TLS, rate limiting, shared secret management, multi-broker Kafka,
-centralized logs, capacity testing ו-disaster recovery רחב. המערכת הנוכחית מיועדת
-ל-localhost ומוכיחה את העקרונות והגבולות.
+<bdi dir="ltr">Authentication</bdi>, <bdi dir="ltr">TLS</bdi>, <bdi dir="ltr">rate limiting</bdi>, <bdi dir="ltr">shared secret management</bdi>, <bdi dir="ltr">multi-broker Kafka</bdi>,
+<bdi dir="ltr">centralized logs</bdi>, <bdi dir="ltr">capacity testing</bdi> ו־<bdi dir="ltr">disaster recovery</bdi> רחב. המערכת הנוכחית מיועדת
+ל־<bdi dir="ltr">localhost</bdi> ומוכיחה את העקרונות והגבולות.
 
 </div>
