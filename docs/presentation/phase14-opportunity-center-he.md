@@ -16,14 +16,14 @@
 4. **<bdi dir="ltr"><code>BUY ZONE</code></bdi>** — טווח כניסה ולא מחיר קסם יחיד.
 5. **<bdi dir="ltr"><code>STOP</code></bdi>, ‏<bdi dir="ltr"><code>TARGET 1</code></bdi>, ‏<bdi dir="ltr"><code>TARGET 2</code></bdi>** — נקודת ביטול ושני תרחישי מימוש.
 6. **<bdi dir="ltr"><code>Risk / Reward</code></bdi>** — כמה רווח מתוכנן ביחס לכל יחידת סיכון.
-7. **<bdi dir="ltr"><code>Position sizing</code></bdi>** — כמה מניות מותר לקנות לפי הון, מזומן ו־<bdi dir="ltr">2%</bdi> סיכון.
+7. **<bdi dir="ltr"><code>Position sizing</code></bdi>** — כמה מניות מותר לקנות לפי הון, מזומן ו־<bdo dir="ltr">2%</bdo> סיכון.
 8. **<bdi dir="ltr"><code>WHY NOW?</code></bdi>** — הסבר בעברית שמקשר בין הציון לבין הנתונים.
 
 ## מה לומר בזמן ההצגה
 
 > המסך הזה הוא שכבת ה־<bdi dir="ltr">Decision Support</bdi> של המערכת. אני לא מציג המלצת קנייה
 > חסרת הקשר, אלא תרחיש מלא: טווח כניסה, <bdi dir="ltr">Stop</bdi>, שני <bdi dir="ltr">Targets</bdi>, יחס <bdi dir="ltr">Risk/Reward</bdi>
-> וגודל פוזיציה. הציון משלב <bdi dir="ltr">50%</bdi> ניתוח טכני ו־<bdi dir="ltr">50%</bdi> ניתוח פונדמנטלי.
+> וגודל פוזיציה. הציון משלב <bdo dir="ltr">50%</bdo> ניתוח טכני ו־<bdo dir="ltr">50%</bdo> ניתוח פונדמנטלי.
 >
 > בצד אחד מופיעות ראיות היסטוריות מאושרות, שמאפשרות לי לבדוק רעיונות על העבר.
 > בצד השני מופיע <bdi dir="ltr">Live Shadow Mode</bdi>, שמודד המלצות שנוצרו לפני שידענו מה יקרה.

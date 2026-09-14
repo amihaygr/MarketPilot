@@ -42,7 +42,7 @@
 
 ## שלב 1 — פתיחה: מה בניתי ולמה
 
-**זמן:** <bdi dir="ltr">00:00–01:30</bdi>
+**זמן:** <bdo dir="ltr">00:00–01:30</bdo>
 **נווט אל:** <http://localhost:3000/showcase.html>
 
 ### מה להציג
@@ -95,7 +95,7 @@
 
 ## שלב 2 — הארכיטקטורה: מי עושה מה
 
-**זמן:** <bdi dir="ltr">01:30–03:30</bdi>
+**זמן:** <bdo dir="ltr">01:30–03:30</bdo>
 **הישאר ב:** <bdi dir="ltr">Project Story</bdi>
 **לחץ:** בתפריט העליון על **<bdi dir="ltr">Architecture</bdi>**.
 
@@ -135,7 +135,7 @@
 
 ## שלב 3 — אירוע חי: מהמקור עד המשתמש
 
-**זמן:** <bdi dir="ltr">03:30–06:00</bdi>
+**זמן:** <bdo dir="ltr">03:30–06:00</bdo>
 
 ### 3א — <bdi dir="ltr">Dashboard</bdi>
 
@@ -194,7 +194,7 @@
 
 ## שלב 4 — <bdi dir="ltr">Airflow</bdi>: היסטוריה אמיתית עד <bdi dir="ltr">Certified Gold</bdi>
 
-**זמן:** <bdi dir="ltr">06:00–08:30</bdi>
+**זמן:** <bdo dir="ltr">06:00–08:30</bdo>
 **נווט אל:** <http://localhost:8080/>
 **פתח:** <bdi dir="ltr"><code>historical_market_backfill</code></bdi>
 **בחר:** <bdi dir="ltr"><code>phase14_historical_evidence_20260914</code></bdi>
@@ -233,7 +233,7 @@
 
 ## שלב 5 — <bdi dir="ltr">Opportunity Center</bdi>: כיצד המערכת תומכת בהחלטה
 
-**זמן:** <bdi dir="ltr">08:30–11:00</bdi>
+**זמן:** <bdo dir="ltr">08:30–11:00</bdo>
 **נווט אל:** <http://localhost:3000/opportunities.html>
 
 ### מה להציג
@@ -261,7 +261,7 @@
 
 ## שלב 6 — <bdi dir="ltr">Backtesting</bdi>: מה הנתונים מאפשרים לעשות
 
-**זמן:** <bdi dir="ltr">11:00–12:30</bdi>
+**זמן:** <bdo dir="ltr">11:00–12:30</bdo>
 **נווט אל:** <http://localhost:3000/backtesting.html>
 **בחר:** את הריצה החדשה ביותר ואת <bdi dir="ltr"><code>AAPL</code></bdi>.
 
@@ -297,7 +297,7 @@
 
 ## שלב 7 — אמינות: מה קורה כשיש בעיה
 
-**זמן:** <bdi dir="ltr">12:30–13:15</bdi>
+**זמן:** <bdo dir="ltr">12:30–13:15</bdo>
 **נווט חזרה אל:** <http://localhost:3000/showcase.html#evidence>
 
 ### מה להציג
@@ -330,7 +330,7 @@
 
 ## שלב 8 — סיכום: מה היו ההחלטות שלי
 
-**זמן:** <bdi dir="ltr">13:15–14:15</bdi>
+**זמן:** <bdo dir="ltr">13:15–14:15</bdo>
 **הישאר ב:** <bdi dir="ltr">Project Story</bdi>.
 
 ### מה לומר
@@ -364,7 +364,7 @@
 
 ## הדקה האחרונה — לא מוסיפים חומר
 
-**זמן:** <bdi dir="ltr">14:15–15:00</bdi>
+**זמן:** <bdo dir="ltr">14:15–15:00</bdo>
 
 השתמש בדקה הזאת רק לניווט שהתעכב, לשאלה קצרה או לסיום רגוע. אם סיימת מוקדם,
 עצור בביטחון. אין צורך למלא בכוח את כל הזמן.
