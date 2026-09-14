@@ -49,10 +49,11 @@
 
 - [ ] מחשב מחובר לחשמל ומצב שינה מבוטל.
 - [ ] `docker compose ps` מציג את השירותים הנדרשים כבריאים.
-- [ ] Project Story, Presenter Console, Dashboard ו-Backtesting Lab מחזירים HTTP 200.
+- [ ] Project Story, Presenter Console, Dashboard, Opportunity Center ו-Backtesting Lab מחזירים HTTP 200.
+- [ ] Opportunity Center מציג בנפרד Historical Evidence ו-Live Shadow Mode.
 - [ ] נבחר Symbol עם נתונים.
 - [ ] שני Kafka Topics, Bronze object וה-Airflow run הסופי פתוחים מראש.
-- [ ] Backtesting Lab מציג 20 sessions, 23,349 observations ו-555 trades.
+- [ ] Backtesting Lab מציג 41 sessions, 46,749 observations ו-1,059 trades.
 - [ ] זום הדפדפן ו-resolution מאפשרים קריאה מרחוק.
 - [ ] התראות, Teams, WhatsApp ודואר מושתקים.
 

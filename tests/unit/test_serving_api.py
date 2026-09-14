@@ -57,6 +57,10 @@ class FakeReadRepository:
             "evaluated_recommendations": 4,
             "hit_rate_pct": "50",
             "average_return_pct": "1.25",
+            "historical_certified_sessions": 41,
+            "historical_first_session_date": date(2026, 7, 6),
+            "historical_latest_session_date": date(2026, 9, 11),
+            "published_backtest_runs": 3,
         }
 
     @staticmethod
@@ -361,6 +365,7 @@ def test_decision_alerts_and_shadow_progress_are_bounded() -> None:
     assert alerts.json()["items"][0]["alert_type"] == "ENTERED_BUY_ZONE"
     assert status.status_code == 200
     assert status.json()["completed_sessions"] == 3
+    assert status.json()["historical_certified_sessions"] == 41
     assert client.get("/api/v1/decision-alerts?limit=101").status_code == 422
 
 

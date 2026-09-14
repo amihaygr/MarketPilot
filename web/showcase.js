@@ -85,6 +85,13 @@ const phases = {
       "עשרים ימי מסחר סגורים ב־XNYS עוברים דרך ארכיון מקור מבוסס תוכן, Topic היסטורי מבודד, מחסום Bronze ברמת Offset, שערי איכות ב־Spark, Gold מאושר וה־Backtest הסופי.",
     proof: "ראיה: 23,349 רשומות תקינות הותאמו, ו־513 רשומות ביקורת מחוץ למסחר הוחרגו במפורש.",
   },
+  14: {
+    label: "PHASE 14",
+    title: "נתוני שוק ו־SEC הופכים לתרחיש החלטה מוסבר ומוגבל סיכון.",
+    description:
+      "Opportunity Center מדרג Watchlist, מחשב Buy Zone, שני Targets, Stop, Risk/Reward וגודל פוזיציה. Historical Evidence נשמר בנפרד מ־Live Shadow Mode כדי שהצגה עשירה לא תעקוף את שער הבטיחות.",
+    proof: "ראיה: 41 ימי Historical Evidence, ‏46,749 תצפיות Backtest, ‏99 בדיקות ו־1/20 ימי Shadow חיים — ללא ביצוע פקודות.",
+  },
 };
 
 document.addEventListener("DOMContentLoaded", () => {

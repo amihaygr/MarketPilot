@@ -210,7 +210,16 @@ class MariaDbReadRepository:
                    s.first_session_date,s.latest_session_date,s.promotion_status,
                    COUNT(e.recommendation_id) evaluated_recommendations,
                    ROUND(100*AVG(e.outcome IN ('TARGET_1','TARGET_2')),2) hit_rate_pct,
-                   ROUND(AVG(e.realized_return_pct),4) average_return_pct
+                   ROUND(AVG(e.realized_return_pct),4) average_return_pct,
+                   (SELECT COUNT(DISTINCT DATE(b.event_time_utc))
+                      FROM fact_market_bar_1m b
+                     WHERE b.certification_status='CERTIFIED') historical_certified_sessions,
+                   (SELECT MIN(DATE(b.event_time_utc)) FROM fact_market_bar_1m b
+                     WHERE b.certification_status='CERTIFIED') historical_first_session_date,
+                   (SELECT MAX(DATE(b.event_time_utc)) FROM fact_market_bar_1m b
+                     WHERE b.certification_status='CERTIFIED') historical_latest_session_date,
+                   (SELECT COUNT(*) FROM fact_backtest_run b
+                     WHERE b.status='PUBLISHED') published_backtest_runs
             FROM shadow_mode_status s
             LEFT JOIN fact_opportunity_recommendation r ON r.model_version=s.model_version
             LEFT JOIN fact_recommendation_evaluation e ON e.recommendation_id=r.recommendation_id

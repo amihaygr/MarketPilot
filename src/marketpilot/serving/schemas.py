@@ -98,6 +98,10 @@ class DecisionEvaluationStatus(ApiModel):
     evaluated_recommendations: int = Field(ge=0)
     hit_rate_pct: Decimal | None = Field(default=None, ge=0, le=100)
     average_return_pct: Decimal | None = None
+    historical_certified_sessions: int = Field(ge=0)
+    historical_first_session_date: date | None
+    historical_latest_session_date: date | None
+    published_backtest_runs: int = Field(ge=0)
 
 
 class PortfolioState(ApiModel):

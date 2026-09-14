@@ -26,6 +26,10 @@ state: twenty real sessions must elapse before a human review may approve Decisi
 - The Opportunity Center was visually inspected at desktop and mobile widths. Ranked selection,
   AAPL/MSFT detail changes, position sizing, bilingual explanations, chart legend, journal and
   Shadow Mode progress rendered correctly.
+- Historical evidence was expanded to 41 certified XNYS sessions for AAPL, MSFT and SPY. The
+  combined 2026-07-06 through 2026-08-28 backtest published 46,749 observations and 1,059
+  position changes under run `2bf99281-ec93-5fec-9ce2-d72539021bea`.
+- Historical evidence remains separate from the live gate; Shadow Mode is still 1 of 20.
 
 ## Quality gates
 

@@ -20,6 +20,14 @@ MarketPilot מקבל נתוני שוק ו-SEC, שומר מקור גולמי שנ
 5. ה-Dashboard קורא רק דרך Backend API עם משתמש MariaDB בעל SELECT בלבד.
 6. Historical Backfill מכניס Alpaca IEX דרך topic נפרד, Bronze barrier ואותו מסלול Certification.
 7. Backtesting משתמש רק ב-Certified Gold ושומר תוצאה מלאה, הנחות ו-lineage שניתנים לשחזור.
+8. Opportunity Center מפריד בין ראיות היסטוריות לבין Live Shadow Mode, ומציג תרחיש מחקר מוסבר בלי לבצע פקודה.
+
+## ההבחנה החדשה שחובה להסביר
+
+- **Historical Evidence:** ימים מאושרים מן העבר שמשמשים לגרף, Backtest והערכת רעיונות.
+- **Live Shadow Mode:** המלצות שנוצרו בזמן אמת ונמדדות רק לאחר שהזמן באמת חלף.
+- Backfill היסטורי לעולם אינו מגדיל את מונה `1/20` של השער החי.
+- המשמעות המקצועית: אפשר להציג מערכת עשירה היום בלי לזייף תקופת תצפית עתידית.
 
 ## חמשת המסלולים שאתה חייב להסביר ללא דף
 

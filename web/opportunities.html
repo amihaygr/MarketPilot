@@ -7,15 +7,18 @@
   <title>MarketPilot | Opportunity Center</title>
   <link rel="stylesheet" href="/opportunities.css?v=phase14-1" />
   <link rel="stylesheet" href="/opportunities-simulator.css?v=phase14-4" />
-  <link rel="stylesheet" href="/opportunities-analysis.css?v=phase14-5" />
-  <script src="/opportunities.js?v=phase14-5" defer></script>
+  <link rel="stylesheet" href="/opportunities-analysis.css?v=phase14-6" />
+  <script src="/opportunities.js?v=phase14-6" defer></script>
 </head>
 <body>
   <header class="topbar"><a href="/" class="brand">MP <span>MarketPilot</span></a><nav><a href="/">Data</a><a href="/backtesting.html">Backtesting</a></nav></header>
   <main>
     <section class="hero">
       <div><p class="eyebrow">PHASE 14 · DECISION INTELLIGENCE</p><h1>Opportunity Center</h1><p>Explainable swing scenarios for 2–20 trading days. Research support—not financial advice or order execution.</p></div>
-      <div class="shadow"><strong id="shadow-label">SHADOW MODE</strong><span id="shadow-progress">Loading validation gate…</span><progress id="shadow-meter" max="20" value="0">0 of 20</progress></div>
+      <div class="evidence-stack">
+        <div class="shadow"><strong id="shadow-label">LIVE SHADOW MODE</strong><span id="shadow-progress">Loading validation gate…</span><progress id="shadow-meter" max="20" value="0">0 of 20</progress></div>
+        <div class="historical-evidence"><strong>HISTORICAL EVIDENCE</strong><span id="historical-progress">Loading certified history…</span><small>Evidence only · never advances the live safety gate</small></div>
+      </div>
     </section>
     <section class="summary" aria-label="Opportunity summary">
       <article><span>Tracked</span><strong id="tracked">—</strong></article><article><span>Buy zones</span><strong id="buy-count">—</strong></article><article><span>Certified</span><strong id="certified-count">—</strong></article><article><span>Fresh</span><strong id="fresh-count">—</strong></article>
