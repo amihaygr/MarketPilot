@@ -1,343 +1,283 @@
 # MarketPilot Technical Architecture
 
-## 1. Architecture summary
+**Document status:** final project baseline<br>
+**Architecture version:** 2.0<br>
+**Last verified:** 2026-09-17
+**Scope:** local Docker Compose platform for market data, SEC fundamentals, governed analytics, backtesting, and explainable decision support
 
-MarketPilot separates long-running streaming services from bounded orchestration jobs.
+## 1. Executive summary
 
-Docker Compose is the service supervisor for the local environment. Airflow is the workflow orchestrator for bounded tasks. Spark provides both Structured Streaming and Batch compute. Kafka decouples ingestion from processing. MinIO provides local object storage. MariaDB is the Gold serving database.
+MarketPilot is a local, reproducible data platform that turns live and historical US-equity data into an auditable research product. It follows one central rule: speed must never erase evidence. Live data is useful immediately as `PROVISIONAL`; bounded post-market processing rebuilds the same session from immutable source data, applies data-quality gates, and publishes `CERTIFIED` results.
 
-## 2. Logical layers
+Docker Compose owns every long-running service. Airflow schedules and monitors only bounded work. Kafka provides the event log, Spark performs streaming and batch computation, MinIO stores immutable and analytical files, MariaDB serves application-ready Gold data, and the browser communicates only with the Backend API.
 
-| Layer | Technology | Responsibility |
+The application supports research and decision support. It does not place orders, connect to brokerage balances, promise returns, or replace human judgment.
+
+## 2. Product and quality goals
+
+The platform is designed to answer five questions:
+
+1. What is happening in the market now?
+2. Can the user trust the displayed data?
+3. What company information was known at that moment?
+4. What risk, invalidation point, and possible reward define the scenario?
+5. Can the result be reproduced from source, code version, run, and data version?
+
+The architecture therefore prioritizes immutable raw evidence, explicit schema versions, UTC event time, idempotent writes, quality gates, point-in-time features, and visible `PROVISIONAL`, `CERTIFIED`, `PREVIEW`, and `FALLBACK` states.
+
+## 3. System context
+
+| Actor or system | Interaction with MarketPilot |
+|---|---|
+| Alpaca Market Data | Live WebSocket bars, bounded historical bars, and corporate actions |
+| SEC EDGAR | Filing metadata and Company Facts/XBRL fundamentals |
+| Research user | Uses dashboards, watchlists, portfolio assumptions, opportunities, and backtests |
+| Docker Compose | Supervises the complete local runtime |
+| Airflow | Schedules and monitors bounded acquisition, transformation, quality, archive, backtest, and model-training jobs |
+
+Tracked universe: `AAPL`, `MSFT`, `AMZN`, `NVDA`, `GOOGL`, `META`, `TSLA`, `JPM`, `UNH`, `XOM`, and `SPY`. `SPY` is both a visible asset and the market benchmark.
+
+## 4. Governing data paths
+
+### 4.1 Live path
+
+```text
+Alpaca -> market-producer -> Kafka -> Spark Structured Streaming
+       -> MariaDB Gold PROVISIONAL -> Backend API -> Web App
+```
+
+The producer normalizes market bars to `MarketBarV1` and publishes keyed Kafka events. Spark Structured Streaming validates and upserts near-real-time Gold rows. A durable checkpoint allows restart without inventing a second business record.
+
+### 4.2 Raw archive path
+
+```text
+Kafka -> raw-archive-sink -> MinIO Bronze -> offset commit
+```
+
+The archive consumer writes the exact event to immutable Bronze storage before committing its Kafka offset. Topic, partition, and offset remain part of the object path and lineage. This path is independent from the live serving path.
+
+### 4.3 Certified batch path
+
+```text
+MinIO Bronze -> Spark Batch -> MinIO Silver -> Data Quality
+             -> Spark Batch -> MariaDB Gold CERTIFIED
+```
+
+Airflow submits bounded Spark applications through `SparkSubmitOperator`. A failed completeness, consistency, or freshness gate blocks certified publication. The daily path never starts or stops the streaming service.
+
+### 4.4 Historical acquisition path
+
+```text
+Airflow -> Alpaca IEX REST -> content-addressed source pages
+        -> Kafka backfill topic -> Bronze offset barrier
+        -> Silver -> DQ -> Gold CERTIFIED -> Backtest
+```
+
+Historical data uses the same contracts and certification gates as live data. A dedicated Kafka topic prevents backfill traffic from entering the live streaming job. Requests are limited to 31-day windows and are idempotent.
+
+### 4.5 SEC and corporate context
+
+```text
+Airflow -> SEC EDGAR / Alpaca corporate actions
+        -> immutable Bronze JSON -> normalized Gold facts
+        -> fundamental and split-adjusted analytical features
+```
+
+SEC requests use a declared `User-Agent`, rate limiting, retries, and accession-number deduplication. Company Facts are point-in-time filtered so a model snapshot cannot see a filing published in the future. Raw price bars are never rewritten for splits; analytical copies are adjusted.
+
+## 5. Runtime ownership
+
+| Lifecycle owner | Components | Rule |
 |---|---|---|
-| Sources | Alpaca, SEC EDGAR | External market and filing data |
-| Ingestion | Python services | Connect, normalize event envelope, publish or archive |
-| Transport | Kafka KRaft | Buffering, consumer isolation, replay by offset |
-| Streaming compute | Spark Structured Streaming | Near-real-time validation, indicators, and Gold upserts |
-| Batch compute | Spark Batch | Bronze to Silver and Silver to Gold transformations |
-| Orchestration | Airflow | Schedule and monitor bounded work |
-| Object storage | MinIO, future S3 | Bronze, Silver, checkpoints, manifests, archives |
-| Serving storage | MariaDB | Gold tables queried by the application |
-| Application | Backend API, Web App | Secure access and user experience |
+| Docker Compose | Kafka, producer, archive sink, Spark master/worker/streaming, MinIO, MariaDB, Airflow services, API, Web, monitor, UI helpers | Long-running processes and infrastructure |
+| Airflow | SEC polling, corporate actions, daily close, historical acquisition, replay, backtest, compaction, archive, hybrid training | Bounded work with a defined start and end |
+| Spark | Streaming and batch computation | Computes data; does not own business scheduling |
 
-## 3. Planned Docker services
+Airflow never controls the lifecycle of Kafka, Spark Streaming, MariaDB, MinIO, the Backend API, or the Web App. This boundary is enforced by ADR-002 and ADR-003.
 
-| Service | Lifecycle | Responsibility |
+## 6. Implemented Docker Compose topology
+
+The project defines 19 Compose services, including two finite initialization services.
+
+| Group | Services | Purpose |
 |---|---|---|
-| `kafka` | Long-running | Single KRaft broker for MVP |
-| `market-producer` | Long-running | Alpaca connection and Kafka publication |
-| `raw-archive-sink` | Long-running | Kafka to Bronze archive |
-| `sec-adapter` | Bounded or internal endpoint | SEC polling and raw archive |
-| `spark-master` | Long-running | Spark standalone cluster coordinator |
-| `spark-worker` | Long-running | Spark compute resources |
-| `spark-streaming` | Long-running | Kafka streaming application |
-| Spark Batch applications | Bounded | Bronze to Silver and Silver to Gold |
-| `minio` | Long-running | Object storage |
-| `mariadb` | Long-running | Gold business database |
-| `airflow-db` | Long-running | Airflow PostgreSQL metadata database |
-| `airflow-scheduler` | Long-running | DAG scheduling |
-| `airflow-api-server` | Long-running | Airflow UI and API |
-| `airflow-dag-processor` | Long-running | DAG parsing |
-| `backend-api` | Long-running | Application data API |
-| `web-app` | Long-running | Browser UI |
-| `operational-monitor` | Long-running | Dependency and freshness probes with deduplicated alerts |
+| Data plane | `kafka`, `market-producer`, `raw-archive-sink`, `spark-master`, `spark-worker`, `spark-streaming`, `minio`, `mariadb` | Ingestion, transport, compute, and storage |
+| Control plane | `airflow-db`, `airflow-init`, `airflow-scheduler`, `airflow-api-server`, `airflow-dag-processor` | Workflow metadata and bounded orchestration |
+| Serving plane | `backend-api`, `web-app` | Product API and browser experience |
+| Operations | `operational-monitor`, `platform-init` | Read-only probes and idempotent platform bootstrap |
+| Local inspection | `kafka-ui`, `spark-ui-proxy`, `adminer` | Demonstration and developer inspection only |
 
-## 4. Network boundaries
+Every technically suitable long-running service has a healthcheck and restart policy. Readiness-sensitive dependencies use health-based startup conditions.
 
-Recommended logical Docker networks:
+## 7. Network and trust boundaries
 
-- `ingestion-net`: producer, Kafka, raw archive, SEC adapter.
-- `processing-net`: Kafka, Spark Master, Spark Worker, streaming and batch jobs.
-- `storage-net`: MinIO, MariaDB, Spark, archive services, API.
-- `orchestration-net`: Airflow components, Airflow metadata database, Spark Master, SEC adapter.
-- `serving-net`: Backend API and Web App.
+| Docker network | Exposure | Members and purpose |
+|---|---|---|
+| `data-plane` | Internal | Kafka, Spark, storage, ingestion, archive, monitor |
+| `control-plane` | Internal | Airflow metadata and control services |
+| `serving-plane` | Host-facing where required | Web, API, Airflow UI, MinIO Console, Kafka UI, Adminer, Spark UI proxy |
 
-A service may join more than one internal network where required. Infrastructure ports should not be published to the host unless a developer needs them.
+The browser has no MariaDB or MinIO credentials. It calls relative `/api/` routes through Nginx, which proxies to the Backend API. The API uses parameterized SQL, bounded ranges, response models, symbol validation, and least-privilege database identities.
 
-## 5. Persistent state
+Host-facing demonstration endpoints bind to loopback where applicable. The local project is not a production security boundary; production deployment would additionally require authentication, TLS, secret management, network policy, and audited user identity.
 
-Named volumes:
+## 8. Persistent state
+
+Named volumes protect Kafka logs, MinIO objects, MariaDB data, Airflow metadata/logs/authentication files, and Spark checkpoints. The important volumes are:
 
 - `kafka-data`
 - `minio-data`
 - `mariadb-data`
 - `airflow-db-data`
 - `airflow-logs`
+- `airflow-auth`
+- `spark-checkpoints`
 
-Spark checkpoints should be durable across container restarts. For the MVP, validate whether the selected S3A dependencies support MinIO reliably. A named volume is an acceptable fallback for local checkpointing if it is documented and tested.
+MinIO buckets separate Bronze, Silver, streaming checkpoints, analytics/model artifacts, and long-term archives. Restart tests verify that Spark resumes from checkpoints and business-key upserts prevent duplicate rows.
 
-## 6. Kafka design
+## 9. Kafka and event contracts
 
-Initial topics:
-
-| Topic | Key | Value |
+| Topic | Key | Consumer intent |
 |---|---|---|
-| `market.bars.1m.v1` | symbol | Versioned market-bar event |
-| `market.bars.1m.backfill.v1` | symbol | Historical bars for bounded Bronze certification; not consumed by live streaming |
-| `market.bars.1m.dlq.v1` | event identifier | Rejected event with reason metadata |
-| `sec.filings.v1` | accession number | Optional modeled filing event |
+| `market.bars.1m.v1` | Symbol | Live streaming and raw archive |
+| `market.bars.1m.backfill.v1` | Symbol | Historical certification and raw archive; excluded from live streaming |
+| `market.bars.1m.dlq.v1` | Event identifier | Quarantined malformed or rejected events |
 
-Initial MVP partitions should be conservative. Increase partition count only after measuring throughput and consumer parallelism. The current event volume does not justify a large local Kafka cluster.
+`MarketBarV1` carries a deterministic event ID, symbol, UTC event time, interval, OHLCV values, source, schema version, and ingestion timestamp. The business key is symbol plus interval plus event timestamp. Invalid OHLC relationships, non-positive prices, negative volume, or unsupported schema versions are quarantined rather than silently dropped.
 
-## 7. Event envelope
+## 10. Medallion storage model
 
-Every event should contain:
+### Bronze
 
-- `event_id`
-- `event_type`
-- `schema_version`
-- `source`
-- `source_event_time`
-- `ingested_at_utc`
-- `correlation_id`
-- `payload`
+Immutable, append-oriented evidence in MinIO. Market event paths include source, event, date, symbol, topic, partition, and offset. SEC and corporate-action pages are stored content-addressed with hashes.
 
-For market bars, the business uniqueness rule is symbol plus event timestamp plus interval.
+### Silver
 
-## 8. Bronze layout
+Canonical Parquet with typed fields, UTC timestamps, deduplication, normalized schemas, validation flags, and controlled partition layout. Weekly compaction reduces small files without changing logical rows.
 
-Bronze is immutable and append-oriented.
+### Gold
 
-Suggested paths:
+MariaDB holds the serving model: market bars, indicators, signals, filings, fundamentals, corporate actions, opportunities, evaluations, user research state, backtest summaries, quality results, watermarks, archives, and hybrid-model metadata. Raw payloads and full-resolution analytical artifacts remain in object storage.
 
-```text
-s3a://marketpilot-bronze/source=alpaca/event=market_bar_1m/year=YYYY/month=MM/day=DD/symbol=SYMBOL/
-s3a://marketpilot-bronze/source=sec/event=filing/year=YYYY/month=MM/day=DD/form=FORM/
-```
+## 11. Gold data domains
 
-Avoid writing one tiny object for every event. Buffer safely and write bounded files while preserving recoverable Kafka offsets and event identifiers.
+| Domain | Representative tables |
+|---|---|
+| Market and lineage | `dim_symbol`, `fact_market_bar_1m`, `etl_watermark`, `data_quality_result` |
+| Analytics | `fact_indicator_1m`, `fact_signal` |
+| SEC and fundamentals | `fact_sec_filing`, `fact_fundamental_metric`, `fact_corporate_action` |
+| Decision support | `fact_opportunity_recommendation`, `fact_recommendation_evaluation`, `fact_decision_alert`, `shadow_mode_status` |
+| User research state | `user_portfolio`, `user_position`, `user_watchlist_symbol` |
+| Backtesting | `dim_strategy`, `fact_backtest_run`, `fact_backtest_result`, `fact_backtest_equity_daily` |
+| Hybrid model | `fact_decision_feature_snapshot`, `fact_decision_label`, `decision_model_registry`, `fact_decision_model_prediction` |
+| Operations and recovery | `archive_manifest`, `archive_restore_result` |
 
-## 9. Silver layout
+All mutating paths use deterministic keys and idempotent writes. Publication state and lineage distinguish live, certified, historical, model-preview, and fallback outputs.
 
-Silver contains canonical schemas, normalized timestamps, typed values, deduplication, validation flags, and symbol linkage.
+## 12. Airflow DAG catalogue
 
-Suggested path:
-
-```text
-s3a://marketpilot-silver/dataset=market_bars_1m/year=YYYY/month=MM/day=DD/symbol=SYMBOL/
-```
-
-Use Parquet compression and controlled file sizes. The weekly compaction DAG addresses small-file accumulation.
-
-## 10. Gold database model
-
-Initial MariaDB tables:
-
-| Table | Business key | Purpose |
+| DAG | Trigger | Bounded responsibility |
 |---|---|---|
-| `dim_symbol` | symbol | Asset metadata |
-| `fact_market_bar_1m` | symbol ID and event UTC timestamp | One-minute OHLCV |
-| `fact_indicator_1m` | symbol, timestamp, indicator code, version | Technical indicators |
-| `fact_signal` | symbol, signal timestamp, model version | Application signal |
-| `fact_sec_filing` | accession number | Filing metadata and Bronze URI |
-| `fact_backtest_result` | run, symbol, horizon | Backtest results |
-| `fact_backtest_run` | run ID | Immutable strategy parameters and publication state |
-| `fact_backtest_equity_daily` | run, symbol, trading date | Bounded application equity curve |
-| `etl_watermark` | pipeline and partition | Progress and publication state |
-| `data_quality_result` | run, check, partition | Quality results |
-| `archive_manifest` | dataset, year, version | Archive verification metadata |
+| `sec_polling` | Scheduled | Discover, download, deduplicate, and publish filing/company facts |
+| `corporate_actions` | Scheduled/manual | Archive and normalize splits and dividends |
+| `daily_market_close` | Weekdays after market close in `America/New_York` | Exchange-calendar gate, Bronze-to-Silver, DQ, Certified Gold, analytics, evaluation |
+| `historical_market_backfill` | Manual, maximum 31 calendar days | Historical acquisition through Kafka, Bronze, certification, and backtest |
+| `backfill_replay` | Manual | Reprocess selected Bronze scope idempotently |
+| `historical_backtest` | Manual | Reproducible strategy evaluation on Certified Gold |
+| `weekly_compaction` | Weekly | Compact Silver Parquet and verify logical equivalence |
+| `annual_archive` | Annual/manual | Export, hash, manifest, and restore-test closed data |
+| `hybrid_model_training` | Manual | Dataset, labels, chronological validation, artifact registration, and fail-closed promotion gates |
 
-Application queries require indexes on symbol and event time. Exact DDL is an implementation task and must be tested against query patterns.
+Partition-mutating DAGs use `max_active_runs=1`. Shared external and compute capacity is serialized through `sec_api_pool`, `alpaca_api_pool`, and `spark_batch_pool`.
 
-Phase 9 implements four versioned, one-minute Indicator series and sparse,
-explained Signal observations. A bounded Spark application reads a configured
-Gold lookback, calculates native Spark window metrics, validates the result, and
-atomically replaces only the requested UTC date in the two Gold analytics tables.
-The daily certified DAG invokes it after `silver_to_gold_certified`. Each row
-retains schema/model, run, code, data, and certification lineage.
+## 13. Data quality and publication
 
-Phase 11 adds bounded historical strategy evaluation. Certified Gold bars feed a
-Spark Batch backtest whose signal from bar `t` is applied only to the following
-bar return. Full-resolution results are versioned Parquet in MinIO; MariaDB stores
-run metadata, summary metrics, and a bounded daily equity curve for the API. SPY
-is a comparison benchmark and no component performs trade execution.
+Quality checks cover freshness, completeness, duplicates, nulls, OHLC consistency, expected exchange-session bars, schema versions, and lineage. A session requires at least 80% historical coverage to enter model-training evidence. The daily close pipeline is intentionally stricter and may fail when a partial IEX feed misses expected bars.
 
-Phase 12 acquires real historical bars without introducing a shortcut around the
-Medallion pipeline. A manual Airflow task pages through Alpaca IEX, stores each exact
-API response in content-addressed Bronze objects, normalizes bars to `MarketBarV1`,
-and publishes them to `market.bars.1m.backfill.v1`. The long-running
-`raw-archive-sink` consumes both market topics. A bounded barrier confirms the exact
-topic, partition, and offset object for every published event before the existing
-Spark Batch certification chain starts. The separate topic prevents historical
-traffic from entering the live Structured Streaming application.
+Failure is visible and recoverable. A failed daily run is retained as audit evidence; a bounded historical repair can reacquire the same date through the governed path and publish a certified replacement without erasing the failed run.
 
-## 11. Streaming application
+## 14. Analytics and backtesting
 
-The Spark Structured Streaming application:
+Certified bars feed versioned indicator jobs for `SMA`, `EMA`, `RSI`, `MACD`, `ATR`, realized volatility, and volume ratios. Multi-timeframe decision features use 5-minute, 15-minute, hourly, and daily windows; the one-minute series is primarily for display and fast context.
 
-1. Reads `market.bars.1m.v1` from Kafka.
-2. Parses the versioned schema.
-3. Rejects malformed events to quarantine or DLQ.
-4. Applies event-time semantics and a watermark.
-5. May calculate approved near-real-time indicators after a stateful restart and
-   reconciliation design is accepted. Phase 9 keeps the authoritative Indicator
-   calculation in a bounded Spark application.
-6. Uses `foreachBatch` or another tested sink strategy for transactional MariaDB upserts.
-7. Persists checkpoints.
-8. Emits structured operational metrics.
+Backtests read only Certified Gold. A signal produced from bar `t` is applied to a later bar, preventing look-ahead. Costs and slippage reduce returns. Results include immutable run parameters, code/data versions, benchmark comparison to `SPY`, a bounded equity curve in MariaDB, and full-resolution Parquet in MinIO.
 
-The streaming service must not be implemented as an Airflow task.
+## 15. Decision Intelligence v1
 
-## 12. Airflow architecture
+The deterministic rules remain authoritative. They calculate:
 
-MVP components:
+- `Buy Zone` from support, EMA context, and ATR;
+- `Stop` from technical invalidation and volatility;
+- `Target 1` and `Target 2` from resistance and risk multiples;
+- technical, fundamental, and combined scores;
+- risk/reward and position sizing under portfolio limits;
+- actions: `BUY ZONE`, `WAIT`, `WATCH BREAKOUT`, `AVOID`, or `INSUFFICIENT DATA`.
 
-- Airflow Scheduler
-- Airflow API Server and UI
-- Airflow DAG Processor
-- PostgreSQL metadata database
-- LocalExecutor
+The first 20 successful live certified sessions are Shadow Mode. Historical backfills improve evidence but never advance this safety gate. Software may reach `READY_FOR_REVIEW`; a human must approve any later activation.
 
-Celery and Redis are intentionally excluded from the MVP.
+## 16. Hybrid Decision Intelligence v2
 
-Airflow submits Spark Batch work to `spark-master` through `SparkSubmitOperator`. Airflow monitors bounded job completion and applies downstream gates.
+Phase 15 adds a probability layer without replacing deterministic price levels or risk gates. The target is the conditional probability that `Target 1` is reached before `Stop` within ten exchange sessions, after the market actually entered the published Buy Zone.
 
-## 13. DAG catalogue
+The training design compares calibrated Logistic Regression and Histogram Gradient Boosting using expanding chronological walk-forward folds. `NO_ENTRY` is measured separately and is not mislabeled as a losing trade. Point-in-time features prevent future market or SEC information from leaking into the past.
 
-| DAG | Recommended schedule | Tasks |
-|---|---|---|
-| `sec_polling_dag` | Every 15 minutes in the configured weekday window | Discover, download, deduplicate, archive, update watermark |
-| `daily_market_close_dag` | 16:30 America/New_York on weekdays | Completeness, Bronze to Silver, Silver DQ, Silver to Gold, Gold DQ, publish |
-| `weekly_compaction_dag` | Saturday 06:00 America/New_York | Discover small files, compact, validate, manifest |
-| `annual_archive_dag` | January 10 at 02:00 America/New_York | Export previous year, verify, register manifest |
-| `backfill_replay_dag` | Manual with validated parameters | Replay selected date range and symbols |
-| `historical_backtest_dag` | Manual with validated parameters | Validate scope, submit Spark backtest, quality gate, publish |
-| `historical_market_backfill` | Manual, at most 31 calendar days | Alpaca pages, source archive, Kafka, Bronze barrier, Silver, DQ, Gold Certified, backtest |
+Promotion requires 24 months of suitable history, at least 300 valid entries, at least 50 successes, coverage across eight assets and four quarters, acceptable Brier score, PR-AUC, calibration, positive expected R after friction, diversification, and no failed quality window. The model also requires 20 new v2 live certified sessions and explicit human approval.
 
-The daily DAG checks the exchange calendar and short-circuits on non-trading days. A future custom timetable may replace simple cron scheduling.
+Current final-project state is `FALLBACK`: no trained model has been registered because the evidence gate is not yet satisfied. v1 rules continue to control the product. The UI deliberately shows `Rule Score`, `Model Probability`, `Data Confidence`, `Expected R`, and model state as separate concepts; it never invents a probability.
 
-## 14. Airflow controls
+## 17. Failure, restart, and recovery
 
-- `catchup=False` for polling and routine daily DAGs.
-- `max_active_runs=1` for partition-mutating DAGs.
-- `sec_api_pool=1`.
-- `alpaca_api_pool=1` for bounded historical acquisition.
-- `spark_batch_pool=1` for the local MVP.
-- Two or three retries with exponential backoff.
-- Explicit execution timeouts.
-- No certified publication after a failed quality gate.
-- Parameter validation for backfill and archive ranges.
+| Failure | Expected behavior |
+|---|---|
+| Producer or WebSocket disconnect | Reconnect with bounded exponential backoff; no fabricated bars |
+| Kafka/archive failure | Offset is not committed before Bronze persistence |
+| Spark Streaming restart | Resume from durable checkpoint and idempotent business keys |
+| Batch/DQ failure | Certified publication and watermark advancement are blocked |
+| Historical retry | Content hashes, event IDs, and upserts prevent duplicated business data |
+| Missing or corrupt model artifact | Switch to `FALLBACK`; retain v1 rules; never serve a stale probability |
+| Archive restore drill | Verify inventory and checksums, then restore only to an isolated schema |
 
-## 15. Annual archive
+The operational monitor performs read-only dependency and freshness probes and emits state changes instead of repeated alerts.
 
-1. Select the previous closed calendar year.
-2. Export eligible MariaDB partitions to versioned Parquet paths.
-3. Record schema version and code version.
-4. Validate row count, min and max timestamp, checksum, and sample queries.
-5. Register `archive_manifest` as verified.
-6. Do not automatically purge MariaDB in the MVP.
+## 18. Security and secrets
 
-The implementation writes immutable, versioned Parquet objects to the dedicated
-`marketpilot-archive` bucket. Every object has a SHA-256 digest; the deterministic
-inventory digest, counts, time bounds, run ID, code version, and closed-period flag
-are stored in both an object-store manifest and `archive_manifest`. Restore drills
-first verify the complete inventory and write only to an isolated restore schema.
+Secrets live in an untracked `.env`; `.env.example` contains safe placeholders. Browser code contains no infrastructure credentials. Database identities are separated by responsibility: ingestion, certification, SEC publication, read-only application access, and bounded user-state writes.
 
-Weekly Silver compaction follows the same safety model: measure input rows,
-business keys, logical row hashes, and schema; write staging output; back up the
-original objects; replace; then publish its manifest. A failed replacement restores
-the run-specific backup.
+The local stack is intentionally scoped to loopback development and demonstration. Production hardening would add managed secret rotation, user authentication, role-based authorization, TLS, network policy, audit logging, and a managed object store/database.
 
-## 16. API boundary
+## 19. Current verified evidence
 
-The Backend API reads Gold tables through a narrowly scoped database identity. It provides pagination, filtering, bounded date ranges, input validation, and safe response models.
+The release snapshot verified on 2026-09-17 contains:
 
-The Web App has no database credentials and no MinIO credentials.
+- 11 tracked symbols;
+- 72,850 Gold one-minute bars, including 65,616 `CERTIFIED` rows;
+- 937 SEC filing records;
+- 53 certified historical exchange sessions from 2026-07-06 through 2026-09-16;
+- 11 published backtest runs;
+- v1 Shadow Mode at 2 of 20 live certified sessions;
+- v2 hybrid model in explicit `FALLBACK`, with no fabricated probability.
 
-The Phase 9 `/api/v1/indicators` and `/api/v1/signals` endpoints use the same
-symbol validation, maximum 31-day range, parameterized SQL, and pagination ceiling
-as market bars. Explanations contain calculated market context only; internal
-lineage and credentials remain outside browser response models.
+These values are evidence snapshots, not hard-coded product claims. The application and demo preflight read current status from the API.
 
-The implemented Phase 7 boundary uses a `marketpilot_app` identity with `SELECT`
-only on symbols, market bars, SEC filings, and watermarks. Market queries default
-to seven days and cannot exceed 31 days; all collection responses enforce a page
-and page-size ceiling. Internal Bronze URIs and lineage fields are not part of the
-browser response model.
+## 20. Capacity, limitations, and roadmap
 
-The Nginx Web App serves static assets and proxies relative `/api/` paths to the
-Backend API over `serving-plane`. This keeps database addressing and credentials
-out of browser code while allowing the API container to be restarted independently.
+The complete local stack is resource-heavy. A practical workstation target is eight CPU cores, 16 GB RAM, and SSD storage. Spark must leave enough memory for Kafka, Airflow, MariaDB, MinIO, the API, and the operating system.
 
-## 17. Observability
+Known limitations are explicit: the free IEX feed is partial, the dataset is not yet 24 months, dividends are archived but not yet credited in price-return backtests, the fixed universe introduces survivorship bias, and local Compose is not a production availability or security design.
 
-Minimum metrics:
+The next justified steps are additional governed history, v2 training and validation, completion of the live Shadow Mode gate, human review, and only then broader data coverage or cloud deployment. Elastic observability, SIP data, S3, and production authentication remain optional future work, not hidden dependencies of the final project.
 
-- producer connection status and reconnect count;
-- Kafka publish failures;
-- Kafka consumer lag;
-- source-to-Gold freshness;
-- Spark batch and streaming durations;
-- checkpoint progress;
-- expected versus actual bars by symbol and session;
-- duplicate and rejected event counts;
-- Airflow DAG status and duration;
-- MariaDB connection and query latency;
-- object count and small-file growth.
+## 21. Architecture decision records
 
-The local `operational-monitor` is supervised by Compose, not Airflow. It performs
-read-only dependency and freshness probes, writes structured JSON logs, and emits
-only state transitions to avoid repeated alerts. A generic webhook is optional and
-disabled by default.
+The accepted ADRs are the binding rationale for storage, orchestration, lifecycle, publication, backtesting, historical acquisition, decision intelligence, and hybrid modeling:
 
-## 18. Decision Intelligence
+- ADR-001 — storage strategy
+- ADR-002 — Airflow boundary
+- ADR-003 — streaming lifecycle
+- ADR-004 — provisional and certified publication
+- ADR-005 — historical backtesting
+- ADR-007 — certified historical acquisition
+- ADR-008 — decision intelligence
+- ADR-009 — hybrid decision intelligence
 
-Phase 14 adds an application-facing decision-support layer without changing the source-of-truth
-paths. Certified bars are resampled into 5-minute, 15-minute, hourly and daily feature windows;
-SEC Company Facts are archived raw, normalized and published as versioned Gold fundamentals.
-Corporate actions are fetched by a bounded Airflow DAG, retained as exact content-addressed Bronze
-pages and normalized in Gold. Split factors are applied to analytical copies before return and
-level calculations; immutable raw bars are never rewritten. Cash-dividend events are retained for
-audit and future total-return models, while the current price-signal backtest does not credit cash
-distributions.
-
-The live Structured Streaming path may publish `PROVISIONAL` snapshots only after a closed
-15-minute window. The bounded post-market Spark job publishes authoritative `CERTIFIED` snapshots
-after market, fundamental and quality gates. Each snapshot includes its input window, feed,
-formula/model version, lineage, expiry and explanation. The first 20 sessions are Shadow Mode and
-therefore never actionable. See ADR-008.
-
-After every certified daily publication, a bounded evaluator measures recommendation outcomes at
-2, 5, 10 and 20 XNYS sessions. The conservative path rule records a stop when an aggregated path
-touches both a stop and a target and intrabar ordering is unknown. Promotion status advances only
-to `READY_FOR_REVIEW`; software never self-approves the model.
-
-In-app alerts are append-only transition events (`ENTERED_BUY_ZONE`, `ACTION_CHANGED`, stale-data
-or risk warnings). They are informational only and cannot trigger an order. The Shadow Mode gate,
-evaluation summary and alerts are exposed through bounded read-only API endpoints.
-
-The browser reads recommendations only through the Backend API. Manual watchlist and portfolio
-writes require a separate, least-privilege identity; the existing market-data API identity remains
-read-only. The `marketpilot_user_write` identity can modify only the local portfolio, position and
-watchlist tables and can read only symbol identifiers needed for validation. Browser payloads are
-schema-bounded and symbol-validated before a transaction replaces the saved watchlist. No
-component submits an order or reads an Alpaca brokerage balance.
-
-## 19. Hybrid Decision Intelligence
-
-Phase 15 keeps the deterministic Decision Intelligence rules authoritative for Buy Zone, Stop,
-targets, freshness and portfolio-risk gates. A separately versioned probability model estimates
-the conditional chance that Target 1 is reached before Stop within ten XNYS sessions, but only
-after the market actually traded through the published Buy Zone.
-
-Point-in-time feature snapshots and labels are stored in MariaDB Gold. `NO_ENTRY` is measured
-separately and never treated as a losing trade. Calibrated Logistic Regression and Histogram
-Gradient Boosting candidates are evaluated with expanding chronological walk-forward folds. Model
-artifacts and manifests are checksum-protected in MinIO; registry, validation metrics and
-predictions remain queryable in MariaDB.
-
-`PREVIEW` predictions are visible but cannot change the v1 action. An `ACTIVE` model must first
-pass automatic validation gates, collect 20 new live certified sessions for v2 and receive human
-approval. Missing artifacts, checksum failures and feature-schema failures result in `FALLBACK` to
-the deterministic rules. The browser continues to read all results only through the Backend API.
-
-## 20. Capacity assumptions
-
-The MVP workload is small, but the local stack is resource-heavy. A practical workstation target is:
-
-- 8 CPU cores preferred;
-- 16GB RAM minimum for comfortable concurrent operation;
-- 100GB SSD preferred;
-- explicit container memory limits after empirical testing.
-
-Do not allocate all host memory to Spark. Leave capacity for Docker, Kafka, Airflow, MariaDB, MinIO, the API, and the OS.
+The Mermaid sources under `docs/architecture/diagrams/` remain the diagram source of truth. This document and its PDF are presentation views of the same implemented architecture.

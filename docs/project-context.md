@@ -6,6 +6,20 @@ MarketPilot is a solo data-engineering capstone project intended to demonstrate 
 
 The product provides market monitoring, indicators, signals, historical analysis, and SEC filing context for traders and casual investors. It is an engineering and analytics project, not an automated trading execution system.
 
+## Final release baseline — 17 September 2026
+
+The presentation release contains 11 tracked assets, 72,850 Gold market bars,
+65,616 certified bars, 937 SEC records, 53 certified historical sessions and 11
+published backtests. The v1 Decision Intelligence safety gate has observed 2 of
+20 required live sessions.
+
+Phase 15 is implemented as a guarded hybrid extension, not as an active trained
+model. Until 24 months of certified history, at least 300 entered scenarios,
+walk-forward validation, calibration, a fresh 20-session v2 Shadow Mode and
+human approval all exist, v1 remains authoritative and v2 reports `FALLBACK`.
+The UI deliberately leaves model probability unavailable rather than converting
+data confidence into a false success probability.
+
 ## MVP scope
 
 - 10 to 20 fixed US equities.

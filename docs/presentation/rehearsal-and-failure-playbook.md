@@ -1,19 +1,19 @@
 <div dir="rtl" align="right">
 
-# ⁦`MarketPilot`⁩ — חזרות ותרחישי תקלה
+# <bdi dir="ltr"><code>MarketPilot</code></bdi> — חזרות ותרחישי תקלה
 
 ## תכנית חזרות
 
 ### חזרה 1 - הבנה ללא מסכים
 
-- הסבר בקול את ⁦Live⁩, ⁦Raw⁩, ⁦Certified⁩, ⁦Historical⁩ ו־⁦SEC⁩ ללא פתיחת מחשב.
-- הגדר ⁦Kafka⁩, ⁦Spark⁩, ⁦Airflow⁩, ⁦Bronze⁩, ⁦Gold⁩ ו־⁦idempotency⁩ במשפט אחד כל אחד.
+- הסבר בקול את <bdi dir="ltr">Live</bdi>, <bdi dir="ltr">Raw</bdi>, <bdi dir="ltr">Certified</bdi>, <bdi dir="ltr">Historical</bdi> ו־<bdi dir="ltr">SEC</bdi> ללא פתיחת מחשב.
+- הגדר <bdi dir="ltr">Kafka</bdi>, <bdi dir="ltr">Spark</bdi>, <bdi dir="ltr">Airflow</bdi>, <bdi dir="ltr">Bronze</bdi>, <bdi dir="ltr">Gold</bdi> ו־<bdi dir="ltr">idempotency</bdi> במשפט אחד כל אחד.
 - אם נתקעת, חזור לחוברת המסביר; אל תשנן את תסריט הלחיצות.
 
 ### חזרה 2 - מסלול איטי
 
 - בצע את כל המסלול בלי טיימר.
-- רשום לכל מעבר את ה־⁦URL⁩, האובייקט או ה־⁦DAG⁩ המדויק.
+- רשום לכל מעבר את ה־<bdi dir="ltr">URL</bdi>, האובייקט או ה־<bdi dir="ltr">DAG</bdi> המדויק.
 - ודא שאינך מחפש נתון מול הקהל.
 
 ### חזרה 3 - 15 דקות מוקלטות
@@ -24,13 +24,13 @@
 
 ### חזרה 4 - תקלה מכוונת
 
-- סגור מראש ⁦UI⁩ אחד שאינו קריטי.
-- המשך באמצעות ⁦verification file⁩ או ⁦Project Story⁩.
-- אמור בקול: "זהו ⁦snapshot⁩ מתוארך; איני מציג אותו כמצב חי."
+- סגור מראש <bdi dir="ltr">UI</bdi> אחד שאינו קריטי.
+- המשך באמצעות <bdi dir="ltr">verification file</bdi> או <bdi dir="ltr">Project Story</bdi>.
+- אמור בקול: "זהו <bdi dir="ltr">snapshot</bdi> מתוארך; איני מציג אותו כמצב חי."
 
 ### חזרה 5 - שאלות
 
-- בקש ממישהו לשאול עשר שאלות מ־⁦`qa-bank.md`⁩ בסדר אקראי.
+- בקש ממישהו לשאול עשר שאלות מ־<bdi dir="ltr"><code>qa-bank.md</code></bdi> בסדר אקראי.
 - תשובה ישירה צריכה להתחיל בתוך חמש שניות.
 - אם אינך יודע: ציין מה ידוע, מה לא נמדד ואיך היית בודק.
 
@@ -39,59 +39,61 @@
 - שתי ריצות רצופות של 15 דקות בטווח של 45 שניות.
 - חמשת המסלולים מוסברים ללא הערות.
 - עשר שאלות החובה נענות ישירות.
-- מעבר ל־⁦fallback⁩ אחד בלי לחץ ובלי שינוי נתונים.
+- מעבר ל־<bdi dir="ltr">fallback</bdi> אחד בלי לחץ ובלי שינוי נתונים.
 - שלוש מגבלות נאמרות יחד עם דרך ההרחבה שלהן.
 - משפט פתיחה ומשפט סיום נאמרים באופן טבעי.
 
-## בדיקה מקדימה (⁦Preflight⁩) ביום ההצגה
+## בדיקה מקדימה (<bdi dir="ltr">Preflight</bdi>) ביום ההצגה
 
 ### טכני
 
 - [ ] מחשב מחובר לחשמל ומצב שינה מבוטל.
-- [ ] ⁦`docker compose ps`⁩ מציג את השירותים הנדרשים כבריאים.
-- [ ] ⁦Project Story⁩, ⁦Presenter Console⁩, ⁦Dashboard⁩, ⁦Opportunity Center⁩ ו־⁦Backtesting Lab⁩ מחזירים ⁦HTTP 200⁩.
-- [ ] ⁦Opportunity Center⁩ מציג בנפרד ⁦Historical Evidence⁩ ו־⁦Live Shadow Mode⁩.
-- [ ] ברשימת המעקב מופיעים 11 סימולים; <bdi dir="ltr"><code>AAPL</code></bdi> ו־<bdi dir="ltr"><code>AMZN</code></bdi> נבדקו מראש.
+- [ ] <bdi dir="ltr"><code>docker compose ps</code></bdi> מציג את השירותים הנדרשים כבריאים.
+- [ ] <bdi dir="ltr">Project Story</bdi>, <bdi dir="ltr">Presenter Console</bdi>, <bdi dir="ltr">Dashboard</bdi>, <bdi dir="ltr">Opportunity Center</bdi> ו־<bdi dir="ltr">Backtesting Lab</bdi> מחזירים <bdi dir="ltr">HTTP 200</bdi>.
+- [ ] <bdi dir="ltr">Opportunity Center</bdi> מציג בנפרד <bdi dir="ltr">Historical Evidence</bdi> ו־<bdi dir="ltr">Live Shadow Mode</bdi>.
+- [ ] ברשימת המעקב מופיעים 11 סימולים; <bdi dir="ltr"><code>META</code></bdi> ו־<bdi dir="ltr"><code>AAPL</code></bdi> נבדקו מראש.
 - [ ] מונה <bdi dir="ltr"><code>Shadow Mode</code></bdi> נקרא מהמסך בזמן אמת; אין לשנן מספר ישן.
 - [ ] שני <bdi dir="ltr"><code>Kafka Topics</code></bdi>, אובייקט <bdi dir="ltr"><code>Bronze</code></bdi> וריצת <bdi dir="ltr"><code>Airflow</code></bdi> ירוקה פתוחים מראש.
-- [ ] ⁦Backtesting Lab⁩ מציג 41 ⁦sessions⁩, 46,749 ⁦observations⁩ ו-1,059 ⁦trades⁩.
-- [ ] זום הדפדפן ו־⁦resolution⁩ מאפשרים קריאה מרחוק.
-- [ ] התראות, ⁦Teams⁩, ⁦WhatsApp⁩ ודואר מושתקים.
+- [ ] <bdi dir="ltr"><code>Backtesting Lab</code></bdi> מציג ריצה במצב <bdi dir="ltr"><code>Published</code></bdi>, טווח של כמה שבועות ו־<bdi dir="ltr"><code>Lineage</code></bdi> מלא.
+- [ ] <bdi dir="ltr"><code>Opportunity Center</code></bdi> מציג <bdi dir="ltr"><code>53 sessions</code></bdi>, ‏<bdi dir="ltr"><code>2/20</code></bdi> ו־<bdi dir="ltr"><code>RULES ACTIVE · MODEL FALLBACK</code></bdi>.
+- [ ] ריצת <bdi dir="ltr"><code>repair__2026-09-16__20260917</code></bdi> ב־<bdi dir="ltr"><code>Airflow</code></bdi> ירוקה.
+- [ ] זום הדפדפן ו־<bdi dir="ltr">resolution</bdi> מאפשרים קריאה מרחוק.
+- [ ] התראות, <bdi dir="ltr">Teams</bdi>, <bdi dir="ltr">WhatsApp</bdi> ודואר מושתקים.
 
 ### אבטחה
 
-- [ ] ⁦`.env`⁩ וטרמינלים עם סודות סגורים.
-- [ ] ⁦Adminer⁩ אינו שומר סיסמה גלויה.
-- [ ] אין ⁦clipboard⁩ עם ⁦API keys⁩.
-- [ ] אין כוונה להריץ ⁦UPDATE⁩, ⁦purge⁩ או ⁦credential rotation⁩.
+- [ ] <bdi dir="ltr"><code>.env</code></bdi> וטרמינלים עם סודות סגורים.
+- [ ] <bdi dir="ltr">Adminer</bdi> אינו שומר סיסמה גלויה.
+- [ ] אין <bdi dir="ltr">clipboard</bdi> עם <bdi dir="ltr">API keys</bdi>.
+- [ ] אין כוונה להריץ <bdi dir="ltr">UPDATE</bdi>, <bdi dir="ltr">purge</bdi> או <bdi dir="ltr">credential rotation</bdi>.
 
 ### הצגה
 
-- [ ] מצב 15 דקות נבחר ב־⁦Presenter Console⁩.
+- [ ] מצב 15 דקות נבחר ב־<bdi dir="ltr">Presenter Console</bdi>.
 - [ ] טיימר מאופס.
 - [ ] משפט הפתיחה והסיום נמצאים בכרטיס הראשון והאחרון.
-- [ ] מסמך הארכיטקטורה ו־⁦`docs/phase12-verification.md`⁩ זמינים כגיבוי.
+- [ ] מסמך הארכיטקטורה ו־<bdi dir="ltr"><code>docs/phase12-verification.md</code></bdi> זמינים כגיבוי.
 
 ## תרחישי תקלה ודרך התאוששות
 
-### ⁦Dashboard⁩ אינו עולה
+### <bdi dir="ltr">Dashboard</bdi> אינו עולה
 
-1. אל תתחיל ⁦debugging⁩ ממושך מול הקהל.
-2. הראה את ⁦Project Story⁩ ואת ⁦Phase 7/9 verification⁩.
-3. הסבר את גבול ⁦Browser⁩ -> ⁦API⁩ -> ⁦MariaDB⁩.
-4. אם יש זמן, בדוק לאחר מכן ⁦`docker compose ps web-app backend-api mariadb`⁩.
+1. אל תתחיל <bdi dir="ltr">debugging</bdi> ממושך מול הקהל.
+2. הראה את <bdi dir="ltr">Project Story</bdi> ואת <bdi dir="ltr">Phase 7/9 verification</bdi>.
+3. הסבר את גבול <bdi dir="ltr">Browser</bdi> -> <bdi dir="ltr">API</bdi> -> <bdi dir="ltr">MariaDB</bdi>.
+4. אם יש זמן, בדוק לאחר מכן <bdi dir="ltr"><code>docker compose ps web-app backend-api mariadb</code></bdi>.
 
 ### אין נתונים בטווח
 
-1. עבור ל־⁦`7D`⁩ או ⁦Symbol⁩ אחר שהוכן מראש.
-2. אל תיצור ⁦event⁩ ידני לצורך ההצגה.
-3. הראה ⁦Evidence⁩ מתוארך וציין שהוא ⁦snapshot⁩.
+1. עבור ל־<bdi dir="ltr"><code>7D</code></bdi> או <bdi dir="ltr">Symbol</bdi> אחר שהוכן מראש.
+2. אל תיצור <bdi dir="ltr">event</bdi> ידני לצורך ההצגה.
+3. הראה <bdi dir="ltr">Evidence</bdi> מתוארך וציין שהוא <bdi dir="ltr">snapshot</bdi>.
 
 ### סימול מציג <bdi dir="ltr"><code>INSUFFICIENT DATA</code></bdi>
 
 1. אל תציג זאת כתקלה ואל תשנה נתונים מול הקהל.
 2. אמור שהמערכת חסמה מסקנה מפני שהיסטוריית המחיר או הנתונים הפונדמנטליים אינם מספיקים.
-3. עבור אל <bdi dir="ltr"><code>AAPL</code></bdi> כדי להראות תרחיש מלא, ואז חזור והדגש את שער האיכות.
+3. עבור אל <bdi dir="ltr"><code>META</code></bdi> כדי להראות תרחיש מלא, ואז חזור והדגש את שער האיכות.
 
 ### מונה <bdi dir="ltr"><code>Shadow Mode</code></bdi> עדיין נמוך
 
@@ -99,61 +101,67 @@
 2. הסבר ש־<bdi dir="ltr"><code>Backfill</code></bdi> אינו מקדם אותו, משום שהוא יודע את העבר מראש.
 3. ציין שכשל בריצה היומית אינו נספר כהצלחה; רק יום חי שאושר מקצה לקצה מקדם את המונה.
 
-### ⁦Kafka UI⁩ אינו זמין
+### מודל <bdi dir="ltr"><code>v2</code></bdi> מציג <bdi dir="ltr"><code>FALLBACK</code></bdi>
 
-1. פתח ⁦Bronze object⁩ שהוכן מראש.
-2. הצג ⁦topic/partition/offset⁩ בנתיב ואת חוזה ⁦MarketBarV1⁩.
-3. השתמש ב־⁦Phase 3/6 verification⁩ להוכחת ⁦publish⁩ ו־⁦consumption⁩.
+1. אל תנסה להסתיר את המצב ואל תפעיל אימון מול הקהל.
+2. אמור שאין עדיין 24 חודשי ראיות ומדגם אימון שעומד בשער.
+3. הסבר שכללי <bdi dir="ltr"><code>v1</code></bdi> פעילים, והשדות ההסתברותיים נשארים ריקים במקום להציג מספר לא אמין.
 
-### ⁦MinIO⁩ אינו זמין
+### <bdi dir="ltr">Kafka UI</bdi> אינו זמין
 
-1. הצג את מסלול ⁦Raw⁩ ב־⁦Project Story⁩.
-2. פתח ⁦`docs/project-context.md`⁩ או ⁦PDF⁩ הארכיטקטורה והסבר ⁦Bronze immutable⁩.
-3. הצג את ⁦Phase 8 archive manifest evidence⁩ אם נדרש.
+1. פתח <bdi dir="ltr">Bronze object</bdi> שהוכן מראש.
+2. הצג <bdi dir="ltr">topic/partition/offset</bdi> בנתיב ואת חוזה <bdi dir="ltr">MarketBarV1</bdi>.
+3. השתמש ב־<bdi dir="ltr">Phase 3/6 verification</bdi> להוכחת <bdi dir="ltr">publish</bdi> ו־<bdi dir="ltr">consumption</bdi>.
 
-### ⁦Airflow⁩ אינו זמין
+### <bdi dir="ltr">MinIO</bdi> אינו זמין
 
-1. הראה את תרשים ⁦Certified⁩ ואת ⁦`docs/architecture/execution-model.md`⁩.
-2. פתח ⁦Phase 5 verification⁩ עם סדר המשימות וה־⁦run⁩ המתועד.
-3. הדגש שכשל ⁦Airflow⁩ אינו עוצר את ⁦Streaming⁩.
+1. הצג את מסלול <bdi dir="ltr">Raw</bdi> ב־<bdi dir="ltr">Project Story</bdi>.
+2. פתח <bdi dir="ltr"><code>docs/project-context.md</code></bdi> או <bdi dir="ltr">PDF</bdi> הארכיטקטורה והסבר <bdi dir="ltr">Bronze immutable</bdi>.
+3. הצג את <bdi dir="ltr">Phase 8 archive manifest evidence</bdi> אם נדרש.
 
-### ⁦Spark UI⁩ אינו זמין
+### <bdi dir="ltr">Airflow</bdi> אינו זמין
 
-1. הראה את ⁦Airflow DAG⁩ ואת ⁦verification⁩ של ⁦Spark Batch/Streaming⁩.
-2. הסבר ש־⁦UI⁩ הוא כלי תצפית; הנתונים, ⁦checkpoint⁩ וה־⁦run evidence⁩ הם ההוכחה.
+1. הראה את תרשים <bdi dir="ltr">Certified</bdi> ואת <bdi dir="ltr"><code>docs/architecture/execution-model.md</code></bdi>.
+2. פתח <bdi dir="ltr">Phase 5 verification</bdi> עם סדר המשימות וה־<bdi dir="ltr">run</bdi> המתועד.
+3. הדגש שכשל <bdi dir="ltr">Airflow</bdi> אינו עוצר את <bdi dir="ltr">Streaming</bdi>.
 
-### ⁦Adminer⁩ אינו זמין
+### <bdi dir="ltr">Spark UI</bdi> אינו זמין
 
-1. השתמש ב־⁦Backend API docs⁩ או ⁦Dashboard⁩.
-2. הצג את טבלת ⁦Gold⁩ במסמך הארכיטקטורה.
-3. ציין ש־⁦Adminer⁩ אינו חלק מזרימת המשתמש, אלא כלי פיתוח מקומי.
+1. הראה את <bdi dir="ltr">Airflow DAG</bdi> ואת <bdi dir="ltr">verification</bdi> של <bdi dir="ltr">Spark Batch/Streaming</bdi>.
+2. הסבר ש־<bdi dir="ltr">UI</bdi> הוא כלי תצפית; הנתונים, <bdi dir="ltr">checkpoint</bdi> וה־<bdi dir="ltr">run evidence</bdi> הם ההוכחה.
 
-### ⁦Backend API⁩ אינו זמין
+### <bdi dir="ltr">Adminer</bdi> אינו זמין
 
-1. ⁦Project Story⁩ עדיין מציג ראיות מתוארכות ומסמן ⁦live proof⁩ כ־⁦unavailable⁩.
-2. הצג ⁦Phase 7 verification⁩ ואת גבול ה־⁦SELECT-only identity⁩.
-3. אל תעקוף את ה־⁦API⁩ באמצעות חיבור ⁦UI⁩ ישיר למסד.
+1. השתמש ב־<bdi dir="ltr">Backend API docs</bdi> או <bdi dir="ltr">Dashboard</bdi>.
+2. הצג את טבלת <bdi dir="ltr">Gold</bdi> במסמך הארכיטקטורה.
+3. ציין ש־<bdi dir="ltr">Adminer</bdi> אינו חלק מזרימת המשתמש, אלא כלי פיתוח מקומי.
 
-### ⁦Backtesting Lab⁩ אינו עולה או מציג ⁦run⁩ ישן
+### <bdi dir="ltr">Backend API</bdi> אינו זמין
 
-1. אל תריץ ⁦Backtest⁩ חדש מול הקהל.
-2. פתח את טבלת ⁦`Final published results`⁩ ב־⁦`docs/phase12-verification.md`⁩.
-3. ציין את ⁦run ID⁩ ⁦`48cf39e5-ccb0...`⁩, את ⁦code version⁩ ⁦`bed1fb7`⁩ ואת תאריך האימות.
-4. הסבר שה־⁦UI⁩ הוא ⁦read model⁩; ה־⁦Parquet⁩ וה־⁦manifest⁩ הם ראיית השחזור המלאה.
+1. <bdi dir="ltr">Project Story</bdi> עדיין מציג ראיות מתוארכות ומסמן <bdi dir="ltr">live proof</bdi> כ־<bdi dir="ltr">unavailable</bdi>.
+2. הצג <bdi dir="ltr">Phase 7 verification</bdi> ואת גבול ה־<bdi dir="ltr">SELECT-only identity</bdi>.
+3. אל תעקוף את ה־<bdi dir="ltr">API</bdi> באמצעות חיבור <bdi dir="ltr">UI</bdi> ישיר למסד.
+
+### <bdi dir="ltr">Backtesting Lab</bdi> אינו עולה או מציג <bdi dir="ltr">run</bdi> ישן
+
+1. אל תריץ <bdi dir="ltr">Backtest</bdi> חדש מול הקהל.
+2. פתח את טבלת <bdi dir="ltr"><code>Final published results</code></bdi> ב־<bdi dir="ltr"><code>docs/phase12-verification.md</code></bdi>.
+3. ציין את <bdi dir="ltr">run ID</bdi> <bdi dir="ltr"><code>48cf39e5-ccb0...</code></bdi>, את <bdi dir="ltr">code version</bdi> <bdi dir="ltr"><code>bed1fb7</code></bdi> ואת תאריך האימות.
+4. הסבר שה־<bdi dir="ltr">UI</bdi> הוא <bdi dir="ltr">read model</bdi>; ה־<bdi dir="ltr">Parquet</bdi> וה־<bdi dir="ltr">manifest</bdi> הם ראיית השחזור המלאה.
 
 ## ניסוחים טובים בזמן תקלה
 
-- "הממשק המקומי הזה אינו זמין כרגע, ולכן אעבור לראיית ⁦verification⁩ מתוארכת."
-- "אני מפריד בין מצב חי לבין תוצאה שנמדדה; איני מציג ⁦snapshot⁩ כ־⁦live⁩."
-- "הכשל ב־⁦UI⁩ אינו משנה את הגבול הארכיטקטוני שאותו אני מסביר."
+- "הממשק המקומי הזה אינו זמין כרגע, ולכן אעבור לראיית <bdi dir="ltr">verification</bdi> מתוארכת."
+- "אני מפריד בין מצב חי לבין תוצאה שנמדדה; איני מציג <bdi dir="ltr">snapshot</bdi> כ־<bdi dir="ltr">live</bdi>."
+- "הכשל ב־<bdi dir="ltr">UI</bdi> אינו משנה את הגבול הארכיטקטוני שאותו אני מסביר."
 - "לא אבצע שינוי נתונים כדי לתקן דמו; אשתמש במסלול הגיבוי שהוכן מראש."
 
 ## ניסוחים שכדאי להימנע מהם
 
 - "זה אמור לעבוד" ללא ראיה.
-- "זה ⁦exactly once⁩" כשאין הבטחה כזו.
-- "זה ⁦production ready⁩" בלי ⁦authentication⁩, ⁦TLS⁩ ו־⁦capacity testing⁩.
-- "⁦Airflow⁩ מריץ את כל המערכת" - הוא מריץ רק ⁦bounded workflows⁩.
-- "⁦MariaDB⁩ שומר הכול" - ⁦Raw⁩, ⁦Silver⁩ ו־⁦Archive⁩ נמצאים ב־⁦object storage⁩.
+- "זה <bdi dir="ltr">exactly once</bdi>" כשאין הבטחה כזו.
+- "זה <bdi dir="ltr">production ready</bdi>" בלי <bdi dir="ltr">authentication</bdi>, <bdi dir="ltr">TLS</bdi> ו־<bdi dir="ltr">capacity testing</bdi>.
+- "<bdi dir="ltr">Airflow</bdi> מריץ את כל המערכת" - הוא מריץ רק <bdi dir="ltr">bounded workflows</bdi>.
+- "<bdi dir="ltr">MariaDB</bdi> שומר הכול" - <bdi dir="ltr">Raw</bdi>, <bdi dir="ltr">Silver</bdi> ו־<bdi dir="ltr">Archive</bdi> נמצאים ב־<bdi dir="ltr">object storage</bdi>.
 
 </div>

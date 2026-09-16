@@ -90,7 +90,14 @@ const phases = {
     title: "נתוני שוק ו־SEC הופכים לתרחיש החלטה מוסבר ומוגבל סיכון.",
     description:
       "Opportunity Center מדרג Watchlist, מחשב Buy Zone, שני Targets, Stop, Risk/Reward וגודל פוזיציה. Historical Evidence נשמר בנפרד מ־Live Shadow Mode כדי שהצגה עשירה לא תעקוף את שער הבטיחות.",
-    proof: "ראיה: 41 ימי Historical Evidence, ‏46,749 תצפיות Backtest, ‏99 בדיקות ו־1/20 ימי Shadow חיים — ללא ביצוע פקודות.",
+    proof: "ראיה: 53 ימי Historical Evidence, ‏11 ריצות Backtest ו־2/20 ימי Shadow חיים — ללא ביצוע פקודות.",
+  },
+  15: {
+    label: "PHASE 15",
+    title: "כללים שקופים נשארים אחראים לרמות המחיר; מודל הסתברותי חייב להרוויח את הזכות להשפיע.",
+    description:
+      "שכבת v2 בונה צילומי מצב נקודתיים, Labels ללא Look-ahead, השוואת Logistic Regression ו-Gradient Boosting ואימות Walk-Forward כרונולוגי. כאשר אין 24 חודשי ראיות ומודל מאומת, המערכת עוברת ל-FALLBACK ושומרת את v1 כסמכות.",
+    proof: "ראיה: ה-API והמסך מציגים FALLBACK, משאירים Model Probability ריק ומסרבים להמציא הסתברות.",
   },
 };
 
@@ -159,9 +166,15 @@ function bindPhaseButtons() {
 
 async function loadLiveProof() {
   try {
-    const response = await fetch("/api/v1/freshness", { headers: { Accept: "application/json" } });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
+    const [freshnessResponse, evaluationResponse, modelResponse] = await Promise.all([
+      fetch("/api/v1/freshness", { headers: { Accept: "application/json" } }),
+      fetch("/api/v1/decision-evaluation/status", { headers: { Accept: "application/json" } }),
+      fetch("/api/v1/decision-model/status", { headers: { Accept: "application/json" } }),
+    ]);
+    if (!freshnessResponse.ok || !evaluationResponse.ok || !modelResponse.ok) throw new Error("one or more evidence APIs failed");
+    const data = await freshnessResponse.json();
+    const evaluation = await evaluationResponse.json();
+    const model = await modelResponse.json();
     document.getElementById("proof-bars").textContent = number(data.market.bar_count);
     document.getElementById("proof-assets").textContent = number(data.symbols.length);
     document.getElementById("proof-filings").textContent = number(data.sec.filing_count);
@@ -169,6 +182,12 @@ async function loadLiveProof() {
       data.symbols.find((item) => item.latest_certification_status)?.latest_certification_status || "NO DATA";
     document.getElementById("proof-generated").textContent =
       `צילום מצב של Backend API · ${formatTimestamp(data.generated_at_utc)} UTC`;
+    document.getElementById("evidence-sessions").textContent = number(evaluation.historical_certified_sessions);
+    document.getElementById("evidence-certified-bars").textContent = number(data.market.certified_count);
+    document.getElementById("evidence-backtests").textContent = number(evaluation.published_backtest_runs);
+    document.getElementById("evidence-filings").textContent = number(data.sec.filing_count);
+    document.getElementById("evidence-shadow").textContent = `${evaluation.completed_sessions}/${evaluation.required_sessions}`;
+    document.getElementById("evidence-model").textContent = model.status;
     document.getElementById("proof-status").textContent = "הפלטפורמה המקומית מגיבה";
     document.getElementById("proof-dot").classList.add("ready");
   } catch (_error) {

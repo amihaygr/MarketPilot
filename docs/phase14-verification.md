@@ -1,5 +1,9 @@
 # Phase 14 verification — Decision Intelligence
 
+> Historical verification snapshot. The current presentation baseline is recorded
+> in `docs/final-presentation-verification.md`; this file is retained as an immutable
+> account of the 14 September gate and should not be read as the latest runtime state.
+
 Verification date: 2026-09-14
 
 ## Release state

@@ -54,6 +54,14 @@ flowchart TB
     gold -->|"SQL בלבד"| api
     api -->|"HTTPS או REST"| web
 
+    rules["Decision Intelligence v1 | רמות וסיכון דטרמיניסטיים"]
+    model["Hybrid v2 | הסתברות מכוילת לאחר אימות"]
+    registry[("MinIO model artifacts + MariaDB registry")]
+    gold --> rules --> api
+    gold -. "Point-in-time features" .-> model
+    registry -. "PREVIEW / ACTIVE / FALLBACK" .-> model
+    model -. "דירוג בלבד; אינו ממציא מחירים" .-> api
+
     note["Airflow אינו מפעיל את Kafka, את market-producer או את Spark Streaming. Docker Compose שומר אותם כשירותים רציפים."]
     note -.-> stream
 
@@ -61,5 +69,6 @@ flowchart TB
     class kafka,backfilltopic transport
     class producer,stream,rawsink,secjob,b2sjob,s2gjob compute
     class bronze,silver,gold storage
-    class api,web serving
+    class api,web,rules,model serving
+    class registry storage
     class airflow,historical,note control

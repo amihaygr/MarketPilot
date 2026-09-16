@@ -17,7 +17,7 @@ flowchart TB
             direction LR
             producer["market-producer | long-running"]
             kafka["Kafka KRaft | broker יחיד ל-MVP"]
-            secadapter["sec-adapter | on-demand"]
+            bounded["SEC / corporate / backfill jobs | bounded"]
             rawsink["raw-archive-sink | long-running"]
         end
 
@@ -63,19 +63,19 @@ flowchart TB
         kafka --> rawsink
         rawsink --> minio
         streaming --> mariadb
-        secadapter --> minio
+        bounded --> minio
         batch -->|"Bronze אל Silver"| minio
         batch -->|"Silver אל Gold"| mariadb
         sparkop -. "spark-submit" .-> master
-        scheduler -. "Docker task או HTTP" .-> secadapter
+        scheduler -. "bounded Python / Spark work" .-> bounded
         api -->|"SQL"| mariadb
     end
 
     alpaca --> producer
-    sec --> secadapter
+    sec --> bounded
     browser -->|"HTTPS"| web
 
-    volumes["Volumes: kafka-data, minio-data, mariadb-data, airflow-db-data, airflow-logs"]
+    volumes["Volumes: kafka-data, minio-data, mariadb-data, airflow-db-data, airflow-logs, airflow-auth, spark-checkpoints"]
     readiness["Healthchecks ו-service_healthy לפני הפעלת תלות"]
     volumes -.-> kafka
     volumes -.-> minio
@@ -88,7 +88,7 @@ flowchart TB
     boundary -.-> streaming
 
     class alpaca,sec external
-    class producer,secadapter,rawsink,streaming,batch,api,web service
+    class producer,bounded,rawsink,streaming,batch,api,web service
     class kafka,master,worker platform
     class minio,mariadb,airflowdb database
     class scheduler,apiserver,dagprocessor,sparkop,readiness,boundary,volumes airflow

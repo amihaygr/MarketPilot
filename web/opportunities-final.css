@@ -1,0 +1,45 @@
+/* Final presentation polish: explain the three distinct forms of evidence. */
+.decision-legend {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 0 0 18px;
+}
+
+.decision-legend article {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 17px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #091827;
+}
+
+.decision-legend article > span {
+  display: grid;
+  place-items: center;
+  min-width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #12372f;
+  color: var(--mint);
+  font: 800 11px/1 ui-monospace, monospace;
+}
+
+.decision-legend strong { display: block; font-size: 14px; }
+.decision-legend p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+.model-evidence[data-state="fallback"] { border-color: #735b2a; background: linear-gradient(135deg, #211b12, #0a192a); }
+.model-evidence[data-state="active"] { border-color: #247c70; }
+.metric.pending strong { font-size: 15px; color: var(--amber); }
+.metric.fallback strong { color: var(--amber); }
+.metric.active strong { color: var(--mint); }
+.model-explanation { padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: #091727; }
+.model-explanation p:not(.eyebrow) { color: var(--muted); max-width: 880px; }
+.asset[aria-current="true"] { border-color: var(--mint); box-shadow: 0 0 0 1px #4edcc033 inset; }
+.topbar nav a { white-space: nowrap; }
+
+@media (max-width: 900px) {
+  .decision-legend { grid-template-columns: 1fr; }
+  .topbar nav a:last-child { display: none; }
+}

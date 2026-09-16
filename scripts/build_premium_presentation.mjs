@@ -324,14 +324,14 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   const slide = presentation.slides.add();
   base(slide);
   title(slide, "איך הנתון עובר מהמקור למסך", "SYSTEM ARCHITECTURE", 4);
-  text(slide, rtl("שלושה מסלולים חולקים מקור אחד: חי, גולמי ומאושר"), 690, 112, 526, 30, {
+  text(slide, rtl("מסלולים נפרדים למהירות, ראיה גולמית ואישור — ושכבת החלטה מעליהם"), 570, 112, 646, 34, {
     size: 20,
     color: C.mutedDark,
     align: "right",
   });
 
   label(slide, "LIVE PATH", 1086, 174, 120, C.teal, "right");
-  const n1 = node(slide, "Alpaca + SEC", "מקורות נתונים", 1042, 214, 164, C.teal);
+  const n1 = node(slide, "Alpaca", "נתוני שוק", 1042, 214, 164, C.teal);
   const n2 = node(slide, "Python", "קליטה וחוזי מידע", 845, 214, 158, C.teal);
   const n3 = node(slide, "Kafka", "תעבורה ו־Replay", 648, 214, 158, C.blue);
   const n4 = node(slide, "Spark", "Streaming + Batch", 451, 214, 158, C.blue);
@@ -375,12 +375,12 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
     color: C.mutedDark,
     align: "right",
   });
-  text(slide, rtl("Airflow אינו מפעיל שירותי Streaming. הוא מתזמן רק עבודות שמתחילות ומסתיימות."), 48, 536, 612, 58, {
+  text(slide, rtl("התזמור אינו מפעיל עיבוד רציף. הוא מנהל רק עבודות תחומות, לרבות דיווחי חברות ונתוני עבר."), 48, 536, 612, 58, {
     size: 18,
     color: C.mutedDark,
     align: "right",
   });
-  text(slide, rtl("Bronze שומר את הראיה. Silver מנקה ומנרמל. Gold מוכן לצריכת המוצר."), 702, 536, 504, 58, {
+  text(slide, rtl("השכבה הגולמית שומרת ראיה; השכבה הנקייה מנרמלת; שכבת ההגשה מזינה כללים ומודל."), 702, 536, 504, 58, {
     size: 18,
     color: C.mutedDark,
     align: "right",
@@ -388,7 +388,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   notes(
     slide,
     "02:00–03:15",
-    "פתח במשפט: זהו אותו נתון בשלוש רמות של אמון. עקוב אחר השורה העליונה מימין לשמאל: Alpaca ו-SEC הם המקורות, Python מאחד אותם לחוזים ברורים, Kafka מפריד בין היצרן לצרכנים, Spark מעבד, ו-MariaDB Gold מגיש את התוצאה ל-API ול-Web. אחר כך עבור למסלול התחתון: Kafka נשמר גם ב-Bronze, Spark Batch מנקה ל-Silver, ורק אחרי בדיקות מפרסם Gold מאושר. Airflow מתזמן את העבודות התחומות במסלול הזה. הוא אינו מפעיל את שירות ה-Streaming. סיים בגבול האבטחה: הדפדפן מתקשר רק עם ה-API.",
+    "פתח במשפט: כל מסלול עונה על צורך אחר. עקוב אחר השורה העליונה מימין לשמאל: Alpaca הוא מקור השוק, Python מאחד את הנתונים לחוזה, Kafka מפריד בין היצרן לצרכנים, Spark מעבד, ו-MariaDB Gold מגיש את התוצאה ל-API ול-Web. במקביל Kafka נשמר ב-Bronze, Spark Batch מנקה ל-Silver, ורק אחרי בדיקות מפרסם Gold מאושר. SEC ו-Corporate Actions נכנסים בעבודות תחומות ומוסיפים הקשר פונדמנטלי. מעל Gold יושבים כללי v1 ושכבת v2 המוגנת. Airflow מתזמן עבודות תחומות בלבד; הדפדפן מתקשר רק עם ה-API.",
     "docs/architecture/architecture.md; docs/decisions/ADR-001-storage-strategy.md; ADR-002-airflow-boundary.md; ADR-003-streaming-lifecycle.md",
   );
 }
@@ -472,12 +472,13 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   rule(slide, 918, 330, 298, C.lineDark, 1);
   const facts = [
     ["11", "נכסים במעקב"],
-    ["57,217", "רשומות Gold"],
-    ["937", "דיווחי SEC"],
+    ["72,850", "נרות Gold"],
+    ["65,616", "נרות Certified"],
+    ["937", "רשומות SEC"],
   ];
   facts.forEach(([metric, caption], index) => {
-    const y = 354 + index * 82;
-    text(slide, metric, 918, y, 150, 35, { font: MONO, size: 26, bold: true, color: index === 1 ? C.blue : C.teal, align: "left" });
+    const y = 348 + index * 64;
+    text(slide, metric, 918, y, 150, 35, { font: MONO, size: 24, bold: true, color: index === 1 || index === 2 ? C.blue : C.teal, align: "left" });
     text(slide, rtl(caption), 1050, y + 4, 166, 30, { size: 19, color: C.mutedDark, align: "right" });
   });
   notes(
@@ -492,14 +493,14 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 {
   const slide = presentation.slides.add();
   base(slide);
-  title(slide, "המלצה שמראה גם את הסיכון", "DECISION INTELLIGENCE", 8);
+  title(slide, "החלטה שמפרידה בין ראיה, הסתברות וסיכון", "DECISION INTELLIGENCE", 8);
   await addImage(slide, "opportunity-center.png", 48, 142, 830, 492, "MarketPilot Opportunity Center screenshot");
-  text(slide, rtl("לא מחיר קסם"), 920, 154, 290, 38, { size: 28, bold: true, color: C.white, align: "right" });
+  text(slide, rtl("שלוש שכבות שונות"), 920, 154, 290, 38, { size: 28, bold: true, color: C.white, align: "right" });
   const items = [
-    ["BUY ZONE", "טווח כניסה"],
-    ["STOP", "נקודת ביטול"],
-    ["TARGET 1 / 2", "שני תרחישי מימוש"],
-    ["RISK / REWARD", "סיכון מול פוטנציאל"],
+    ["RULE SCORE", "מה הכללים תומכים"],
+    ["MODEL PROBABILITY", "רק לאחר אימון ואימות"],
+    ["DATA CONFIDENCE", "איכות, כיסוי וטריות"],
+    ["LEVELS + RISK", "כניסה, ביטול ויעדים"],
   ];
   items.forEach(([en, he], index) => {
     const y = 222 + index * 72;
@@ -507,14 +508,15 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
     text(slide, rtl(he), 920, y + 28, 282, 30, { size: 22, color: C.white, align: "right" });
   });
   rect(slide, 920, 520, 290, 2, C.lineDark);
-  text(slide, "1 / 20", 920, 546, 100, 34, { font: MONO, size: 24, bold: true, color: C.amber, align: "left" });
+  text(slide, "2 / 20", 920, 546, 100, 34, { font: MONO, size: 24, bold: true, color: C.amber, align: "left" });
   text(slide, rtl(`ימי ${iso("Shadow Mode")} חיים`), 1028, 550, 182, 28, { size: 18, color: C.mutedDark, align: "right" });
-  text(slide, rtl("אין פקודה, אין הבטחת תשואה"), 920, 590, 290, 26, { size: 18, color: C.coral, align: "right" });
+  text(slide, "V2 FALLBACK", 920, 582, 290, 24, { font: MONO, size: 15, bold: true, color: C.coral, align: "left" });
+  text(slide, rtl("אין הסתברות מומצאת"), 920, 610, 290, 24, { size: 17, color: C.coral, align: "right" });
   notes(
     slide,
     "05:45–06:35",
-    "פתח כך: המלצה בלי נקודת ביטול ובלי גודל פוזיציה היא רק דעה. MarketPilot מציגה תרחיש שלם: Buy Zone, Stop, שני יעדים, יחס Risk/Reward וגודל פוזיציה שמכבד את מגבלות התיק. אחר כך הסבר את הגבול: Shadow Mode עדיין אוסף ראיות חיות ולכן הפלט אינו Actionable. ההיסטוריה משמשת למחקר ולבדיקה, אך אינה מזייפת זמן אמיתי.",
-    "docs/phase14-verification.md; docs/decisions/ADR-008-decision-intelligence.md",
+    "פתח כך: המלצה בלי נקודת ביטול ובלי גודל פוזיציה היא רק דעה. המסך מפריד בין Rule Score, שמסכם ראיות לפי כללים שקופים; Data Confidence, שמודד איכות וטריות; ו-Model Probability, שתופיע רק לאחר אימון וכיול. כרגע v1 מחשב Buy Zone, Stop, Targets ו-Risk/Reward. Shadow Mode עומד על 2/20 ו-v2 נמצא ב-FALLBACK, ולכן המערכת אינה מציגה הסתברות לא מוכחת. זהו מנגנון בטיחות, לא חוסר שמסתירים.",
+    "docs/decisions/ADR-008-decision-intelligence.md; docs/decisions/ADR-009-hybrid-decision-intelligence.md",
   );
 }
 
@@ -526,9 +528,9 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   await addImage(slide, "backtesting.png", 52, 134, 840, 486, "MarketPilot Backtesting Lab screenshot");
   text(slide, rtl("ריצה מאושרת"), 930, 148, 280, 36, { size: 26, bold: true, color: C.white, align: "right" });
   const facts = [
-    ["41", "ימי מסחר מאושרים", C.teal],
-    ["46,749", "תצפיות", C.blue],
-    ["1,059", "שינויי פוזיציה", C.amber],
+    ["53", "ימי מסחר מאושרים", C.teal],
+    ["11", "ריצות מפורסמות", C.blue],
+    ["65,616", "נרות Certified", C.amber],
   ];
   facts.forEach(([metric, caption, color], index) => {
     const y = 216 + index * 94;
@@ -545,7 +547,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
     slide,
     "06:35–07:25",
     "הדגש שהמטרה אינה לייצר גרף יפה אלא ניסוי שאפשר לבקר. הקלט כולל רק Certified Gold. אות שנוצר בנר מסוים יכול להשפיע רק מהנר הבא, כדי למנוע Look-ahead. עלויות ו-Slippage מפחיתים את התוצאה במקום להיעלם מהמודל. כך גם תוצאה חלשה היא מידע שימושי. ביצועי עבר אינם הבטחת תשואה.",
-    "docs/phase14-historical-evidence-verification.md; docs/decisions/ADR-005-historical-backtesting.md",
+    "docs/architecture/architecture.md; docs/decisions/ADR-005-historical-backtesting.md",
   );
 }
 
@@ -592,9 +594,9 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 
   rule(slide, 136, 342, 1000, C.lineDark, 4);
   const milestones = [
-    [1030, "01", "היום", `סביבה מקומית עובדת\n41 ימים מאושרים\n${iso("Shadow Mode 1/20")}`, C.teal],
-    [635, "02", "לאחר 20 ימים חיים", `בדיקת ${iso("Calibration")}\nאישור אנושי נפרד\nפתיחת ${iso("Decision Support")}`, C.blue],
-    [240, "03", "הרחבה עתידית", `${iso("SIP / S3 / Elastic")}\n${iso("Authentication + TLS")}\nפריסה משותפת`, C.amber],
+    [1030, "01", "היום", `53 ימים מאושרים\n${iso("v1 Shadow 2/20")}\n${iso("v2 FALLBACK")}`, C.teal],
+    [635, "02", "שער הראיות", `24 חודשי נתונים\n300 כניסות תקפות\n${iso("Walk-Forward gates")}`, C.blue],
+    [240, "03", "לפני הפעלה", `${iso("v2 Shadow 20 days")}\nבדיקת ${iso("Calibration")}\nאישור אנושי`, C.amber],
   ];
   milestones.forEach(([x, n, heading, body, accent]) => {
     rect(slide, x, 327, 30, 30, accent, 15);
@@ -602,7 +604,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
     text(slide, rtl(heading), x - 190, 210, 220, 60, { size: 27, bold: true, color: C.white, align: "right" });
     text(slide, rtl(body), x - 190, 390, 220, 116, { size: 21, color: C.mutedDark, align: "right", lineSpacing: 1.05 });
   });
-  text(slide, rtl("הקידום יתאפשר רק לאחר ראיות חיות ובדיקה אנושית. תוצאות היסטוריות לבדן אינן מספיקות."), 464, 556, 750, 46, {
+  text(slide, rtl("רק אחרי שערי האמון נשקול הזנת שוק מלאה, ענן, אבטחה וניטור תפעולי."), 400, 556, 814, 46, {
     size: 21,
     bold: true,
     color: C.coral,
@@ -611,8 +613,8 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   notes(
     slide,
     "08:15–08:55",
-    "הפרד בבירור בין קיים לעתידי. היום יש פלטפורמה מקומית מלאה, מסלולי Live ו-Certified, היסטוריה מאושרת ומוצר Web. לפני שהמלצה תהפוך ל-Decision Support פעיל נדרשים 20 ימי Shadow Mode, בדיקת Calibration ואישור אנושי מתועד. בהמשך אפשר להוסיף SIP, מעבר ל-S3, Observability ואבטחת Production. אל תציג אותם כאילו כבר מומשו.",
-    "docs/implementation-plan.md; docs/phase14-verification.md",
+    "הפרד בבירור בין קיים לעתידי. היום יש פלטפורמה מקומית מלאה, 53 ימי היסטוריה מאושרים, v1 Rules ו-Shadow Mode של 2/20. תשתית v2 קיימת אך נמצאת ב-FALLBACK כי אין עדיין 24 חודשי נתונים ומדגם של 300 כניסות. לאחר אימון נדרש Walk-Forward, כיול, 20 ימי Shadow חדשים ואישור אנושי. רק אחר כך יש מקום ל-SIP, S3 ואבטחת Production.",
+    "docs/implementation-plan.md; docs/decisions/ADR-009-hybrid-decision-intelligence.md",
   );
 }
 
@@ -620,7 +622,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 {
   const slide = presentation.slides.add();
   base(slide);
-  label(slide, "LIVE DEMO · 06:00", 64, 44, 280, C.teal, "left");
+  label(slide, "LIVE DEMO · 05:50", 64, 44, 280, C.teal, "left");
   text(slide, rtl("עוברים מהסיפור למערכת"), 520, 98, 694, 62, {
     size: 42,
     bold: true,

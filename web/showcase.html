@@ -8,8 +8,8 @@
       content="סיפור הפרויקט MarketPilot: ארכיטקטורה, החלטות הנדסיות, ראיות אימות וקישורים להדגמה חיה."
     />
     <title>MarketPilot | סיפור הפרויקט</title>
-    <link rel="stylesheet" href="/showcase.css?v=phase10-1" />
-    <script src="/showcase.js?v=phase10-1" defer></script>
+    <link rel="stylesheet" href="/showcase.css?v=phase15-final" />
+    <script src="/showcase.js?v=phase15-final" defer></script>
   </head>
   <body>
     <header class="story-nav">
@@ -152,21 +152,21 @@
             <p class="story-eyebrow">נמדד על סביבת היעד</p>
             <h2 id="evidence-title">ראיות הנדסיות, לא רק תרשים יפה.</h2>
           </div>
-          <p>הראיות עודכנו בסביבת היעד ב־14 בספטמבר 2026; נתונים חיים מסומנים בנפרד.</p>
+          <p>הראיות עודכנו בסביבת היעד ב־17 בספטמבר 2026; נתונים חיים נטענים מה־API ומסומנים בנפרד.</p>
         </div>
         <div class="evidence-grid">
           <article class="evidence-lead">
-            <strong>18 / 18</strong>
-            <span>שירותי Compose תקינים בסביבת הריצה שנבדקה</span>
+            <strong>19</strong>
+            <span>שירותי Compose מוגדרים, כולל שני שירותי אתחול תחומים</span>
           </article>
-          <article><strong>99</strong><span>בדיקות אוטומטיות שעברו בשער ההפצה הנוכחי</span></article>
-          <article><strong>41</strong><span>ימי מסחר אמיתיים של XNYS שאושרו במסלול ההיסטורי</span></article>
-          <article><strong>46,749</strong><span>תצפיות מאושרות ב־Backtest המאוחד על כל החלון</span></article>
-          <article><strong>1,059</strong><span>שינויי פוזיציה ב־AAPL, ב־MSFT וב־SPY</span></article>
-          <article><strong>513</strong><span>רשומות בדיקה סינתטיות מחוץ למסחר שאותרו והוחרגו</span></article>
-          <article><strong>5,106</strong><span>רשומות Gold שיוצאו לתרגיל ארכיון Parquet מאומת</span></article>
-          <article><strong>25</strong><span>רשומות ששוחזרו לאחר אימות מחדש של מלאי הארכיון</span></article>
-          <article><strong>0</strong><span>מפתחות עסקיים כפולים לאחר עיבוד Idempotent חוזר</span></article>
+          <article><strong>113</strong><span>בדיקות אוטומטיות שעברו בשער ההפצה האחרון</span></article>
+          <article><strong id="evidence-sessions">53</strong><span>ימי מסחר אמיתיים של XNYS שאושרו במסלול ההיסטורי</span></article>
+          <article><strong id="evidence-certified-bars">65,616</strong><span>נרות דקה מאושרים הזמינים ב־Gold</span></article>
+          <article><strong id="evidence-backtests">11</strong><span>ריצות Backtest שפורסמו עם Lineage וגרסאות</span></article>
+          <article><strong id="evidence-filings">937</strong><span>רשומות דיווחי SEC הזמינות למחקר</span></article>
+          <article><strong id="evidence-shadow">2/20</strong><span>ימי מסחר חיים שנצברו בשער Shadow Mode של v1</span></article>
+          <article><strong id="evidence-model">FALLBACK</strong><span>מצב v2: אין הסתברות עד שמודל מאומן יעבור את כל השערים</span></article>
+          <article><strong>0</strong><span>הסתברויות מומצאות או פקודות מסחר שנשלחו</span></article>
         </div>
         <p class="evidence-note">
           אלו תוצאות אימות הנדסיות מתוארכות, ולא טענות על היקף Production.
@@ -176,7 +176,7 @@
       <section class="journey-section" id="journey" aria-labelledby="journey-title">
         <div class="section-intro">
           <p class="story-eyebrow">תהליך הבנייה</p>
-          <h2 id="journey-title">ארבעה־עשר שלבים, וכל אחד מסתיים בראיה ניתנת לבדיקה.</h2>
+          <h2 id="journey-title">חמישה־עשר שלבים, וכל אחד מסתיים בראיה ניתנת לבדיקה.</h2>
           <p>בחרו אבן דרך כדי לראות מה הפך בה לניתן לאימות.</p>
         </div>
         <div class="journey-layout">
@@ -189,6 +189,7 @@
             <button type="button" class="phase-button" data-phase="11" aria-pressed="false">11 · Backtesting</button>
             <button type="button" class="phase-button" data-phase="12" aria-pressed="false">12 · נתונים היסטוריים</button>
             <button type="button" class="phase-button" data-phase="14" aria-pressed="false">14 · Decision Intelligence</button>
+            <button type="button" class="phase-button" data-phase="15" aria-pressed="false">15 · Hybrid Model</button>
           </div>
           <article class="phase-detail" aria-live="polite">
             <span id="phase-label">PHASES 0–2</span>
@@ -211,8 +212,8 @@
         <div class="demo-links">
           <a href="/presenter.html">00 · מסך המציג <span>טיימר וכרטיסי דיבור</span></a>
           <a href="/">01 · לוח המחוונים <span>Gold ו־Analytics</span></a>
-          <a href="/backtesting.html">02 · מעבדת Backtesting <span>ראיות היסטוריות מאושרות</span></a>
-          <a href="/opportunities.html">03 · Opportunity Center <span>תרחישי החלטה ו־Shadow Mode</span></a>
+          <a href="/opportunities.html">02 · Opportunity Center <span>כללים, סיכון ומצב המודל</span></a>
+          <a href="/backtesting.html">03 · מעבדת Backtesting <span>ראיות היסטוריות מאושרות</span></a>
           <a href="http://localhost:8085/">04 · ממשק Kafka <span>Topics חיים והיסטוריים</span></a>
           <a href="http://localhost:9001/">05 · MinIO <span>Bronze, Silver וארכיון</span></a>
           <a href="http://localhost:8080/">06 · Airflow <span>תהליכים תחומים</span></a>

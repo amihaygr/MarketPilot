@@ -20,13 +20,13 @@ flowchart TB
         direction TB
 
         secclock["כל 15 דקות | ימי חול | 06:00 עד 22:00 ET"]
-        secdag["sec_polling_dag | catchup=False | max_active_runs=1"]
+        secdag["sec_polling | catchup=False | max_active_runs=1"]
         sectask["בדיקת SEC והורדת accession חדשים בלבד"]
         bronze[("Bronze | SEC raw JSON")]
         secclock --> secdag --> sectask --> bronze
 
         closeclock["16:30 ET | שני עד שישי"]
-        dailydag["daily_market_close_dag | max_active_runs=1"]
+        dailydag["daily_market_close | max_active_runs=1"]
         watermark["בדיקת watermark ושלמות קליטה"]
         b2s["SparkSubmitOperator | Bronze אל Silver"]
         dqs["בדיקות איכות Silver"]
@@ -35,21 +35,26 @@ flowchart TB
         closeclock --> dailydag --> watermark --> b2s --> dqs --> s2g --> publish
 
         weekclock["שבת 06:00 ET"]
-        weeklydag["weekly_compaction_dag"]
+        weeklydag["weekly_compaction"]
         compact["איחוד קובצי Parquet קטנים, manifest ובדיקת checksum"]
         weekclock --> weeklydag --> compact
 
         yearclock["10 בינואר 02:00 ET"]
-        annualdag["annual_archive_dag | השנה הקודמת בלבד"]
+        annualdag["annual_archive | השנה הקודמת בלבד"]
         export["ייצוא מחיצות MariaDB סגורות ל-Parquet"]
         verify["השוואת שורות, checksum ושאילתות מדגם"]
         register["רישום manifest | ללא מחיקה אוטומטית ב-MVP"]
         yearclock --> annualdag --> export --> verify --> register
 
         manual["הפעלה ידנית עם טווח תאריכים וסימולים"]
-        backfilldag["backfill_replay_dag | max_active_runs=1"]
+        backfilldag["backfill_replay | max_active_runs=1"]
         replay["קריאה חוזרת מ-Bronze והרצת Spark idempotent"]
         manual --> backfilldag --> replay
+
+        trainingclock["ידני | לאחר השלמת 24 חודשי ראיות"]
+        trainingdag["hybrid_model_training | fail closed"]
+        training["Dataset + labels + walk-forward + registry"]
+        trainingclock --> trainingdag --> training
     end
 
     controls["בקרות משותפות: retries עם backoff, execution_timeout, pools, UPSERT idempotent, התראות ולוגים"]
@@ -63,17 +68,19 @@ flowchart TB
     controls -.-> weeklydag
     controls -.-> annualdag
     controls -.-> backfilldag
+    controls -.-> trainingdag
     pools -.-> secdag
     pools -.-> dailydag
     pools -.-> backfilldag
+    pools -.-> trainingdag
 
     note["אין חץ מ-Airflow אל Spark Streaming: זהו שירות ארוך חיים. Airflow שולח רק עבודות Spark Batch תחומות בזמן אל Spark Master."]
     note -.-> streaming
     note -.-> b2s
     note -.-> s2g
 
-    class timezone,secclock,closeclock,weekclock,yearclock,manual clock
-    class secdag,dailydag,weeklydag,annualdag,backfilldag,controls,pools,note dag
-    class sectask,watermark,b2s,dqs,s2g,publish,compact,export,verify,register,replay task
+    class timezone,secclock,closeclock,weekclock,yearclock,manual,trainingclock clock
+    class secdag,dailydag,weeklydag,annualdag,backfilldag,trainingdag,controls,pools,note dag
+    class sectask,watermark,b2s,dqs,s2g,publish,compact,export,verify,register,replay,training task
     class bronze,livegold store
     class producer,kafka,streaming continuous

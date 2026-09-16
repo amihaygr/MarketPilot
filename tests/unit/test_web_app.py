@@ -41,7 +41,7 @@ def test_dashboard_uses_safe_dom_rendering_for_api_content() -> None:
     assert 'id="source-filter"' in (PROJECT_ROOT / "web" / "index.html").read_text(encoding="utf-8")
 
 
-def test_phase10_showcase_is_packaged_and_uses_the_existing_api_boundary() -> None:
+def test_final_showcase_is_packaged_and_uses_the_existing_api_boundary() -> None:
     dashboard = (PROJECT_ROOT / "web" / "index.html").read_text(encoding="utf-8")
     showcase = (PROJECT_ROOT / "web" / "showcase.html").read_text(encoding="utf-8")
     script = (PROJECT_ROOT / "web" / "showcase.js").read_text(encoding="utf-8")
@@ -50,8 +50,8 @@ def test_phase10_showcase_is_packaged_and_uses_the_existing_api_boundary() -> No
     )
 
     assert 'href="/showcase.html"' in dashboard
-    assert "showcase.css?v=phase10-1" in showcase
-    assert "showcase.js?v=phase10-1" in showcase
+    assert "showcase.css?v=phase15-final" in showcase
+    assert "showcase.js?v=phase15-final" in showcase
     assert 'fetch("/api/v1/freshness"' in script
     assert ".innerHTML" not in script
     assert 'connector.textContent = "←"' in script
@@ -75,9 +75,12 @@ def test_presenter_console_packages_timed_routes_without_a_data_plane_connection
     assert 'data-mode="10"' in presenter
     assert 'data-mode="15"' in presenter
     assert 'data-mode="20"' in presenter
-    assert "presenter.js?v=final-demo-1" in presenter
+    assert "presenter.js?v=phase15-final" in presenter
     assert 'href="/backtesting.html"' in presenter
-    assert "fetch(" not in script
+    assert 'fetch("/api/v1/decision-evaluation/status")' in script
+    assert 'fetch("/api/v1/decision-model/status")' in script
+    assert 'fetch("http://mariadb' not in script
+    assert 'fetch("http://minio' not in script
     assert ".innerHTML" not in script
     assert "replaceChildren" in script
     assert "[90, core.opening]" in script
@@ -133,7 +136,7 @@ def test_phase14_opportunity_center_is_real_api_driven_and_shadow_safe() -> None
     assert "SHADOW MODE" in page
     assert "fetch(`${API}/opportunities${symbolQuery}`" in script
     assert ".innerHTML" not in script
-    assert "No placeholder recommendation is shown" in page
+    assert "never substitutes placeholder recommendations" in page
     assert "does not guarantee profit" in page
     assert "COPY web/opportunities.html" in dockerfile
     assert 'id="portfolio-equity"' in page

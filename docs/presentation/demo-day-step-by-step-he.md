@@ -51,10 +51,11 @@ docker compose up -d
 2. התחבר מראש ל־<bdi dir="ltr"><code>MinIO</code></bdi> ול־<bdi dir="ltr"><code>Airflow</code></bdi>.
 3. סגור את קובץ <bdi dir="ltr"><code>.env</code></bdi> וכל חלון שעלול לחשוף סיסמה או מפתח.
 4. במסך הראשי בחר <bdi dir="ltr"><code>AAPL</code></bdi> וטווח <bdi dir="ltr"><code>7D</code></bdi>.
-5. ודא שבגרף מופיעים 5 ימי מסחר, 1,950 נרות וכיסוי מלא של <bdi dir="ltr"><code>SMA 20</code></bdi>.
+5. ודא שבגרף מופיעים לפחות 5 ימי מסחר, שהפערים מחוץ לשעות המסחר נשארים גלויים ושכיסוי <bdi dir="ltr"><code>SMA 20</code></bdi> גבוה מ־<bdi dir="ltr"><code>80%</code></bdi>.
 6. פתח מראש הודעה אחת ב־<bdi dir="ltr"><code>Kafka UI</code></bdi> ואובייקט אחד ב־<bdi dir="ltr"><code>MinIO Bronze</code></bdi>.
-7. ב־<bdi dir="ltr"><code>Airflow</code></bdi> פתח ריצה מוצלחת של <bdi dir="ltr"><code>historical_market_backfill</code></bdi> או של <bdi dir="ltr"><code>daily_market_close</code></bdi>.
-8. במעבדת הבדיקה ההיסטורית בחר את הריצה שמזהה שלה מתחיל ב־<bdi dir="ltr"><code>2bf99281</code></bdi>.
+7. ב־<bdi dir="ltr"><code>Airflow</code></bdi> פתח את ריצת התיקון הירוקה <bdi dir="ltr"><code>repair__2026-09-16__20260917</code></bdi> של <bdi dir="ltr"><code>historical_market_backfill</code></bdi>.
+8. במעבדת הבדיקה ההיסטורית בחר ריצה במצב <bdi dir="ltr"><code>Published</code></bdi> שמכסה כמה שבועות; אין להסתמך על מזהה קבוע.
+9. במרכז ההזדמנויות ודא שמופיעים <bdi dir="ltr"><code>2/20</code></bdi>, ‏<bdi dir="ltr"><code>53 certified sessions</code></bdi> ו־<bdi dir="ltr"><code>RULES ACTIVE · MODEL FALLBACK</code></bdi>.
 
 ## ניהול הזמן
 
@@ -107,7 +108,7 @@ docker compose up -d
 
 ### שקף 4 — הארכיטקטורה
 
-**המסר:** אותו נתון עובר בשלושה מסלולים בעלי מטרות שונות.
+**המסר:** אותו נתון עובר במסלולים נפרדים למהירות, ראיה גולמית ואישור; שכבת ההחלטה אינה עוקפת אותם.
 
 > אני קורא את התרשים מימין לשמאל. <bdi dir="ltr"><code>Alpaca</code></bdi> (ספק נתוני
 > שוק וממשק מסחר; בפרויקט משמש לנתונים בלבד) ו־<bdi dir="ltr"><code>SEC</code></bdi>
@@ -192,11 +193,17 @@ docker compose up -d
 > (מחיר שבו התזה נפסלת ומתכננים מראש את היציאה), ושני יעדי רווח. יחס
 > <bdi dir="ltr"><code>Risk/Reward</code></bdi> (כמה רווח מתוכנן ביחס לכל יחידת סיכון
 > עד מחיר העצירה) וגודל הפוזיציה מחושבים לפי מגבלות התיק. ההסבר בעברית מפרט למה התרחיש
-> קיבל את הציון שלו. המודל נמצא ב־<bdi dir="ltr"><code>Shadow Mode</code></bdi>, ולכן הוא אוסף ראיות ואינו
-> מסומן כ־<bdi dir="ltr"><code>Actionable</code></bdi>.
+> קיבל את הציון שלו. חשוב להפריד בין <bdi dir="ltr"><code>Rule Score</code></bdi>
+> (סיכום הראיות לפי הכללים), ‏<bdi dir="ltr"><code>Data Confidence</code></bdi>
+> (איכות, כיסוי וטריות הנתונים) ו־<bdi dir="ltr"><code>Model Probability</code></bdi>
+> (הסתברות מכוילת שתופיע רק לאחר אימון ואימות). כרגע כללי <bdi dir="ltr"><code>v1</code></bdi>
+> פעילים, מונה הצל עומד על <bdi dir="ltr"><code>2/20</code></bdi>, ומודל
+> <bdi dir="ltr"><code>v2</code></bdi> נמצא ב־<bdi dir="ltr"><code>FALLBACK</code></bdi>.
+> לכן אין הסתברות על המסך — זו התנהגות בטוחה, לא חוסר מקרי.
 >
-> בדמו אראה שלושה מצבים אמיתיים: <bdi dir="ltr"><code>AAPL</code></bdi> עם היסטוריה עשירה,
-> <bdi dir="ltr"><code>AMZN</code></bdi> שנוספה לרשימת המעקב וקיבלה חישוב חי, וסימול שמסומן
+> בדמו אראה שלושה מצבים אמיתיים: <bdi dir="ltr"><code>META</code></bdi> שנמצאת כרגע בתוך
+> <bdi dir="ltr"><code>BUY ZONE</code></bdi>, ‏<bdi dir="ltr"><code>AAPL</code></bdi> שמסומנת
+> <bdi dir="ltr"><code>WATCH BREAKOUT</code></bdi>, וסימול שמסומן
 > <bdi dir="ltr"><code>INSUFFICIENT DATA</code></bdi>. המצב האחרון אינו תקלה; הוא מוכיח ששערי
 > האיכות יכולים לעצור מסקנה כשאין בסיס מספק.
 
@@ -248,6 +255,12 @@ docker compose up -d
 > <bdi dir="ltr"><code>Production</code></bdi> (הקשחה הנדרשת להפעלה אמיתית עבור
 > משתמשים). אלה שלבי המשך ולא יכולות שאני טוען שכבר
 > מימשתי.
+
+> בנוסף יישמתי את תשתית <bdi dir="ltr"><code>Phase 15</code></bdi>: יצירת
+> <bdi dir="ltr"><code>Point-in-time features</code></bdi>, ‏<bdi dir="ltr"><code>Labels</code></bdi>,
+> אימון והשוואת מודלים, ‏<bdi dir="ltr"><code>Walk-Forward Validation</code></bdi> ורישום
+> <bdi dir="ltr"><code>Artifact</code></bdi>. כרגע אין 24 חודשי נתונים ואין לפחות
+> 300 כניסות תקפות, ולכן המערכת מסרבת לאמן או לפרסם הסתברות ועוברת ל־<bdi dir="ltr"><code>FALLBACK</code></bdi>.
 
 ### שקף 12 — מעבר לדמו
 
@@ -426,7 +439,7 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 
 1. פתח את רשימת ה־<bdi dir="ltr"><code>DAGs</code></bdi> (תהליכים שמוגדרים
    כמשימות עם סדר ותלויות; משימה מאוחרת אינה מתחילה לפני שקודמתה הצליחה).
-2. בחר ריצה ירוקה ומוצלחת של <bdi dir="ltr"><code>historical_market_backfill</code></bdi>.
+2. בחר את ריצת התיקון הירוקה <bdi dir="ltr"><code>repair__2026-09-16__20260917</code></bdi> של <bdi dir="ltr"><code>historical_market_backfill</code></bdi>.
 אל תבחר את הריצה האחרונה באופן אוטומטי; בדוק קודם שהסטטוס שלה ירוק.
 3. פתח את תצוגת <bdi dir="ltr"><code>Grid</code></bdi> (טבלת ריצות ומשימות) או
    <bdi dir="ltr"><code>Graph</code></bdi> (תרשים התלויות) והצבע על סדר המשימות הירוקות.
@@ -439,8 +452,8 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 
 > מנהל התזמור הוא מנהל העבודה של התהליכים שמתחילים ומסתיימים. כאן רואים בדיוק
 > מה קרה ובאיזה סדר: מעבדים את המקור הגולמי לשכבה נקייה, בודקים איכות,
-> מפרסמים לשכבת ההגשה ורק אחר כך ממשיכים לחישובי הניתוח. בריצת ההשלמה האחרונה
-> עובדו 21 ימי מסחר.
+> מפרסמים לשכבת ההגשה ורק אחר כך ממשיכים לחישובי הניתוח. ריצת התיקון המוצגת
+> רכשה מחדש את 16 בספטמבר, העבירה 11 סימולים דרך שער הכיסוי ופרסמה אותם כ־<bdi dir="ltr"><code>CERTIFIED</code></bdi>.
 >
 > חשוב להדגיש מה מנהל התזמור לא עושה: הוא לא מפעיל את שירות ההודעות, לא
 > מפעיל את העיבוד הרציף ולא מנהל את חיי הדשבורד. אלה שירותים ארוכי־חיים.
@@ -459,9 +472,8 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 **מה לעשות על המסך:**
 
 1. ודא שמופיעים 11 סימולים ברשימת המעקב.
-2. בחר את <bdi dir="ltr"><code>AAPL</code></bdi> כמקרה עם היסטוריה מאושרת ועשירה.
-3. עבור אל <bdi dir="ltr"><code>AMZN</code></bdi> כמקרה שנוסף ל־<bdi dir="ltr"><code>Watchlist</code></bdi>
-   (רשימת המניות שהמשתמש בחר לעקוב אחריהן) וחושב במסלול החי.
+2. בחר את <bdi dir="ltr"><code>META</code></bdi> והראה תרחיש <bdi dir="ltr"><code>BUY ZONE</code></bdi>.
+3. עבור אל <bdi dir="ltr"><code>AAPL</code></bdi> והראה מדוע מחיר מעל טווח הכניסה הופך את הפעולה ל־<bdi dir="ltr"><code>WATCH BREAKOUT</code></bdi> ולא ל־<bdi dir="ltr"><code>BUY</code></bdi> עיוור.
 4. בחר סימול שמציג <bdi dir="ltr"><code>INSUFFICIENT DATA</code></bdi> (אין מספיק
    נתונים טריים ומאושרים כדי לחשב תרחיש אמין) והסבר מדוע עצירת מסקנה היא תוצאה תקינה.
 5. הצבע על הסטטוס: <bdi dir="ltr"><code>PROVISIONAL</code></bdi>, ‏<bdi dir="ltr"><code>CERTIFIED</code></bdi>,
@@ -469,7 +481,8 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 <bdi dir="ltr"><code>INSUFFICIENT DATA</code></bdi> — מה שמופיע בפועל.
 6. עבור על כרטיס התרחיש בסדר: <bdi dir="ltr"><code>Buy Zone</code></bdi>, ‏<bdi dir="ltr"><code>Stop</code></bdi>, ‏<bdi dir="ltr"><code>Target 1</code></bdi>,
 <bdi dir="ltr"><code>Target 2</code></bdi>, ‏<bdi dir="ltr"><code>Risk/Reward</code></bdi> וגודל הפוזיציה.
-7. פתח את ההסבר בעברית, ובחר סיבה אחת טכנית וסיבה אחת פונדמנטלית בלבד.
+7. הצבע על שלושת המושגים הנפרדים: <bdi dir="ltr"><code>Rule Score</code></bdi>, ‏<bdi dir="ltr"><code>Model Probability</code></bdi> ו־<bdi dir="ltr"><code>Data Confidence</code></bdi>.
+8. פתח את ההסבר בעברית, ובחר סיבה אחת טכנית וסיבה אחת פונדמנטלית בלבד.
 
 **מה הקהל צריך לראות:** המוצר לא זורק “קנה” עם מספר אחד. הוא מראה תרחיש,
 הנחות, סיכון, תנאי ביטול וסטטוס אמינות.
@@ -485,10 +498,17 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 > צל, כלומר אוספת ומודדת את איכות התרחישים לפני שמציגים אותם כהמלצה מעשית. האדם
 > נשאר מקבל ההחלטה.
 >
-> נכון לבדיקת ההכנה יש 52 ימי מסחר היסטוריים מאושרים, אך מונה הצל הוא
-> <bdi dir="ltr"><code>1/20</code></bdi>. ההיסטוריה אינה נספרת כזמן חי. המונה עולה רק
+> נכון לבדיקת ההכנה יש 53 ימי מסחר היסטוריים מאושרים, אך מונה הצל של
+> <bdi dir="ltr"><code>v1</code></bdi> הוא <bdi dir="ltr"><code>2/20</code></bdi>.
+> ההיסטוריה אינה נספרת כזמן חי. המונה עולה רק
 > אחרי יום מסחר אמיתי שבו כל ריצת האישור היומית הסתיימה בהצלחה. אם הריצה
 > נכשלת, היום אינו נספר — זו התנהגות בטוחה ומכוונת.
+>
+> מודל <bdi dir="ltr"><code>v2</code></bdi> מוצג כ־<bdi dir="ltr"><code>FALLBACK</code></bdi>
+> מפני שאין עדיין בסיס אימון שעומד בדרישות. כללי <bdi dir="ltr"><code>v1</code></bdi>
+> עדיין מחשבים את הטווחים והסיכון, אבל השדות <bdi dir="ltr"><code>Model Probability</code></bdi>
+> ו־<bdi dir="ltr"><code>Expected R</code></bdi> נשארים ריקים. כך המערכת אינה הופכת
+> ציון איכות להבטחת הצלחה.
 
 **למה זה קיים:** זה מחבר בין המידע ההנדסי לבין פעולה אחראית. אם אין מספיק
 נתונים או שהמידע ישן, המערכת אמורה לומר “להמתין” ולא להעמיד פנים שהיא יודעת.
@@ -501,7 +521,7 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 
 **מה לעשות על המסך:**
 
-1. בחר את הריצה המפורסמת שהמזהה שלה מתחיל ב־<bdi dir="ltr"><code>2bf99281</code></bdi>.
+1. בחר ריצה במצב <bdi dir="ltr"><code>Published</code></bdi> שמכסה כמה שבועות. העדף את הריצה הארוכה ביותר שמופיעה במסך; מזהה הריצה עשוי להשתנות.
 2. ודא שהמסך מציג את טווח הנתונים, מספר התצפיות ואת עקומת ההון (שינוי הערך
    המצטבר של האסטרטגיה לאורך הניסוי).
 3. הצבע על מדדי התוצאה ועל ההשוואה ל־<bdi dir="ltr"><code>SPY</code></bdi>
@@ -651,6 +671,26 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 <bdi dir="ltr"><code>80%</code></bdi> ביטחון מצליחים רק בחצי מהמקרים, הציון אינו
 מכויל היטב. זו אחת הסיבות לתקופת הצל: קודם אוספים מספיק תוצאות אמיתיות,
 ורק אחר כך מחליטים אם אפשר להציג את התרחישים כתמיכה פעילה בהחלטה.
+
+### <bdi dir="ltr"><code>Rule Score</code></bdi>, ‏<bdi dir="ltr"><code>Model Probability</code></bdi> ו־<bdi dir="ltr"><code>Data Confidence</code></bdi>
+
+<bdi dir="ltr"><code>Rule Score</code></bdi> הוא ציון שקוף שמסכם את הראיות הטכניות
+והפונדמנטליות לפי נוסחה קבועה. ‏<bdi dir="ltr"><code>Model Probability</code></bdi>
+היא הסתברות מכוילת להגיע ליעד הראשון לפני מחיר העצירה, והיא מוצגת רק כאשר
+קיים מודל מאומן שעבר בדיקות מחוץ למדגם. ‏<bdi dir="ltr"><code>Data Confidence</code></bdi>
+מתאר את איכות המקור, הכיסוי והטריות. הוא אינו סיכוי לרווח.
+
+### <bdi dir="ltr"><code>Walk-Forward Validation</code></bdi>
+
+בדיקה כרונולוגית שבה מאמנים רק על העבר ובודקים על תקופה מאוחרת יותר. לאחר
+כל חלון מזיזים את נקודת הזמן קדימה. כך מדמים שימוש אמיתי ונמנעים מערבוב
+אקראי שמאפשר למודל ללמוד מידע מהעתיד.
+
+### <bdi dir="ltr"><code>FALLBACK</code></bdi>
+
+מצב בטוח שבו שכבת המודל אינה זמינה או טרם הוכחה, ולכן המערכת חוזרת לכללי
+<bdi dir="ltr"><code>v1</code></bdi> השקופים. במקרה זה לא מוצגת הסתברות ישנה או
+מומצאת. זהו מנגנון הגנה מתוכנן, לא תקלה שמנסים להסתיר.
 
 ## המשפט לזכור אם אינך יודע תשובה
 

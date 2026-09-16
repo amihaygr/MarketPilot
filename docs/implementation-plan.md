@@ -335,17 +335,26 @@ Status: proposed. Implementation remains gated by ADR-006 and a local resource m
 Candidate scope remains an optional Elasticsearch and Kibana Compose profile for
 operational logs only, with bounded retention and no dependency from the core platform.
 
-## Final release presentation refresh
+## Final presentation release
 
-Status: implemented after the Phase 12 release candidate. This is a delivery
-refresh, not a new data path and not a replacement for the optional Phase 13 decision.
+Status: implemented and re-verified on 17 September 2026 after the Phase 15
+hybrid delivery. This is a delivery and evidence refresh; it does not bypass any
+Decision Intelligence promotion gate.
 
-- The canonical 15-minute scenario now covers Live, Historical Certification,
-  Backtesting, recovery evidence, decisions, limitations and learning.
+- The canonical 15-minute scenario covers the product problem, tool choices,
+  architecture, live and certified paths, recovery, Decision Intelligence,
+  backtesting, limitations and roadmap.
 - The Presenter Console retains exact 10, 15 and 20-minute variants and remains
   read-only.
-- Project Story evidence is dated and aligned with the 2026-09-05 release candidate.
-- Every live-interface segment has a safe documentary fallback.
+- Project Story and Opportunity Center evidence distinguish live API values from
+  dated verification facts.
+- The final deck uses one dark visual system, verified Hebrew RTL, isolated LTR
+  technical terms, current product screenshots and speaker notes.
+- The release architecture is documented in Markdown and in the generated
+  `docs/architecture/output/MarketPilot.pdf`.
+- Every live-interface segment has a documentary fallback, while the automated
+  preflight checks services, APIs, evidence, DAG availability and model safety
+  status before opening presentation pages.
 
 ## Required checkpoints
 

@@ -8,6 +8,7 @@ COPY web/opportunities.html /usr/share/nginx/html/opportunities.html
 COPY web/opportunities.css /usr/share/nginx/html/opportunities.css
 COPY web/opportunities-simulator.css /usr/share/nginx/html/opportunities-simulator.css
 COPY web/opportunities-analysis.css /usr/share/nginx/html/opportunities-analysis.css
+COPY web/opportunities-final.css /usr/share/nginx/html/opportunities-final.css
 COPY web/opportunities.js /usr/share/nginx/html/opportunities.js
 COPY web/backtesting.html /usr/share/nginx/html/backtesting.html
 COPY web/backtesting.css /usr/share/nginx/html/backtesting.css

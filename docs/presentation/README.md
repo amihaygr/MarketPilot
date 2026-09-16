@@ -1,32 +1,24 @@
 <div dir="rtl" align="right">
 
-# מרכז ההצגה של ⁦MarketPilot⁩
+# מרכז ההצגה של <bdi dir="ltr"><code>MarketPilot</code></bdi>
 
-כאן נמצאים כל החומרים הדרושים למצגת ולדמו החי, בסדר שבו מומלץ להשתמש בהם.
+זו תיקיית המסירה הסופית למצגת ולדמו. נשארו כאן רק החומרים שמשמשים בפועל ביום ההצגה.
 
-## מתחילים כאן
+## שני הקבצים שמתחילים מהם
 
-1. [הורדת המצגת הסופית](output/MarketPilot-Final-Presentation.pptx) — 12 שקופיות בתבנית כהה ואחידה, עם סיפור עסקי ברור, השוואת חלופות טכנולוגיות, כיווניות עברית מלאה והערות מציג לכל שקופית.
-2. [מדריך ההצגה והדמו המלא](demo-day-step-by-step-he.md) — מה מפעילים, מה אומרים בכל שקף, לאן עוברים בדמו ומה עושים במקרה תקלה.
+1. [המצגת הסופית](output/MarketPilot-Final-Presentation.pptx) — מצגת כהה ואחידה בת <bdi dir="ltr"><code>12</code></bdi> שקופיות, עם הערות מציג.
+2. [מדריך ההצגה והדמו](demo-day-step-by-step-he.md) — מה לומר, איזה מסך לפתוח, על מה להצביע ומה לעשות במקרה תקלה.
 
-## חומרי לימוד והכנה
+## חומרי הכנה
 
-- [חוברת המציג](presenter-handbook.md) — הסברים מעמיקים על המערכת.
-- [מילון המונחים](glossary.md) — הגדרות קצרות למושגים מרכזיים.
-- [מאגר שאלות ותשובות](qa-bank.md) — הכנה לשאלות הסוקר.
-- [תוכנית חזרה ותרחישי תקלה](rehearsal-and-failure-playbook.md) — מה לעשות אם רכיב אינו זמין.
-- [הסבר מרכז ההזדמנויות](phase14-opportunity-center-he.md) — פירוט מסך התמיכה בהחלטות.
+- [מילון המונחים](glossary.md) — הסבר פשוט למושגים הטכניים והפיננסיים.
+- [מאגר שאלות ותשובות](qa-bank.md) — תשובות קצרות לשאלות צפויות של הסוקר.
+- [תוכנית חזרה ותרחישי תקלה](rehearsal-and-failure-playbook.md) — רשימת בדיקה ליום ההצגה ומסלול חלופי לכל מסך.
+- [מסמך הארכיטקטורה המלא](../architecture/architecture.md) ו־[גרסת ה־<bdi dir="ltr"><code>PDF</code></bdi>](../architecture/output/MarketPilot.pdf).
 
-## ראיות חזותיות
+## הפעלת הסביבה והבדיקה המקדימה
 
-- [מסך המחקר הראשי](assets/dashboard.png)
-- [מרכז ההזדמנויות](assets/opportunity-center.png)
-- [מעבדת הבדיקה ההיסטורית](assets/backtesting.png)
-- [סיפור הפרויקט](assets/project-story.png)
-
-## הפעלת הדמו
-
-פתח <bdi dir="ltr"><code>PowerShell</code></bdi>, עבור לתיקיית הפרויקט והריץ:
+פתח <bdi dir="ltr"><code>PowerShell</code></bdi> והריץ כל שורה בנפרד:
 
 <div dir="ltr" align="left">
 
@@ -38,17 +30,31 @@ docker compose up -d
 
 </div>
 
-כאשר כל הבדיקות ירוקות, הצג את המצגת ועבור לדמו החי בשקופית 12.
+הבדיקה המקדימה מאמתת את תצורת <bdi dir="ltr"><code>Compose</code></bdi>, בריאות השירותים, דפי ההדגמה, ממשקי ה־<bdi dir="ltr"><code>API</code></bdi>, מצב <bdi dir="ltr"><code>Airflow</code></bdi> והראיות הדרושות להצגה. אם מופיעה שורה אדומה, אין להתחיל את הדמו לפני שמבינים אותה.
 
-## מסלול ההדגמה המומלץ ליום ההצגה
+## תמונת המצב הסופית
 
-- <bdi dir="ltr"><code>AAPL</code></bdi> — המקרה היציב: היסטוריה מאושרת, גרף עשיר ו־<bdi dir="ltr"><code>SMA 20</code></bdi> מלא.
-- <bdi dir="ltr"><code>AMZN</code></bdi> — המקרה החי: מניה שנוספה ל־<bdi dir="ltr"><code>Watchlist</code></bdi>, קיבלה תרחיש <bdi dir="ltr"><code>PROVISIONAL</code></bdi> ונכנסה למסלול השלמת היסטוריה.
-- כל 11 הסימולים — הוכחה שהמערכת מדרגת, ממתינה או מסרבת להסיק מסקנה כאשר חסרים נתונים.
+נכון ל־<bdi dir="ltr"><code>2026-09-17</code></bdi>:
 
-מונה <bdi dir="ltr"><code>Shadow Mode</code></bdi> אינו מספר שצריך להסתיר. נכון לבדיקת
-<bdi dir="ltr"><code>2026-09-16</code></bdi> הוא עומד על <bdi dir="ltr"><code>1/20</code></bdi>.
-הוא מתקדם רק לאחר יום מסחר אמיתי שריצת האישור היומית שלו הסתיימה בהצלחה;
-<bdi dir="ltr"><code>Backfill</code></bdi> ו־52 הימים ההיסטוריים המאושרים אינם מקדמים אותו.
+- <bdi dir="ltr"><code>11</code></bdi> נכסים במעקב.
+- <bdi dir="ltr"><code>72,850</code></bdi> נרות דקה ב־<bdi dir="ltr"><code>Gold</code></bdi>, מהם <bdi dir="ltr"><code>65,616 CERTIFIED</code></bdi>.
+- <bdi dir="ltr"><code>937</code></bdi> רשומות דיווחי <bdi dir="ltr"><code>SEC</code></bdi>.
+- <bdi dir="ltr"><code>53</code></bdi> ימי מסחר היסטוריים מאושרים ו־<bdi dir="ltr"><code>11</code></bdi> ריצות <bdi dir="ltr"><code>Backtest</code></bdi> מפורסמות.
+- שער <bdi dir="ltr"><code>v1 Shadow Mode</code></bdi> עומד על <bdi dir="ltr"><code>2/20</code></bdi>.
+- מודל <bdi dir="ltr"><code>v2</code></bdi> במצב <bdi dir="ltr"><code>FALLBACK</code></bdi>; כללי <bdi dir="ltr"><code>v1</code></bdi> פעילים ואין הסתברות מומצאת.
+
+אלה נתוני ראיה מתוארכים. המסכים וסקריפט ההכנה קוראים את המצב הנוכחי מהמערכת ולא מסתמכים על המספרים הכתובים כאן.
+
+## מסלול הדמו המומלץ
+
+1. <bdi dir="ltr"><code>Project Story</code></bdi> — הסיפור העסקי והארכיטקטורה.
+2. <bdi dir="ltr"><code>Dashboard</code></bdi> — <bdi dir="ltr"><code>AAPL</code></bdi>, טווח של שבעה ימים, מחיר ו־<bdi dir="ltr"><code>SMA 20</code></bdi>.
+3. <bdi dir="ltr"><code>Kafka UI</code></bdi> — הודעת <bdi dir="ltr"><code>MarketBarV1</code></bdi> אחת והמיקום שלה.
+4. <bdi dir="ltr"><code>MinIO Bronze</code></bdi> — אותו אירוע גולמי עם <bdi dir="ltr"><code>topic / partition / offset</code></bdi> בנתיב.
+5. <bdi dir="ltr"><code>Airflow</code></bdi> — ריצת התיקון הירוקה <bdi dir="ltr"><code>repair__2026-09-16__20260917</code></bdi>.
+6. <bdi dir="ltr"><code>Opportunity Center</code></bdi> — <bdi dir="ltr"><code>META BUY ZONE</code></bdi>, ‏<bdi dir="ltr"><code>AAPL WATCH BREAKOUT</code></bdi>, שלוש שכבות הראיה ומצב המודל.
+7. <bdi dir="ltr"><code>Backtesting Lab</code></bdi> — ריצה מפורסמת, מדדים, עקומת הון, מדד ייחוס ו־<bdi dir="ltr"><code>Lineage</code></bdi>.
+
+הדמו הוא לקריאה בלבד. אין להפעיל <bdi dir="ltr"><code>Backfill</code></bdi>, לשנות נתונים או להציג את קובץ <bdi dir="ltr"><code>.env</code></bdi> מול הקהל.
 
 </div>

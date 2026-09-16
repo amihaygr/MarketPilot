@@ -542,10 +542,10 @@ h1 {
 
 .evidence-section {
   position: relative;
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  padding-right: max(32px, calc((100vw - 1400px) / 2));
-  padding-left: max(32px, calc((100vw - 1400px) / 2));
+  width: auto;
+  margin-inline: 0;
+  padding-inline: clamp(28px, 4vw, 58px);
+  border-radius: 26px;
   background: #edf4fc;
   color: #08111f;
 }
