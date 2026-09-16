@@ -13,8 +13,7 @@ airflow
 api
 docs
 !docs
-!docs/presentation
-!docs/presentation/*.md
+!docs/**
 spark
 !spark
 !spark/jobs

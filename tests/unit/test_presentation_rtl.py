@@ -3,7 +3,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-PRESENTATION_DIR = Path(__file__).parents[2] / "docs" / "presentation"
+DOCS_DIR = Path(__file__).parents[2] / "docs"
+HEBREW = re.compile(r"[\u0590-\u05ff]")
 LATIN_WORD = re.compile(r"[A-Za-z]{2,}")
 NUMERIC_DIRECTIONAL_RUN = re.compile(
     r"[+\-−‎]?\d+(?:[.,:]\d+)*(?:[–—-]\d+(?:[.,:]\d+)*)+|"
@@ -11,12 +12,15 @@ NUMERIC_DIRECTIONAL_RUN = re.compile(
 )
 PROTECTED_FRAGMENT = re.compile(
     r"<bdi\b[^>]*>.*?</bdi>|<bdo\b[^>]*>.*?</bdo>|"
-    r"<a\b[^>]*>.*?</a>|<[^>]+>|https?://[^)\s>]+"
+    r"<a\b[^>]*>.*?</a>|<[^>]+>|https?://[^)\s>]+|"
+    r"\[[^\]]+\]\([^)]+\)"
 )
 
 
 def test_hebrew_presentation_markdown_has_complete_rtl_isolation() -> None:
-    files = sorted(PRESENTATION_DIR.glob("*.md"))
+    files = sorted(
+        path for path in DOCS_DIR.rglob("*.md") if HEBREW.search(path.read_text(encoding="utf-8"))
+    )
     assert files
 
     for path in files:
@@ -26,7 +30,14 @@ def test_hebrew_presentation_markdown_has_complete_rtl_isolation() -> None:
         assert text.count('<bdi dir="ltr">') == text.count("</bdi>")
         assert text.count('<bdo dir="ltr">') == text.count("</bdo>")
 
+        ltr_block_depth = 0
         for line_number, line in enumerate(text.splitlines(), start=1):
+            if re.search(r'<(?:div|ol)\b[^>]*dir="ltr"', line):
+                ltr_block_depth += 1
+            if ltr_block_depth:
+                if re.search(r"</(?:div|ol)>", line):
+                    ltr_block_depth -= 1
+                continue
             unisolated = PROTECTED_FRAGMENT.sub("", line)
             assert not LATIN_WORD.search(unisolated), (
                 f"{path.name}:{line_number} contains an unisolated LTR term: {unisolated}"

@@ -10,14 +10,16 @@
 
 פתח את כל הדפים הבאים מראש, כל אחד בלשונית נפרדת ובסדר הזה:
 
-1. **<bdi dir="ltr">Presenter Console</bdi>:** <http://localhost:3000/presenter.html>
-2. **<bdi dir="ltr">Project Story</bdi>:** <http://localhost:3000/showcase.html>
-3. **<bdi dir="ltr">Dashboard</bdi>:** <http://localhost:3000/>
-4. **<bdi dir="ltr">Kafka UI</bdi>:** <http://localhost:8085/>
-5. **<bdi dir="ltr">MinIO</bdi>:** <http://localhost:9001/>
-6. **<bdi dir="ltr">Airflow</bdi>:** <http://localhost:8080/>
-7. **<bdi dir="ltr">Opportunity Center</bdi>:** <http://localhost:3000/opportunities.html>
-8. **<bdi dir="ltr">Backtesting Lab</bdi>:** <http://localhost:3000/backtesting.html>
+<ol dir="ltr" align="left">
+  <li><strong>Presenter Console:</strong> <a href="http://localhost:3000/presenter.html">http://localhost:3000/presenter.html</a></li>
+  <li><strong>Project Story:</strong> <a href="http://localhost:3000/showcase.html">http://localhost:3000/showcase.html</a></li>
+  <li><strong>Dashboard:</strong> <a href="http://localhost:3000/">http://localhost:3000/</a></li>
+  <li><strong>Kafka UI:</strong> <a href="http://localhost:8085/">http://localhost:8085/</a></li>
+  <li><strong>MinIO:</strong> <a href="http://localhost:9001/">http://localhost:9001/</a></li>
+  <li><strong>Airflow:</strong> <a href="http://localhost:8080/">http://localhost:8080/</a></li>
+  <li><strong>Opportunity Center:</strong> <a href="http://localhost:3000/opportunities.html">http://localhost:3000/opportunities.html</a></li>
+  <li><strong>Backtesting Lab:</strong> <a href="http://localhost:3000/backtesting.html">http://localhost:3000/backtesting.html</a></li>
+</ol>
 
 בצע לפני שהקהל נכנס:
 
@@ -101,12 +103,15 @@
 
 ### מה להציג
 
-באזור הארכיטקטורה לחץ לפי הסדר על:
+באזור הארכיטקטורה לחץ לפי הסדר הבא. הרשימה מוצגת משמאל לימין משום שכל
+שמות הכפתורים באנגלית:
 
-1. **<bdi dir="ltr">Live path</bdi>**
-2. **<bdi dir="ltr">Certified path</bdi>**
-3. **<bdi dir="ltr">Historical path</bdi>**
-4. **<bdi dir="ltr">Raw + archive</bdi>**
+<ol dir="ltr" align="left">
+  <li><strong>Live path</strong></li>
+  <li><strong>Certified path</strong></li>
+  <li><strong>Historical path</strong></li>
+  <li><strong>Raw + archive</strong></li>
+</ol>
 
 ### מה לומר
 
@@ -124,8 +129,11 @@
 
 ### המשפט החשוב ביותר כאן
 
-> <bdi dir="ltr">Docker Compose</bdi> מנהל שירותים שעובדים כל הזמן. <bdi dir="ltr">Airflow</bdi> מנהל רק עבודות שיש
-> להן התחלה וסיום. <bdi dir="ltr">Spark</bdi> מבצע את החישוב, ו־<bdi dir="ltr">Airflow</bdi> מנהל את הסדר והתזמון.
+> לכל רכיב יש אחריות אחת וברורה:
+>
+> - <bdi dir="ltr"><code>Docker Compose</code></bdi> — מנהל את השירותים שעובדים כל הזמן.
+> - <bdi dir="ltr"><code>Airflow</code></bdi> — מתזמן ומנהל עבודות שיש להן התחלה וסיום.
+> - <bdi dir="ltr"><code>Spark</code></bdi> — מבצע את החישוב עצמו.
 
 ### משפט מעבר
 
