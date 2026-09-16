@@ -20,7 +20,7 @@ const deliveryPath = path.join(
   "docs",
   "presentation",
   "output",
-  "MarketPilot-Final-Presentation-Dark-RTL-v2.pptx",
+  "MarketPilot-Final-Presentation-Dark-RTL-v3.pptx",
 );
 const receiptPath = path.join(buildDir, "MarketPilot-Final-Presentation-Dark-RTL.validation.json");
 await fs.mkdir(path.dirname(finalPath), { recursive: true });
