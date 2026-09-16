@@ -9,7 +9,7 @@ Verification date: 2026-08-28
 - Interactive views for the live, certified, and raw/archive data paths.
 - An interactive phase journey covering Phases 0 through 10.
 - A demo launchpad for the local engineering interfaces.
-- A Hebrew end-to-end presentation route in `docs/demo-guide.md`.
+- A Hebrew end-to-end presentation route in `docs/presentation/demo-day-step-by-step-he.md`.
 - A read-only Presenter Console at `http://localhost:3000/presenter.html` with
   synchronized 10, 15, and 20-minute routes, timer, speaker cues, transitions,
   screen links, and safe fallbacks.

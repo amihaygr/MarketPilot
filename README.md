@@ -23,7 +23,7 @@ With the local stack running, open:
 - **Opportunity Center:** <http://localhost:3000/opportunities.html> — explainable Phase 14
   swing scenarios, portfolio risk sizing and Shadow Mode evidence
   strategy runs, assumptions, benchmark comparison and daily equity curves.
-- **Final Demo Guide:** [`docs/demo-guide.md`](docs/demo-guide.md) — the canonical
+- **Final Demo Guide:** [`docs/presentation/demo-day-step-by-step-he.md`](docs/presentation/demo-day-step-by-step-he.md) — the canonical
   15-minute presentation path through the Phase 12 release candidate, with 10 and
   20-minute variants.
 - **Simple Hebrew demo companion:**
@@ -61,7 +61,7 @@ With the local stack running, open:
 1. Extract this repository and open its root folder in VS Code.
 2. Run `git init` and make an initial checkpoint commit.
 3. Copy `.env.example` to `.env` and replace placeholders locally.
-4. Open `docs/prompts/codex-first-run.md` and give Prompt 1 to Codex.
+4. Read `docs/project-context.md` and `docs/implementation-plan.md` before changing the platform.
 5. Require Codex to read `AGENTS.md` and accepted ADRs before editing.
 
 ## Local quality gate
@@ -305,7 +305,7 @@ data path. The Nginx Web App now serves a separate Project Story that loads only
 the existing read-only freshness API for its live proof. Static verification
 evidence is explicitly dated, and the Dashboard remains focused on exploration.
 
-Use [`docs/demo-guide.md`](docs/demo-guide.md) and the local Presenter Console to
+Use [`docs/presentation/demo-day-step-by-step-he.md`](docs/presentation/demo-day-step-by-step-he.md) and the local Presenter Console to
 present the current system through the Phase 12 release candidate: one live event,
 the certified historical path, and the reproducible Backtesting result. The
 15-minute route is the canonical timing source; the guide includes 10 and 20-minute

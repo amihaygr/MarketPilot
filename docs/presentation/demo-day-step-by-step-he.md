@@ -47,7 +47,7 @@ docker compose up -d
 
 ## הכנה לפני כניסת הקהל
 
-1. פתח את המצגת: [MarketPilot-Final-Presentation-Dark-RTL-v3.pptx](output/MarketPilot-Final-Presentation-Dark-RTL-v3.pptx).
+1. פתח את המצגת: [MarketPilot-Final-Presentation.pptx](output/MarketPilot-Final-Presentation.pptx).
 2. התחבר מראש ל־<bdi dir="ltr"><code>MinIO</code></bdi> ול־<bdi dir="ltr"><code>Airflow</code></bdi>.
 3. סגור את קובץ <bdi dir="ltr"><code>.env</code></bdi> וכל חלון שעלול לחשוף סיסמה או מפתח.
 4. במסך הראשי בחר <bdi dir="ltr"><code>AAPL</code></bdi> וטווח <bdi dir="ltr"><code>7D</code></bdi>.

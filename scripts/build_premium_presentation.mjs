@@ -666,7 +666,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
     slide,
     "08:55–09:10",
     "עצור לשנייה ועבור לדמו במשפט נקי: עד עכשיו הסברתי את ההיגיון. עכשיו אראה את אותה שרשרת במערכת עצמה. נעבור מהמסך העסקי לאירוע ב-Kafka, לראיית המקור ב-MinIO, לריצה המאושרת ב-Airflow, ולבסוף לתרחיש ההחלטה ולבדיקה ההיסטורית. פתח את סקריפט הדמו והתחל את הטיימר.",
-    "docs/presentation/live-demo-script-he.md; scripts/demo-preflight.ps1",
+    "docs/presentation/demo-day-step-by-step-he.md; scripts/demo-preflight.ps1",
   );
 }
 

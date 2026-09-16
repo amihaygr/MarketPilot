@@ -32,7 +32,7 @@ and 20-minute routes, a local timer, Hebrew speaker cues, transitions, screen li
 and safe fallbacks. The final route covers Live, certified historical acquisition,
 the Phase 12 Backtesting evidence, engineering maturity, and honest limitations. It
 makes no API or data-plane request and cannot mutate project state. The canonical
-timing and expanded learning materials live under `docs/demo-guide.md` and
+timing and expanded learning materials live under `docs/presentation/demo-day-step-by-step-he.md` and
 `docs/presentation/`.
 
 The Nginx response includes a restrictive Content Security Policy and other basic

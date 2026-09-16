@@ -13,16 +13,16 @@ const candidatePath = path.join(buildDir, "MarketPilot-premium-candidate.pptx");
 const finalPath = path.join(
   buildDir,
   "final",
-  "MarketPilot-Final-Presentation-Dark-RTL.pptx",
+  "MarketPilot-Final-Presentation.pptx",
 );
 const deliveryPath = path.join(
   workspaceDir,
   "docs",
   "presentation",
   "output",
-  "MarketPilot-Final-Presentation-Dark-RTL-v3.pptx",
+  "MarketPilot-Final-Presentation.pptx",
 );
-const receiptPath = path.join(buildDir, "MarketPilot-Final-Presentation-Dark-RTL.validation.json");
+const receiptPath = path.join(buildDir, "MarketPilot-Final-Presentation.validation.json");
 await fs.mkdir(path.dirname(finalPath), { recursive: true });
 await fs.mkdir(path.dirname(deliveryPath), { recursive: true });
 await fs.rm(finalPath, { force: true });
