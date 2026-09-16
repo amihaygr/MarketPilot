@@ -41,6 +41,7 @@ def prepare_historical_backfill_plan(
     for bronze_args in mapped["bronze"]:
         bronze_args.extend(["--source-name", "alpaca"])
     ingestion = []
+    analytics = []
     for bronze_args in mapped["bronze"]:
         ingestion.append(
             {
@@ -48,6 +49,14 @@ def prepare_historical_backfill_plan(
                 "run_id": bronze_args[3],
                 "symbols": normalized,
             }
+        )
+        analytics.append(
+            [
+                "--logical-date",
+                bronze_args[1],
+                "--run-id",
+                bronze_args[3],
+            ]
         )
     backtest = prepare_backtest_arguments(
         start_date_value=start_date_value,
@@ -62,4 +71,4 @@ def prepare_historical_backfill_plan(
         configured_symbols_value=",".join(configured_symbols),
         airflow_run_id=airflow_run_id,
     )
-    return {**mapped, "ingestion": ingestion, "backtest": backtest}
+    return {**mapped, "ingestion": ingestion, "analytics": analytics, "backtest": backtest}

@@ -606,12 +606,21 @@ button:disabled {
 
 .series-toggle.sma-toggle > span {
   height: 0;
-  border-top: 2px dashed var(--blue);
+  border-top: 2px dashed var(--amber);
   background: transparent;
 }
 
 .chart-caption strong {
   font-size: 22px;
+}
+
+.chart-coverage {
+  min-height: 22px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 11px;
+  text-align: right;
 }
 
 #price-chart {
@@ -687,10 +696,10 @@ button:disabled {
 }
 
 .chart-sma {
-  stroke: var(--blue);
-  stroke-dasharray: 8 7;
-  stroke-width: 2;
-  filter: none;
+  stroke: var(--amber);
+  stroke-dasharray: 6 5;
+  stroke-width: 2.5;
+  filter: drop-shadow(0 2px 5px rgb(244 187 98 / 18%));
 }
 
 .analytics-panel {

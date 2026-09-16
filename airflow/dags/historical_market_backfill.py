@@ -114,6 +114,7 @@ with DAG(
     bronze_args = spark_arguments.override(task_id="bronze_arguments")(plan, "bronze")
     quality_args = spark_arguments.override(task_id="quality_arguments")(plan, "quality")
     gold_args = spark_arguments.override(task_id="gold_arguments")(plan, "gold")
+    analytics_args = spark_arguments.override(task_id="analytics_arguments")(plan, "analytics")
     final_backtest_args = backtest_arguments(plan)
 
     acquire = fetch_archive_historical_bars.expand_kwargs(ingestion_args)
@@ -144,6 +145,15 @@ with DAG(
         max_active_tis_per_dag=1,
         verbose=False,
     ).expand(application_args=gold_args)
+    calculate_market_analytics = SparkSubmitOperator.partial(
+        task_id="calculate_market_analytics",
+        application="/opt/marketpilot/spark/jobs/calculate_market_analytics.py",
+        conn_id="spark_standalone",
+        conf=SPARK_CONF,
+        pool="spark_batch_pool",
+        max_active_tis_per_dag=1,
+        verbose=False,
+    ).expand(application_args=analytics_args)
     run_backtest = SparkSubmitOperator(
         task_id="run_historical_backtest",
         application="/opt/marketpilot/spark/jobs/run_historical_backtest.py",
@@ -154,4 +164,11 @@ with DAG(
         verbose=False,
     )
 
-    acquire >> bronze_to_silver >> silver_quality_gate >> silver_to_gold >> run_backtest
+    (
+        acquire
+        >> bronze_to_silver
+        >> silver_quality_gate
+        >> silver_to_gold
+        >> calculate_market_analytics
+        >> run_backtest
+    )

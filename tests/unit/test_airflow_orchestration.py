@@ -140,6 +140,12 @@ def test_historical_plan_is_bounded_coverage_aware_and_retry_stable() -> None:
     assert "--maximum-ingestion-lag-seconds" in plan["quality"][0]
     assert plan["ingestion"][0]["run_id"] == plan["bronze"][0][3]
     assert plan["bronze"][0][-2:] == ["--source-name", "alpaca"]
+    assert plan["analytics"][0] == [
+        "--logical-date",
+        "2026-08-21",
+        "--run-id",
+        plan["bronze"][0][3],
+    ]
 
     values["benchmark_symbol"] = "MSFT"
     with pytest.raises(ValueError, match="included in symbols"):
@@ -155,4 +161,6 @@ def test_historical_dag_is_manual_serial_and_uses_bronze_barrier() -> None:
     assert "max_active_runs=1" in source
     assert 'pool="alpaca_api_pool"' in source
     assert "backfill_historical_session_from_env" in source
-    assert "bronze_to_silver >> silver_quality_gate >> silver_to_gold >> run_backtest" in source
+    assert 'task_id="calculate_market_analytics"' in source
+    assert ">> calculate_market_analytics" in source
+    assert ">> run_backtest" in source

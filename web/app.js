@@ -53,6 +53,7 @@ function captureElements() {
     "chart-symbol",
     "chart-last-price",
     "chart-range",
+    "chart-coverage",
     "price-line",
     "price-area",
     "sma-line",
@@ -372,6 +373,7 @@ function renderChart(bars, indicators) {
     elements["price-area"].setAttribute("d", "");
     elements["sma-line"].setAttribute("d", "");
     elements["chart-last-price"].textContent = "—";
+    elements["chart-coverage"].textContent = "No observations in the selected range";
     elements["chart-empty"].hidden = false;
     state.chartModel = null;
     hideChartTooltip();
@@ -388,15 +390,24 @@ function renderChart(bars, indicators) {
   const smaValues = ordered
     .map((bar) => smaByTime.get(new Date(bar.event_time_utc).getTime()))
     .filter((value) => value !== undefined);
+  const sessions = new Set(ordered.map((bar) => bar.event_time_utc.slice(0, 10))).size;
+  const smaCoverage = Math.round((smaValues.length / ordered.length) * 100);
+  elements["chart-coverage"].textContent = smaValues.length
+    ? `${number(ordered.length)} bars · ${sessions} market sessions · SMA 20 coverage ${smaCoverage}%`
+    : `${number(ordered.length)} bars · ${sessions} market sessions · SMA 20 is not published for this range`;
   const visibleValues = [
     ...(state.series.price ? closeValues : []),
     ...(state.series.sma ? smaValues : []),
   ];
   const minimum = Math.min(...visibleValues);
   const maximum = Math.max(...visibleValues);
-  const spread = maximum - minimum || 1;
+  const rawSpread = maximum - minimum || Math.max(Math.abs(maximum) * 0.01, 1);
+  const padding = rawSpread * 0.08;
+  const chartMinimum = minimum - padding;
+  const chartMaximum = maximum + padding;
+  const spread = chartMaximum - chartMinimum;
   const x = (index) => 20 + (index / Math.max(closeValues.length - 1, 1)) * 860;
-  const y = (value) => 215 - ((value - minimum) / spread) * 175;
+  const y = (value) => 215 - ((value - chartMinimum) / spread) * 175;
   const points = closeValues.map((value, index) => ({
     x: x(index),
     y: y(
@@ -671,7 +682,9 @@ function showChartPoint(index) {
   elements["chart-focus-dot"].setAttribute("cy", point.y.toFixed(2));
   elements["tooltip-time"].textContent = formatTimestamp(point.bar.event_time_utc);
   elements["tooltip-price"].textContent = `$${price(point.value)}`;
-  elements["tooltip-sma"].textContent = point.sma ? `SMA $${price(point.sma)}` : "SMA unavailable";
+  elements["tooltip-sma"].textContent = point.sma
+    ? `SMA 20 $${price(point.sma)}`
+    : "SMA 20 unavailable";
   elements["tooltip-volume"].textContent = `Volume ${number(point.bar.volume)}`;
   const chartWidth = elements["price-chart"].clientWidth;
   const tooltipX = Math.min(chartWidth - 82, Math.max(82, (point.x / 900) * chartWidth));
