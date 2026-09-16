@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { Presentation, PresentationFile } from "@oai/artifact-tool";
+import JSZip from "jszip";
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const workspaceDir = path.resolve(scriptDir, "..");
@@ -13,11 +14,8 @@ await fs.mkdir(buildDir, { recursive: true });
 
 const W = 1280;
 const H = 720;
-const FONT = "Segoe UI";
+const FONT = "Arial";
 const MONO = "Cascadia Mono";
-const LRI = "\u2066";
-const PDI = "\u2069";
-const RLM = "\u200F";
 
 const C = {
   ink: "#091827",
@@ -28,6 +26,7 @@ const C = {
   tealDark: "#117C70",
   blue: "#5B91FF",
   amber: "#F4B94F",
+  amberDark: "#9A6200",
   coral: "#EF7484",
   mutedDark: "#9AB1C5",
   muted: "#5B6B78",
@@ -39,8 +38,16 @@ const presentation = Presentation.create({
   slideSize: { width: W, height: H },
 });
 
-const iso = (value) => `${LRI}${value}${PDI}`;
-const rtl = (value) => `${RLM}${value}`;
+const iso = (value) => value;
+const rtl = (value) => value;
+const containsHebrew = (value) => /[\u0590-\u05FF]/.test(value);
+const stripBidiControls = (value) =>
+  String(value).replace(/[\u200E\u200F\u202A-\u202E\u2066-\u2069]/g, "");
+
+function base(slide) {
+  slide.background.fill = C.paper;
+  rect(slide, 0, 0, 18, H, C.teal);
+}
 
 function rect(slide, x, y, w, h, fill, radius = 0, line = "none") {
   return slide.shapes.add({
@@ -62,19 +69,21 @@ function rule(slide, x, y, w, color, weight = 1) {
 }
 
 function text(slide, value, x, y, w, h, options = {}) {
+  const cleanValue = stripBidiControls(value);
+  const hasHebrew = containsHebrew(cleanValue);
   const shape = slide.shapes.add({
     geometry: "textbox",
     position: { left: x, top: y, width: w, height: h },
     fill: "none",
     line: { fill: "none", width: 0 },
   });
-  shape.text = value;
+  shape.text = cleanValue;
   shape.text.style = {
     typeface: options.font ?? FONT,
     fontSize: options.size ?? 24,
     bold: options.bold ?? false,
     color: options.color ?? C.ink,
-    alignment: options.align ?? "right",
+    alignment: hasHebrew ? "right" : (options.align ?? "left"),
     verticalAlignment: options.valign ?? "top",
     autoFit: options.autoFit ?? "shrinkText",
     wrap: "square",
@@ -95,27 +104,27 @@ function label(slide, value, x, y, w, color = C.teal, align = "left") {
   });
 }
 
-function slideNumber(slide, number, dark = false) {
+function slideNumber(slide, number) {
   text(slide, String(number).padStart(2, "0"), 52, 676, 36, 18, {
     font: MONO,
     size: 11,
     bold: true,
-    color: dark ? C.mutedDark : C.muted,
+    color: C.muted,
     align: "left",
   });
-  rule(slide, 96, 686, 1128, dark ? C.lineDark : C.lineLight, 1);
+  rule(slide, 96, 686, 1128, C.lineLight, 1);
 }
 
-function title(slide, titleText, kicker, number, dark = false) {
-  label(slide, kicker, 64, 38, 420, dark ? C.teal : C.tealDark, "left");
-  text(slide, rtl(titleText), 610, 38, 606, 66, {
-    size: 40,
+function title(slide, titleText, kicker, number) {
+  label(slide, kicker, 64, 38, 420, C.tealDark, "left");
+  text(slide, rtl(titleText), 440, 56, 776, 58, {
+    size: 32,
     bold: true,
-    color: dark ? C.white : C.ink,
+    color: C.ink,
     align: "right",
-    valign: "middle",
+    valign: "top",
   });
-  slideNumber(slide, number, dark);
+  slideNumber(slide, number);
 }
 
 function notes(slide, duration, body, source) {
@@ -180,11 +189,10 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 // 1 — Cover
 {
   const slide = presentation.slides.add();
-  slide.background.fill = C.paper;
-  rect(slide, 0, 0, 18, H, C.teal);
+  base(slide);
   label(slide, "MARKETPILOT · FINAL PROJECT", 68, 58, 430, C.tealDark, "left");
-  text(slide, rtl("מערכת נתונים שמחברת בין\nשוק חי, אמון והחלטה"), 540, 148, 670, 218, {
-    size: 66,
+  text(slide, rtl("מערכת נתונים\nשמחברת בין שוק חי,\nאמון והחלטה"), 540, 132, 670, 246, {
+    size: 58,
     bold: true,
     color: C.ink,
     align: "right",
@@ -228,12 +236,12 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 // 2 — Problem
 {
   const slide = presentation.slides.add();
-  slide.background.fill = C.ink;
-  label(slide, "THE PROBLEM", 64, 42, 260, C.teal, "left");
-  text(slide, rtl("סוחר רואה מספר.\nאבל האם אפשר לסמוך עליו?"), 420, 90, 790, 154, {
-    size: 58,
+  base(slide);
+  label(slide, "THE PROBLEM", 64, 42, 260, C.tealDark, "left");
+  text(slide, rtl("סוחר רואה מספר.\nאבל האם אפשר לסמוך עליו?"), 420, 122, 790, 132, {
+    size: 44,
     bold: true,
-    color: C.white,
+    color: C.ink,
     align: "right",
     lineSpacing: 0.92,
   });
@@ -244,7 +252,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
     270,
     680,
     74,
-    { size: 24, color: C.mutedDark, align: "right" },
+    { size: 24, color: C.muted, align: "right" },
   );
 
   const questions = [
@@ -255,12 +263,12 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   ];
   questions.forEach(([n, q, a], index) => {
     const x = 964 - index * 302;
-    if (index < questions.length - 1) rect(slide, x - 18, 414, 1, 152, C.lineDark);
-    text(slide, n, x, 398, 34, 22, { font: MONO, size: 12, color: C.teal, align: "left" });
-    text(slide, rtl(q), x, 436, 252, 48, { size: 25, bold: true, color: C.white, align: "right" });
-    text(slide, rtl(a), x, 505, 252, 40, { size: 20, color: C.mutedDark, align: "right" });
+    if (index < questions.length - 1) rect(slide, x - 18, 414, 1, 152, C.lineLight);
+    text(slide, n, x, 398, 34, 22, { font: MONO, size: 12, color: C.tealDark, align: "left" });
+    text(slide, rtl(q), x, 436, 252, 48, { size: 25, bold: true, color: C.ink, align: "right" });
+    text(slide, rtl(a), x, 505, 252, 40, { size: 20, color: C.muted, align: "right" });
   });
-  slideNumber(slide, 2, true);
+  slideNumber(slide, 2);
   notes(
     slide,
     "00:30–01:15",
@@ -272,7 +280,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 // 3 — Product value
 {
   const slide = presentation.slides.add();
-  slide.background.fill = C.paper;
+  base(slide);
   title(slide, "מה המערכת נותנת לסוחר", "PRODUCT VALUE", 3, false);
   const stages = [
     ["04", "מסבירה", "תרחיש החלטה\nעם סיכון והקשר", C.amber],
@@ -315,11 +323,11 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 // 4 — Architecture
 {
   const slide = presentation.slides.add();
-  slide.background.fill = C.ink;
-  title(slide, "הארכיטקטורה מקצה לקצה", "SYSTEM ARCHITECTURE", 4, true);
+  base(slide);
+  title(slide, "ארכיטקטורת המערכת", "SYSTEM ARCHITECTURE", 4);
   text(slide, rtl("הזרימה מוצגת מימין לשמאל, מן המקור אל המשתמש"), 744, 106, 472, 30, {
     size: 21,
-    color: C.mutedDark,
+    color: C.muted,
     align: "right",
   });
 
@@ -353,8 +361,8 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
     tail: { type: "triangle", width: "sm", length: "sm" },
   });
   text(slide, "Airflow", 222, 448, 150, 30, { font: MONO, size: 20, bold: true, color: C.amber, align: "center" });
-  text(slide, rtl("מתזמן עבודות תחומות בלבד"), 160, 486, 272, 28, { size: 18, color: C.mutedDark, align: "center" });
-  text(slide, rtl(`הדפדפן מדבר רק עם ה־${iso("API")}`), 62, 352, 260, 30, { size: 19, color: C.teal, bold: true, align: "left" });
+  text(slide, rtl("מתזמן עבודות תחומות בלבד"), 160, 486, 272, 28, { size: 18, color: C.muted, align: "right" });
+  text(slide, rtl(`הדפדפן מדבר רק עם ה־${iso("API")}`), 62, 352, 260, 30, { size: 19, color: C.tealDark, bold: true, align: "right" });
   notes(
     slide,
     "02:00–03:15",
@@ -366,7 +374,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 // 5 — Live vs certified
 {
   const slide = presentation.slides.add();
-  slide.background.fill = C.paper;
+  base(slide);
   title(slide, "שני מסלולים, שתי הבטחות", "LIVE VS CERTIFIED", 5, false);
   text(slide, rtl("מהיר עכשיו"), 940, 142, 274, 42, { size: 30, bold: true, color: C.tealDark, align: "right" });
   text(slide, rtl("המסלול החי מספק תמונת מצב בזמן שהשוק פעיל"), 660, 186, 554, 32, { size: 22, color: C.muted, align: "right" });
@@ -393,7 +401,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 // 6 — Technology choices
 {
   const slide = presentation.slides.add();
-  slide.background.fill = "#FFFFFF";
+  base(slide);
   title(slide, "בחירות טכנולוגיות עם סיבה", "TECHNOLOGY CHOICES", 6, false);
   const rows = [
     ["Kafka", `שומר סדר לפי ${iso("Offset")} ומאפשר ${iso("Replay")} בין צרכנים נפרדים`, C.tealDark],
@@ -423,7 +431,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 // 7 — Dashboard evidence
 {
   const slide = presentation.slides.add();
-  slide.background.fill = C.paper;
+  base(slide);
   title(slide, "המוצר מתחיל בנתון שאפשר לבדוק", "PRODUCT EVIDENCE", 7, false);
   await addImage(slide, "dashboard.png", 58, 150, 825, 474, "MarketPilot Data Command Center screenshot");
   text(slide, rtl("מסך המחקר הראשי"), 918, 160, 298, 48, { size: 30, bold: true, color: C.ink, align: "right" });
@@ -454,10 +462,10 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 // 8 — Opportunity Center
 {
   const slide = presentation.slides.add();
-  slide.background.fill = C.ink;
-  title(slide, "מתוצאה טכנית לתרחיש החלטה", "DECISION INTELLIGENCE", 8, true);
+  base(slide);
+  title(slide, "מתוצאה טכנית לתרחיש החלטה", "DECISION INTELLIGENCE", 8);
   await addImage(slide, "opportunity-center.png", 48, 142, 830, 492, "MarketPilot Opportunity Center screenshot");
-  text(slide, rtl("לא מחיר קסם"), 920, 154, 290, 38, { size: 28, bold: true, color: C.white, align: "right" });
+  text(slide, rtl("לא מחיר קסם"), 920, 154, 290, 38, { size: 28, bold: true, color: C.ink, align: "right" });
   const items = [
     ["BUY ZONE", "טווח כניסה"],
     ["STOP", "נקודת ביטול"],
@@ -467,11 +475,11 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   items.forEach(([en, he], index) => {
     const y = 222 + index * 72;
     text(slide, en, 920, y, 282, 24, { font: MONO, size: 14, bold: true, color: index === 1 ? C.coral : C.teal, align: "left" });
-    text(slide, rtl(he), 920, y + 28, 282, 30, { size: 22, color: C.white, align: "right" });
+    text(slide, rtl(he), 920, y + 28, 282, 30, { size: 22, color: C.ink, align: "right" });
   });
-  rect(slide, 920, 520, 290, 2, C.lineDark);
+  rect(slide, 920, 520, 290, 2, C.lineLight);
   text(slide, "1 / 20", 920, 546, 100, 34, { font: MONO, size: 24, bold: true, color: C.amber, align: "left" });
-  text(slide, rtl(`ימי ${iso("Shadow Mode")} חיים`), 1028, 550, 182, 28, { size: 18, color: C.mutedDark, align: "right" });
+  text(slide, rtl(`ימי ${iso("Shadow Mode")} חיים`), 1028, 550, 182, 28, { size: 18, color: C.muted, align: "right" });
   text(slide, rtl("אין פקודה, אין הבטחת תשואה"), 920, 590, 290, 26, { size: 18, color: C.coral, align: "right" });
   notes(
     slide,
@@ -484,7 +492,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 // 9 — Backtesting evidence
 {
   const slide = presentation.slides.add();
-  slide.background.fill = "#FFFFFF";
+  base(slide);
   title(slide, "היסטוריה שנבדקת בלי לייפות", "HISTORICAL VALIDATION", 9, false);
   await addImage(slide, "backtesting.png", 52, 134, 840, 486, "MarketPilot Backtesting Lab screenshot");
   text(slide, rtl("ריצה מאושרת"), 930, 148, 280, 36, { size: 26, bold: true, color: C.ink, align: "right" });
@@ -515,24 +523,24 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 // 10 — Engineering challenges
 {
   const slide = presentation.slides.add();
-  slide.background.fill = C.ink;
-  title(slide, "האתגרים שהפכו להחלטות הנדסיות", "ENGINEERING CHALLENGES", 10, true);
-  text(slide, rtl("המתח"), 920, 132, 290, 26, { size: 16, bold: true, color: C.mutedDark, align: "right" });
-  text(slide, rtl("ההחלטה"), 110, 132, 680, 26, { size: 16, bold: true, color: C.mutedDark, align: "right" });
-  rule(slide, 64, 170, 1152, C.lineDark, 1);
+  base(slide);
+  title(slide, "החלטות הנדסיות מרכזיות", "ENGINEERING CHALLENGES", 10);
+  text(slide, rtl("המתח"), 920, 132, 290, 26, { size: 16, bold: true, color: C.muted, align: "right" });
+  text(slide, rtl("ההחלטה"), 110, 132, 680, 26, { size: 16, bold: true, color: C.muted, align: "right" });
+  rule(slide, 64, 170, 1152, C.lineLight, 1);
   const rows = [
     ["מהירות מול אמינות", "נתון חי מוצג מיד. יום סגור נבנה מחדש ונבדק.", "PROVISIONAL / CERTIFIED", C.teal],
     ["כשל וניסיון חוזר", "הפעלה חוזרת אינה יוצרת רשומה עסקית כפולה.", "CHECKPOINT · BUSINESS KEY · UPSERT", C.blue],
-    ["היסטוריה בלי קיצור דרך", "נתוני עבר עוברים שמירה גולמית ואיכות לפני פרסום.", "HISTORICAL TOPIC · BRONZE BARRIER", C.amber],
+    ["היסטוריה בלי קיצור דרך", "נתוני עבר עוברים שמירה גולמית ואיכות לפני פרסום.", "HISTORICAL TOPIC · BRONZE BARRIER", C.amberDark],
     ["מוצר בלי חשיפת תשתית", "הדפדפן מקבל מידע רק דרך ממשק מוגבל לקריאה.", "READ-ONLY BACKEND API", C.coral],
   ];
   rows.forEach(([problem, decision, mechanism, accent], index) => {
     const y = 194 + index * 105;
-    text(slide, rtl(problem), 872, y, 338, 48, { size: 25, bold: true, color: C.white, align: "right" });
+    text(slide, rtl(problem), 872, y, 338, 48, { size: 25, bold: true, color: C.ink, align: "right" });
     rect(slide, 828, y + 2, 4, 58, accent);
-    text(slide, rtl(decision), 110, y - 2, 675, 36, { size: 22, color: C.white, align: "right" });
+    text(slide, rtl(decision), 110, y - 2, 675, 36, { size: 22, color: C.ink, align: "right" });
     text(slide, mechanism, 110, y + 40, 675, 24, { font: MONO, size: 14, bold: true, color: accent, align: "left" });
-    if (index < rows.length - 1) rule(slide, 64, y + 82, 1152, C.lineDark, 1);
+    if (index < rows.length - 1) rule(slide, 64, y + 82, 1152, C.lineLight, 1);
   });
   notes(
     slide,
@@ -545,7 +553,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 // 11 — Roadmap
 {
   const slide = presentation.slides.add();
-  slide.background.fill = C.paper;
+  base(slide);
   title(slide, "מה עובד היום ומה מגיע בהמשך", "ROADMAP", 11, false);
   text(slide, rtl("המטרה אינה להוסיף עוד טכנולוגיה. המטרה היא להרחיב אמון, כיסוי ותפעול."), 505, 124, 710, 42, {
     size: 22,
@@ -582,17 +590,17 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 // 12 — Demo transition
 {
   const slide = presentation.slides.add();
-  slide.background.fill = C.ink;
-  label(slide, "LIVE DEMO · 06:00", 64, 44, 280, C.teal, "left");
-  text(slide, rtl("עכשיו מוכיחים את זה בלייב"), 476, 82, 738, 80, {
-    size: 52,
+  base(slide);
+  label(slide, "LIVE DEMO · 06:00", 64, 44, 280, C.tealDark, "left");
+  text(slide, rtl("עכשיו מוכיחים את זה בלייב"), 520, 98, 694, 62, {
+    size: 42,
     bold: true,
-    color: C.white,
+    color: C.ink,
     align: "right",
   });
   text(slide, rtl("מהאירוע הגולמי ועד תרחיש החלטה שאפשר להסביר ולשחזר"), 590, 174, 624, 50, {
     size: 23,
-    color: C.mutedDark,
+    color: C.muted,
     align: "right",
   });
 
@@ -612,19 +620,19 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
       width: 1.5,
     });
     text(slide, n, x, 346, 44, 18, { font: MONO, size: 12, bold: true, color: index === 5 ? C.ink : C.teal, align: "center" });
-    text(slide, name, x - 52, 404, 148, 34, { font: MONO, size: 17, bold: true, color: C.white, align: "center" });
+    text(slide, name, x - 52, 404, 148, 34, { font: MONO, size: 17, bold: true, color: C.ink, align: "center" });
     return marker;
   });
-  for (let i = nodes.length - 1; i > 0; i--) connectLeft(slide, nodes[i], nodes[i - 1], C.teal);
-  text(slide, rtl("החלטה ובדיקה"), 64, 492, 260, 34, { size: 22, bold: true, color: C.teal, align: "left" });
-  text(slide, rtl("מקור ואישור"), 510, 492, 260, 34, { size: 22, bold: true, color: C.blue, align: "center" });
-  text(slide, rtl("המוצר והאירוע"), 950, 492, 264, 34, { size: 22, bold: true, color: C.amber, align: "right" });
+  for (let i = nodes.length - 1; i > 0; i--) connectLeft(slide, nodes[i], nodes[i - 1], C.tealDark);
+  text(slide, rtl("החלטה ובדיקה"), 64, 492, 260, 34, { size: 22, bold: true, color: C.tealDark, align: "right" });
+  text(slide, rtl("מקור ואישור"), 510, 492, 260, 34, { size: 22, bold: true, color: C.blue, align: "right" });
+  text(slide, rtl("המוצר והאירוע"), 950, 492, 264, 34, { size: 22, bold: true, color: C.amberDark, align: "right" });
   text(slide, rtl("הדמו לקריאה בלבד. לא מפעילים Backfill, לא משנים נתונים ולא מציגים סודות."), 378, 586, 836, 38, {
     size: 18,
     color: C.coral,
     align: "right",
   });
-  slideNumber(slide, 12, true);
+  slideNumber(slide, 12);
   notes(
     slide,
     "08:55–09:10",
@@ -633,6 +641,57 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   );
 }
 
+function patchHebrewParagraph(paragraphXml) {
+  const cleanParagraph = stripBidiControls(paragraphXml);
+  const visibleText = cleanParagraph
+    .replace(/<[^>]+>/g, "")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
+  if (!containsHebrew(visibleText)) return cleanParagraph;
+
+  let patched = cleanParagraph;
+  if (/<a:pPr\b/.test(patched)) {
+    patched = patched.replace(/<a:pPr\b([^>]*)>/, (_match, attributes) => {
+      const cleanAttributes = attributes
+        .replace(/\s+algn="[^"]*"/g, "")
+        .replace(/\s+rtl="[^"]*"/g, "");
+      return `<a:pPr${cleanAttributes} algn="r" rtl="1">`;
+    });
+  } else {
+    patched = patched.replace(/(<a:p\b[^>]*>)/, '$1<a:pPr algn="r" rtl="1" />');
+  }
+
+  return patched.replace(/<a:(rPr|defRPr)\b([^>]*)>/g, (_match, tag, attributes) => {
+    const cleanAttributes = attributes.replace(/\s+lang="[^"]*"/g, "");
+    return `<a:${tag}${cleanAttributes} lang="he-IL">`;
+  });
+}
+
+async function enforcePowerPointRtl(filePath) {
+  const zip = await JSZip.loadAsync(await fs.readFile(filePath));
+  const xmlTargets = Object.entries(zip.files).filter(([name, entry]) =>
+    !entry.dir &&
+    (/^ppt\/slides\/slide\d+\.xml$/.test(name) ||
+      /^ppt\/notesSlides\/notesSlide\d+\.xml$/.test(name)),
+  );
+
+  for (const [name, entry] of xmlTargets) {
+    const originalXml = await entry.async("string");
+    const cleanXml = stripBidiControls(originalXml);
+    const patchedXml = cleanXml.replace(/<a:p\b[\s\S]*?<\/a:p>/g, patchHebrewParagraph);
+    zip.file(name, patchedXml);
+  }
+
+  const patchedBytes = await zip.generateAsync({
+    type: "nodebuffer",
+    compression: "DEFLATE",
+    compressionOptions: { level: 9 },
+  });
+  await fs.writeFile(filePath, patchedBytes);
+}
+
 await (await PresentationFile.exportPptx(presentation)).save(candidatePath);
+await enforcePowerPointRtl(candidatePath);
 
 console.log(JSON.stringify({ candidatePath, slideCount: presentation.slides.items.length }, null, 2));

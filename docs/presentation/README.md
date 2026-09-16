@@ -6,7 +6,7 @@
 
 ## מתחילים כאן
 
-1. [הורדת המצגת הסופית](output/MarketPilot-Final-Presentation.pptx) — 12 שקופיות בעיצוב חדש, עם הערות מציג לכל שקופית.
+1. [הורדת המצגת הסופית בגרסת RTL](output/MarketPilot-Final-Presentation-RTL.pptx) — 12 שקופיות בתבנית אחידה, עם כיווניות עברית מלאה והערות מציג לכל שקופית.
 2. [תרחיש הדמו החי](live-demo-script-he.md) — שש דקות, תחנה אחר תחנה.
 3. [דף הליווי המלא](demo-day-step-by-step-he.md) — תסריט ההצגה והמעברים.
 

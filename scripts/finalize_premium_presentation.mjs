@@ -11,14 +11,22 @@ if (!path.isAbsolute(skillDir ?? "") || !path.isAbsolute(pythonExecutable ?? "")
 const buildDir = path.join(workspaceDir, ".presentation-build", "premium");
 const candidatePath = path.join(buildDir, "MarketPilot-premium-candidate.pptx");
 const finalPath = path.join(
+  buildDir,
+  "final",
+  "MarketPilot-Final-Presentation.pptx",
+);
+const deliveryPath = path.join(
   workspaceDir,
   "docs",
   "presentation",
   "output",
-  "MarketPilot-Final-Presentation.pptx",
+  "MarketPilot-Final-Presentation-RTL.pptx",
 );
 const receiptPath = path.join(buildDir, "MarketPilot-Final-Presentation.validation.json");
 await fs.mkdir(path.dirname(finalPath), { recursive: true });
+await fs.mkdir(path.dirname(deliveryPath), { recursive: true });
+await fs.rm(finalPath, { force: true });
+await fs.rm(receiptPath, { force: true });
 
 const { finalizePresentation } = await import(
   pathToFileURL(path.join(skillDir, "container_tools", "artifact_tool_utils.mjs")).href
@@ -50,10 +58,12 @@ const result = await finalizePresentation({
   ],
   fontPolicy: {
     basis: "design",
-    families: ["Segoe UI", "Cascadia Mono"],
+    families: ["Arial", "Cascadia Mono"],
   },
   verifyArtifactToolImport: true,
   receiptPath,
 });
 
-console.log(JSON.stringify({ finalPath, receiptPath, result }, null, 2));
+await fs.copyFile(finalPath, deliveryPath);
+
+console.log(JSON.stringify({ finalPath, deliveryPath, receiptPath, result }, null, 2));
