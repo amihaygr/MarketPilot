@@ -23,6 +23,7 @@ def test_dashboard_assets_are_versioned_and_interactive_controls_are_accessible(
 
 
 def test_dashboard_uses_safe_dom_rendering_for_api_content() -> None:
+    html = (PROJECT_ROOT / "web" / "index.html").read_text(encoding="utf-8")
     script = (PROJECT_ROOT / "web" / "app.js").read_text(encoding="utf-8")
 
     assert ".innerHTML" not in script
