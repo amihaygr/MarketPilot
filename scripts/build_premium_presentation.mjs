@@ -45,7 +45,7 @@ const stripBidiControls = (value) =>
   String(value).replace(/[\u200E\u200F\u202A-\u202E\u2066-\u2069]/g, "");
 
 function base(slide) {
-  slide.background.fill = C.paper;
+  slide.background.fill = C.ink;
   rect(slide, 0, 0, 18, H, C.teal);
 }
 
@@ -82,7 +82,7 @@ function text(slide, value, x, y, w, h, options = {}) {
     typeface: options.font ?? FONT,
     fontSize: options.size ?? 24,
     bold: options.bold ?? false,
-    color: options.color ?? C.ink,
+    color: options.color ?? C.white,
     alignment: hasHebrew ? "right" : (options.align ?? "left"),
     verticalAlignment: options.valign ?? "top",
     autoFit: options.autoFit ?? "shrinkText",
@@ -109,18 +109,18 @@ function slideNumber(slide, number) {
     font: MONO,
     size: 11,
     bold: true,
-    color: C.muted,
+    color: C.mutedDark,
     align: "left",
   });
-  rule(slide, 96, 686, 1128, C.lineLight, 1);
+  rule(slide, 96, 686, 1128, C.lineDark, 1);
 }
 
 function title(slide, titleText, kicker, number) {
-  label(slide, kicker, 64, 38, 420, C.tealDark, "left");
+  label(slide, kicker, 64, 38, 420, C.teal, "left");
   text(slide, rtl(titleText), 440, 56, 776, 58, {
     size: 32,
     bold: true,
-    color: C.ink,
+    color: C.white,
     align: "right",
     valign: "top",
   });
@@ -156,7 +156,7 @@ function node(slide, value, sub, x, y, w, accent, dark = true) {
     y,
     w,
     88,
-    dark ? C.ink2 : "#FFFFFF",
+    C.ink2,
     12,
     { style: "solid", fill: accent, width: 1.5 },
   );
@@ -164,13 +164,13 @@ function node(slide, value, sub, x, y, w, accent, dark = true) {
     font: MONO,
     size: 19,
     bold: true,
-    color: dark ? C.white : C.ink,
+    color: C.white,
     align: "center",
     valign: "middle",
   });
   text(slide, rtl(sub), x + 8, y + 50, w - 16, 20, {
     size: 15,
-    color: dark ? C.mutedDark : C.muted,
+    color: C.mutedDark,
     align: "center",
   });
   return shape;
@@ -190,11 +190,11 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 {
   const slide = presentation.slides.add();
   base(slide);
-  label(slide, "MARKETPILOT · FINAL PROJECT", 68, 58, 430, C.tealDark, "left");
+  label(slide, "MARKETPILOT · FINAL PROJECT", 68, 58, 430, C.teal, "left");
   text(slide, rtl("מערכת נתונים\nשמחברת בין שוק חי,\nאמון והחלטה"), 540, 132, 670, 246, {
     size: 58,
     bold: true,
-    color: C.ink,
+    color: C.white,
     align: "right",
     lineSpacing: 0.9,
   });
@@ -205,7 +205,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
     392,
     580,
     76,
-    { size: 24, color: C.muted, align: "right", lineSpacing: 1.05 },
+    { size: 24, color: C.mutedDark, align: "right", lineSpacing: 1.05 },
   );
 
   const stages = [
@@ -215,14 +215,14 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   ];
   stages.forEach(([n, en, he], index) => {
     const yy = 208 + index * 108;
-    text(slide, n, 78, yy, 38, 24, { font: MONO, size: 12, color: C.tealDark, align: "left" });
-    text(slide, en, 126, yy - 7, 300, 36, { font: MONO, size: 24, bold: true, color: C.ink, align: "left" });
-    text(slide, rtl(he), 126, yy + 32, 300, 28, { size: 17, color: C.muted, align: "left" });
-    if (index < stages.length - 1) rule(slide, 78, yy + 78, 330, C.lineLight, 1);
+    text(slide, n, 78, yy, 38, 24, { font: MONO, size: 12, color: C.teal, align: "left" });
+    text(slide, en, 126, yy - 7, 300, 36, { font: MONO, size: 24, bold: true, color: C.white, align: "left" });
+    text(slide, rtl(he), 126, yy + 32, 300, 28, { size: 17, color: C.mutedDark, align: "left" });
+    if (index < stages.length - 1) rule(slide, 78, yy + 78, 330, C.lineDark, 1);
   });
   text(slide, rtl("עמיחי · פרויקט גמר · הנדסת נתונים"), 68, 644, 430, 24, {
     size: 14,
-    color: C.muted,
+    color: C.mutedDark,
     align: "left",
   });
   notes(
@@ -237,11 +237,11 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 {
   const slide = presentation.slides.add();
   base(slide);
-  label(slide, "THE PROBLEM", 64, 42, 260, C.tealDark, "left");
+  label(slide, "THE PROBLEM", 64, 42, 260, C.teal, "left");
   text(slide, rtl("סוחר רואה מספר.\nאבל האם אפשר לסמוך עליו?"), 420, 122, 790, 132, {
     size: 44,
     bold: true,
-    color: C.ink,
+    color: C.white,
     align: "right",
     lineSpacing: 0.92,
   });
@@ -252,7 +252,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
     270,
     680,
     74,
-    { size: 24, color: C.muted, align: "right" },
+    { size: 24, color: C.mutedDark, align: "right" },
   );
 
   const questions = [
@@ -263,10 +263,10 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   ];
   questions.forEach(([n, q, a], index) => {
     const x = 964 - index * 302;
-    if (index < questions.length - 1) rect(slide, x - 18, 414, 1, 152, C.lineLight);
-    text(slide, n, x, 398, 34, 22, { font: MONO, size: 12, color: C.tealDark, align: "left" });
-    text(slide, rtl(q), x, 436, 252, 48, { size: 25, bold: true, color: C.ink, align: "right" });
-    text(slide, rtl(a), x, 505, 252, 40, { size: 20, color: C.muted, align: "right" });
+    if (index < questions.length - 1) rect(slide, x - 18, 414, 1, 152, C.lineDark);
+    text(slide, n, x, 398, 34, 22, { font: MONO, size: 12, color: C.teal, align: "left" });
+    text(slide, rtl(q), x, 436, 252, 48, { size: 25, bold: true, color: C.white, align: "right" });
+    text(slide, rtl(a), x, 505, 252, 40, { size: 20, color: C.mutedDark, align: "right" });
   });
   slideNumber(slide, 2);
   notes(
@@ -285,18 +285,18 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   const stages = [
     ["04", "מסבירה", "תרחיש החלטה\nעם סיכון והקשר", C.amber],
     ["03", "בודקת", "איכות נתונים\nוהיסטוריה", C.blue],
-    ["02", "מבינה", "מגמה, תנודתיות\nודיווחי חברה", C.tealDark],
+    ["02", "מבינה", "מגמה, תנודתיות\nודיווחי חברה", C.teal],
     ["01", "אוספת", "שוק חי ומידע\nרשמי", C.teal],
   ];
   const nodes = [];
   stages.forEach(([n, verb, desc, accent], index) => {
     const x = 68 + index * 295;
     text(slide, n, x, 176, 48, 24, { font: MONO, size: 12, bold: true, color: accent, align: "left" });
-    text(slide, rtl(verb), x, 212, 250, 54, { size: 38, bold: true, color: C.ink, align: "right" });
-    text(slide, rtl(desc), x, 283, 250, 62, { size: 23, color: C.muted, align: "right" });
+    text(slide, rtl(verb), x, 212, 250, 54, { size: 38, bold: true, color: C.white, align: "right" });
+    text(slide, rtl(desc), x, 283, 250, 62, { size: 23, color: C.mutedDark, align: "right" });
     const marker = rect(slide, x, 376, 18, 18, accent, 9);
     nodes.push(marker);
-    if (index < stages.length - 1) rule(slide, x + 18, 385, 277, C.lineLight, 2);
+    if (index < stages.length - 1) rule(slide, x + 18, 385, 277, C.lineDark, 2);
   });
   text(
     slide,
@@ -305,7 +305,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
     460,
     978,
     92,
-    { size: 34, bold: true, color: C.ink, align: "right", lineSpacing: 0.95 },
+    { size: 34, bold: true, color: C.white, align: "right", lineSpacing: 0.95 },
   );
   text(slide, rtl(`המערכת מספקת ${iso("Decision Support")} בלבד. ההחלטה והביצוע נשארים בידי המשתמש.`), 520, 576, 696, 34, {
     size: 20,
@@ -327,7 +327,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   title(slide, "ארכיטקטורת המערכת", "SYSTEM ARCHITECTURE", 4);
   text(slide, rtl("הזרימה מוצגת מימין לשמאל, מן המקור אל המשתמש"), 744, 106, 472, 30, {
     size: 21,
-    color: C.muted,
+    color: C.mutedDark,
     align: "right",
   });
 
@@ -361,8 +361,8 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
     tail: { type: "triangle", width: "sm", length: "sm" },
   });
   text(slide, "Airflow", 222, 448, 150, 30, { font: MONO, size: 20, bold: true, color: C.amber, align: "center" });
-  text(slide, rtl("מתזמן עבודות תחומות בלבד"), 160, 486, 272, 28, { size: 18, color: C.muted, align: "right" });
-  text(slide, rtl(`הדפדפן מדבר רק עם ה־${iso("API")}`), 62, 352, 260, 30, { size: 19, color: C.tealDark, bold: true, align: "right" });
+  text(slide, rtl("מתזמן עבודות תחומות בלבד"), 160, 486, 272, 28, { size: 18, color: C.mutedDark, align: "right" });
+  text(slide, rtl(`הדפדפן מדבר רק עם ה־${iso("API")}`), 62, 352, 260, 30, { size: 19, color: C.teal, bold: true, align: "right" });
   notes(
     slide,
     "02:00–03:15",
@@ -376,16 +376,16 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   const slide = presentation.slides.add();
   base(slide);
   title(slide, "שני מסלולים, שתי הבטחות", "LIVE VS CERTIFIED", 5, false);
-  text(slide, rtl("מהיר עכשיו"), 940, 142, 274, 42, { size: 30, bold: true, color: C.tealDark, align: "right" });
-  text(slide, rtl("המסלול החי מספק תמונת מצב בזמן שהשוק פעיל"), 660, 186, 554, 32, { size: 22, color: C.muted, align: "right" });
+  text(slide, rtl("מהיר עכשיו"), 940, 142, 274, 42, { size: 30, bold: true, color: C.teal, align: "right" });
+  text(slide, rtl("המסלול החי מספק תמונת מצב בזמן שהשוק פעיל"), 660, 186, 554, 32, { size: 22, color: C.mutedDark, align: "right" });
   const liveLabels = ["Gold PROVISIONAL", "Spark Streaming", "Kafka", "Alpaca"];
   const liveNodes = liveLabels.map((v, i) => node(slide, v, i === 0 ? "מוכן לתצוגה" : "", 72 + i * 287, 236, 235, C.teal, false));
-  for (let i = liveNodes.length - 1; i > 0; i--) connectLeft(slide, liveNodes[i], liveNodes[i - 1], C.tealDark);
-  label(slide, "DOCKER COMPOSE OWNS THE LIFECYCLE", 72, 336, 480, C.tealDark, "left");
+  for (let i = liveNodes.length - 1; i > 0; i--) connectLeft(slide, liveNodes[i], liveNodes[i - 1], C.teal);
+  label(slide, "DOCKER COMPOSE OWNS THE LIFECYCLE", 72, 336, 480, C.teal, "left");
 
-  rule(slide, 64, 378, 1152, C.lineLight, 1);
+  rule(slide, 64, 378, 1152, C.lineDark, 1);
   text(slide, rtl("אמין לאחר הסגירה"), 862, 408, 352, 42, { size: 30, bold: true, color: C.blue, align: "right" });
-  text(slide, rtl("המסלול המאושר בונה מחדש את היום מן המקור ומפעיל שערי איכות"), 566, 452, 648, 32, { size: 22, color: C.muted, align: "right" });
+  text(slide, rtl("המסלול המאושר בונה מחדש את היום מן המקור ומפעיל שערי איכות"), 566, 452, 648, 32, { size: 22, color: C.mutedDark, align: "right" });
   const certLabels = ["Gold CERTIFIED", "Data Quality", "Silver", "Spark Batch", "Bronze"];
   const certNodes = certLabels.map((v, i) => node(slide, v, "", 64 + i * 230, 505, 184, C.blue, false));
   for (let i = certNodes.length - 1; i > 0; i--) connectLeft(slide, certNodes[i], certNodes[i - 1], C.blue);
@@ -404,21 +404,21 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   base(slide);
   title(slide, "בחירות טכנולוגיות עם סיבה", "TECHNOLOGY CHOICES", 6, false);
   const rows = [
-    ["Kafka", `שומר סדר לפי ${iso("Offset")} ומאפשר ${iso("Replay")} בין צרכנים נפרדים`, C.tealDark],
+    ["Kafka", `שומר סדר לפי ${iso("Offset")} ומאפשר ${iso("Replay")} בין צרכנים נפרדים`, C.teal],
     ["Spark", `מנוע אחד לעיבוד ${iso("Streaming")} ולעיבוד ${iso("Batch")}`, C.blue],
     ["Airflow", "מנהל סדר, תלויות וניסיונות חוזרים של עבודות תחומות", C.amber],
-    ["MinIO", `שומר ${iso("Bronze")} גולמי, ${iso("Silver")} בפורמט ${iso("Parquet")} וארכיון`, C.tealDark],
+    ["MinIO", `שומר ${iso("Bronze")} גולמי, ${iso("Silver")} בפורמט ${iso("Parquet")} וארכיון`, C.teal],
     ["MariaDB", `מגיש ${iso("Gold")} מוכן ל־${iso("API")} עם מפתחות עסקיים ו־${iso("Upsert")}`, C.blue],
     ["Docker Compose", "מעלה סביבה מקומית שחוזרת על עצמה ומבודדת שירותים", C.amber],
   ];
-  text(slide, rtl("החלטה הנדסית"), 560, 132, 650, 28, { size: 17, bold: true, color: C.muted, align: "right" });
-  text(slide, "Technology", 72, 132, 250, 28, { font: MONO, size: 15, bold: true, color: C.muted, align: "left" });
-  rule(slide, 64, 174, 1152, C.lineLight, 1);
+  text(slide, rtl("החלטה הנדסית"), 560, 132, 650, 28, { size: 17, bold: true, color: C.mutedDark, align: "right" });
+  text(slide, "Technology", 72, 132, 250, 28, { font: MONO, size: 15, bold: true, color: C.mutedDark, align: "left" });
+  rule(slide, 64, 174, 1152, C.lineDark, 1);
   rows.forEach(([tech, why, accent], index) => {
     const y = 194 + index * 72;
     text(slide, tech, 72, y, 260, 34, { font: MONO, size: 23, bold: true, color: accent, align: "left", valign: "middle" });
-    text(slide, rtl(why), 390, y, 820, 36, { size: 23, color: C.ink, align: "right", valign: "middle" });
-    if (index < rows.length - 1) rule(slide, 64, y + 55, 1152, "#E3E7E8", 1);
+    text(slide, rtl(why), 390, y, 820, 36, { size: 23, color: C.white, align: "right", valign: "middle" });
+    if (index < rows.length - 1) rule(slide, 64, y + 55, 1152, C.lineDark, 1);
   });
   notes(
     slide,
@@ -434,13 +434,13 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   base(slide);
   title(slide, "המוצר מתחיל בנתון שאפשר לבדוק", "PRODUCT EVIDENCE", 7, false);
   await addImage(slide, "dashboard.png", 58, 150, 825, 474, "MarketPilot Data Command Center screenshot");
-  text(slide, rtl("מסך המחקר הראשי"), 918, 160, 298, 48, { size: 30, bold: true, color: C.ink, align: "right" });
+  text(slide, rtl("מסך המחקר הראשי"), 918, 160, 298, 48, { size: 30, bold: true, color: C.white, align: "right" });
   text(slide, rtl(`מחיר, נפח, ${iso("Indicators")}, דיווחי חברה וטריות נתונים במקום אחד.`), 918, 222, 298, 86, {
     size: 22,
-    color: C.muted,
+    color: C.mutedDark,
     align: "right",
   });
-  rule(slide, 918, 330, 298, C.lineLight, 1);
+  rule(slide, 918, 330, 298, C.lineDark, 1);
   const facts = [
     ["11", "נכסים במעקב"],
     ["57,217", "רשומות Gold"],
@@ -448,8 +448,8 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   ];
   facts.forEach(([metric, caption], index) => {
     const y = 354 + index * 82;
-    text(slide, metric, 918, y, 150, 35, { font: MONO, size: 26, bold: true, color: index === 1 ? C.blue : C.tealDark, align: "left" });
-    text(slide, rtl(caption), 1050, y + 4, 166, 30, { size: 19, color: C.muted, align: "right" });
+    text(slide, metric, 918, y, 150, 35, { font: MONO, size: 26, bold: true, color: index === 1 ? C.blue : C.teal, align: "left" });
+    text(slide, rtl(caption), 1050, y + 4, 166, 30, { size: 19, color: C.mutedDark, align: "right" });
   });
   notes(
     slide,
@@ -465,7 +465,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   base(slide);
   title(slide, "מתוצאה טכנית לתרחיש החלטה", "DECISION INTELLIGENCE", 8);
   await addImage(slide, "opportunity-center.png", 48, 142, 830, 492, "MarketPilot Opportunity Center screenshot");
-  text(slide, rtl("לא מחיר קסם"), 920, 154, 290, 38, { size: 28, bold: true, color: C.ink, align: "right" });
+  text(slide, rtl("לא מחיר קסם"), 920, 154, 290, 38, { size: 28, bold: true, color: C.white, align: "right" });
   const items = [
     ["BUY ZONE", "טווח כניסה"],
     ["STOP", "נקודת ביטול"],
@@ -475,11 +475,11 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   items.forEach(([en, he], index) => {
     const y = 222 + index * 72;
     text(slide, en, 920, y, 282, 24, { font: MONO, size: 14, bold: true, color: index === 1 ? C.coral : C.teal, align: "left" });
-    text(slide, rtl(he), 920, y + 28, 282, 30, { size: 22, color: C.ink, align: "right" });
+    text(slide, rtl(he), 920, y + 28, 282, 30, { size: 22, color: C.white, align: "right" });
   });
-  rect(slide, 920, 520, 290, 2, C.lineLight);
+  rect(slide, 920, 520, 290, 2, C.lineDark);
   text(slide, "1 / 20", 920, 546, 100, 34, { font: MONO, size: 24, bold: true, color: C.amber, align: "left" });
-  text(slide, rtl(`ימי ${iso("Shadow Mode")} חיים`), 1028, 550, 182, 28, { size: 18, color: C.muted, align: "right" });
+  text(slide, rtl(`ימי ${iso("Shadow Mode")} חיים`), 1028, 550, 182, 28, { size: 18, color: C.mutedDark, align: "right" });
   text(slide, rtl("אין פקודה, אין הבטחת תשואה"), 920, 590, 290, 26, { size: 18, color: C.coral, align: "right" });
   notes(
     slide,
@@ -495,21 +495,21 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   base(slide);
   title(slide, "היסטוריה שנבדקת בלי לייפות", "HISTORICAL VALIDATION", 9, false);
   await addImage(slide, "backtesting.png", 52, 134, 840, 486, "MarketPilot Backtesting Lab screenshot");
-  text(slide, rtl("ריצה מאושרת"), 930, 148, 280, 36, { size: 26, bold: true, color: C.ink, align: "right" });
+  text(slide, rtl("ריצה מאושרת"), 930, 148, 280, 36, { size: 26, bold: true, color: C.white, align: "right" });
   const facts = [
-    ["41", "ימי מסחר מאושרים", C.tealDark],
+    ["41", "ימי מסחר מאושרים", C.teal],
     ["46,749", "תצפיות", C.blue],
     ["1,059", "שינויי פוזיציה", C.amber],
   ];
   facts.forEach(([metric, caption, color], index) => {
     const y = 216 + index * 94;
     text(slide, metric, 930, y, 280, 43, { font: MONO, size: 32, bold: true, color, align: "left" });
-    text(slide, rtl(caption), 930, y + 45, 280, 28, { size: 21, color: C.muted, align: "right" });
+    text(slide, rtl(caption), 930, y + 45, 280, 28, { size: 21, color: C.mutedDark, align: "right" });
   });
-  rule(slide, 930, 506, 280, C.lineLight, 1);
+  rule(slide, 930, 506, 280, C.lineDark, 1);
   text(slide, rtl(`האות של נר ${iso("t")} משפיע רק על הנר הבא, והחישוב כולל עלויות והחלקת מחיר.`), 930, 530, 280, 74, {
     size: 20,
-    color: C.muted,
+    color: C.mutedDark,
     align: "right",
   });
   notes(
@@ -525,22 +525,22 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   const slide = presentation.slides.add();
   base(slide);
   title(slide, "החלטות הנדסיות מרכזיות", "ENGINEERING CHALLENGES", 10);
-  text(slide, rtl("המתח"), 920, 132, 290, 26, { size: 16, bold: true, color: C.muted, align: "right" });
-  text(slide, rtl("ההחלטה"), 110, 132, 680, 26, { size: 16, bold: true, color: C.muted, align: "right" });
-  rule(slide, 64, 170, 1152, C.lineLight, 1);
+  text(slide, rtl("המתח"), 920, 132, 290, 26, { size: 16, bold: true, color: C.mutedDark, align: "right" });
+  text(slide, rtl("ההחלטה"), 110, 132, 680, 26, { size: 16, bold: true, color: C.mutedDark, align: "right" });
+  rule(slide, 64, 170, 1152, C.lineDark, 1);
   const rows = [
     ["מהירות מול אמינות", "נתון חי מוצג מיד. יום סגור נבנה מחדש ונבדק.", "PROVISIONAL / CERTIFIED", C.teal],
     ["כשל וניסיון חוזר", "הפעלה חוזרת אינה יוצרת רשומה עסקית כפולה.", "CHECKPOINT · BUSINESS KEY · UPSERT", C.blue],
-    ["היסטוריה בלי קיצור דרך", "נתוני עבר עוברים שמירה גולמית ואיכות לפני פרסום.", "HISTORICAL TOPIC · BRONZE BARRIER", C.amberDark],
+    ["היסטוריה בלי קיצור דרך", "נתוני עבר עוברים שמירה גולמית ואיכות לפני פרסום.", "HISTORICAL TOPIC · BRONZE BARRIER", C.amber],
     ["מוצר בלי חשיפת תשתית", "הדפדפן מקבל מידע רק דרך ממשק מוגבל לקריאה.", "READ-ONLY BACKEND API", C.coral],
   ];
   rows.forEach(([problem, decision, mechanism, accent], index) => {
     const y = 194 + index * 105;
-    text(slide, rtl(problem), 872, y, 338, 48, { size: 25, bold: true, color: C.ink, align: "right" });
+    text(slide, rtl(problem), 872, y, 338, 48, { size: 25, bold: true, color: C.white, align: "right" });
     rect(slide, 828, y + 2, 4, 58, accent);
-    text(slide, rtl(decision), 110, y - 2, 675, 36, { size: 22, color: C.ink, align: "right" });
+    text(slide, rtl(decision), 110, y - 2, 675, 36, { size: 22, color: C.white, align: "right" });
     text(slide, mechanism, 110, y + 40, 675, 24, { font: MONO, size: 14, bold: true, color: accent, align: "left" });
-    if (index < rows.length - 1) rule(slide, 64, y + 82, 1152, C.lineLight, 1);
+    if (index < rows.length - 1) rule(slide, 64, y + 82, 1152, C.lineDark, 1);
   });
   notes(
     slide,
@@ -557,11 +557,11 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   title(slide, "מה עובד היום ומה מגיע בהמשך", "ROADMAP", 11, false);
   text(slide, rtl("המטרה אינה להוסיף עוד טכנולוגיה. המטרה היא להרחיב אמון, כיסוי ותפעול."), 505, 124, 710, 42, {
     size: 22,
-    color: C.muted,
+    color: C.mutedDark,
     align: "right",
   });
 
-  rule(slide, 136, 342, 1000, C.lineLight, 4);
+  rule(slide, 136, 342, 1000, C.lineDark, 4);
   const milestones = [
     [1030, "01", "היום", `סביבה מקומית עובדת\n41 ימים מאושרים\n${iso("Shadow Mode 1/20")}`, C.teal],
     [635, "02", "לאחר 20 ימים חיים", `בדיקת ${iso("Calibration")}\nאישור אנושי נפרד\nפתיחת ${iso("Decision Support")}`, C.blue],
@@ -570,8 +570,8 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   milestones.forEach(([x, n, heading, body, accent]) => {
     rect(slide, x, 327, 30, 30, accent, 15);
     text(slide, n, x - 4, 330, 38, 20, { font: MONO, size: 11, bold: true, color: C.ink, align: "center", valign: "middle" });
-    text(slide, rtl(heading), x - 190, 210, 220, 60, { size: 27, bold: true, color: C.ink, align: "right" });
-    text(slide, rtl(body), x - 190, 390, 220, 116, { size: 21, color: C.muted, align: "right", lineSpacing: 1.05 });
+    text(slide, rtl(heading), x - 190, 210, 220, 60, { size: 27, bold: true, color: C.white, align: "right" });
+    text(slide, rtl(body), x - 190, 390, 220, 116, { size: 21, color: C.mutedDark, align: "right", lineSpacing: 1.05 });
   });
   text(slide, rtl("הקידום יתאפשר רק לאחר ראיות חיות ובדיקה אנושית. תוצאות היסטוריות לבדן אינן מספיקות."), 464, 556, 750, 46, {
     size: 21,
@@ -591,16 +591,16 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 {
   const slide = presentation.slides.add();
   base(slide);
-  label(slide, "LIVE DEMO · 06:00", 64, 44, 280, C.tealDark, "left");
+  label(slide, "LIVE DEMO · 06:00", 64, 44, 280, C.teal, "left");
   text(slide, rtl("עכשיו מוכיחים את זה בלייב"), 520, 98, 694, 62, {
     size: 42,
     bold: true,
-    color: C.ink,
+    color: C.white,
     align: "right",
   });
   text(slide, rtl("מהאירוע הגולמי ועד תרחיש החלטה שאפשר להסביר ולשחזר"), 590, 174, 624, 50, {
     size: 23,
-    color: C.muted,
+    color: C.mutedDark,
     align: "right",
   });
 
@@ -620,13 +620,13 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
       width: 1.5,
     });
     text(slide, n, x, 346, 44, 18, { font: MONO, size: 12, bold: true, color: index === 5 ? C.ink : C.teal, align: "center" });
-    text(slide, name, x - 52, 404, 148, 34, { font: MONO, size: 17, bold: true, color: C.ink, align: "center" });
+    text(slide, name, x - 52, 404, 148, 34, { font: MONO, size: 17, bold: true, color: C.white, align: "center" });
     return marker;
   });
-  for (let i = nodes.length - 1; i > 0; i--) connectLeft(slide, nodes[i], nodes[i - 1], C.tealDark);
-  text(slide, rtl("החלטה ובדיקה"), 64, 492, 260, 34, { size: 22, bold: true, color: C.tealDark, align: "right" });
+  for (let i = nodes.length - 1; i > 0; i--) connectLeft(slide, nodes[i], nodes[i - 1], C.teal);
+  text(slide, rtl("החלטה ובדיקה"), 64, 492, 260, 34, { size: 22, bold: true, color: C.teal, align: "right" });
   text(slide, rtl("מקור ואישור"), 510, 492, 260, 34, { size: 22, bold: true, color: C.blue, align: "right" });
-  text(slide, rtl("המוצר והאירוע"), 950, 492, 264, 34, { size: 22, bold: true, color: C.amberDark, align: "right" });
+  text(slide, rtl("המוצר והאירוע"), 950, 492, 264, 34, { size: 22, bold: true, color: C.amber, align: "right" });
   text(slide, rtl("הדמו לקריאה בלבד. לא מפעילים Backfill, לא משנים נתונים ולא מציגים סודות."), 378, 586, 836, 38, {
     size: 18,
     color: C.coral,
