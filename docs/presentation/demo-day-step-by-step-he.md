@@ -6,6 +6,10 @@
 כ־9 דקות למצגת וכ־6 דקות לדמו החי. אין צורך לשנן את הנוסח. צריך להבין את
 הרעיון של כל תחנה ולדבר במילים טבעיות.
 
+מונח טכני שאינו מובן מאליו מוסבר בסוגריים מיד אחרי הופעתו הראשונה. לאחר
+מכן משתמשים בו בקיצור, כדי שהטקסט יישאר טבעי ולא יישמע כמו מילון. בסוף
+המדריך מופיע גם מילון מורחב לחזרה לפני ההצגה.
+
 ## הסיפור המרכזי
 
 המטרה של הפרויקט היא לגשר בין המספר שהסוחר רואה לבין היכולת להבין אם אפשר
@@ -30,9 +34,13 @@ docker compose up -d
 
 </div>
 
-הפקודה האחרונה בודקת את תצורת <bdi dir="ltr"><code>Docker Compose</code></bdi>, את שירותי
-הליבה, את ממשקי ההדגמה, את מצב <bdi dir="ltr"><code>Shadow Mode</code></bdi> ואת זמינות
-ה־<bdi dir="ltr"><code>DAG</code></bdi> היומי. היא פותחת את דפי הדמו רק כאשר כל הבדיקות עברו.
+הפקודה האחרונה בודקת את תצורת <bdi dir="ltr"><code>Docker Compose</code></bdi> (כלי שמגדיר
+ומפעיל יחד את כל הקונטיינרים של המערכת), את שירותי הליבה ואת ממשקי ההדגמה.
+היא בודקת גם את מצב <bdi dir="ltr"><code>Shadow Mode</code></bdi> (תקופת צל שבה המערכת
+מייצרת תרחישים ומודדת אותם, אך עדיין אינה מציגה אותם כהמלצה מעשית) ואת
+זמינות ה־<bdi dir="ltr"><code>DAG</code></bdi> היומי (תרשים משימות עם סדר ותלויות
+שמופעל ב־<bdi dir="ltr"><code>Airflow</code></bdi>). דפי הדמו נפתחים רק כאשר כל
+בדיקות ההכנה עברו.
 
 אם הפקודה אינה מזוהה, הסיבה בדרך כלל היא שהטרמינל נמצא בתיקיית המשתמש ולא
 בתיקיית הפרויקט. הרץ קודם את פקודת <bdi dir="ltr"><code>Set-Location</code></bdi> שמופיעה למעלה.
@@ -101,14 +109,31 @@ docker compose up -d
 
 **המסר:** אותו נתון עובר בשלושה מסלולים בעלי מטרות שונות.
 
-> אני קורא את התרשים מימין לשמאל. <bdi dir="ltr"><code>Alpaca</code></bdi> ו־<bdi dir="ltr"><code>SEC</code></bdi> הם המקורות. שירותי <bdi dir="ltr"><code>Python</code></bdi>
-> מאחדים את המידע לחוזים ברורים. <bdi dir="ltr"><code>Kafka</code></bdi> מפריד בין היצרן לצרכנים, ולכן כל צרכן
-> יכול להתקדם בקצב שלו ואפשר לבצע <bdi dir="ltr"><code>Replay</code></bdi>. ‏<bdi dir="ltr"><code>Spark</code></bdi> מעבד את המידע, ו־<bdi dir="ltr"><code>MariaDB Gold</code></bdi>
-> מגיש אותו למוצר דרך <bdi dir="ltr"><code>API</code></bdi>.
+> אני קורא את התרשים מימין לשמאל. <bdi dir="ltr"><code>Alpaca</code></bdi> (ספק נתוני
+> שוק וממשק מסחר; בפרויקט משמש לנתונים בלבד) ו־<bdi dir="ltr"><code>SEC</code></bdi>
+> (רשות ניירות הערך האמריקאית, שמפרסמת דיווחים רשמיים של חברות) הם המקורות.
+> שירותי <bdi dir="ltr"><code>Python</code></bdi> מאחדים את המידע לחוזי נתונים ברורים
+> (מבנה מוסכם שמגדיר אילו שדות וסוגים כל אירוע חייב להכיל).
 >
-> במקביל, האירוע נשמר ב־<bdi dir="ltr"><code>MinIO Bronze</code></bdi> כמקור גולמי ובלתי משתנה. עבודות <bdi dir="ltr"><code>Batch</code></bdi>
-> מנקות ומנרמלות אותו ל־<bdi dir="ltr"><code>Silver</code></bdi>, מפעילות בדיקות איכות, ורק אז מפרסמות <bdi dir="ltr"><code>Gold</code></bdi>
-> מאושר. <bdi dir="ltr"><code>Airflow</code></bdi> מתזמן את העבודות האלה, אבל אינו מפעיל את שירותי ה־<bdi dir="ltr"><code>Streaming</code></bdi>.
+> <bdi dir="ltr"><code>Kafka</code></bdi> (יומן אירועים מבוזר שמעביר הודעות בין
+> שירותים ושומר את סדרן) מפריד בין היצרן לצרכנים. לכן כל צרכן יכול להתקדם
+> בקצב שלו ואפשר לבצע <bdi dir="ltr"><code>Replay</code></bdi> (קריאה ועיבוד מחדש של
+> אירועים שכבר נשמרו). ‏<bdi dir="ltr"><code>Spark</code></bdi> (מנוע עיבוד נתונים
+> מקבילי למסלולים חיים ואצוותיים) מעבד את המידע.
+> ‏<bdi dir="ltr"><code>MariaDB Gold</code></bdi> (מסד הנתונים היחסי שמכיל מידע מוכן לצריכת האפליקציה) מגיש
+> אותו למוצר דרך <bdi dir="ltr"><code>API</code></bdi> (ממשק תוכנה שדרכו הדפדפן
+> מבקש נתונים, במקום להתחבר ישירות למסד).
+>
+> במקביל, האירוע נשמר ב־<bdi dir="ltr"><code>MinIO Bronze</code></bdi> (אחסון
+> אובייקטים מקומי שבו נשמר המקור הגולמי והבלתי משתנה). עבודות
+> <bdi dir="ltr"><code>Batch</code></bdi> (עבודות תחומות שמעבדות כמות נתונים מוגדרת
+> ומסתיימות) מנקות ומנרמלות אותו ל־<bdi dir="ltr"><code>Silver</code></bdi> (שכבה
+> נקייה ואחידה), מפעילות בדיקות איכות, ורק אז מפרסמות
+> <bdi dir="ltr"><code>Gold</code></bdi> (שכבה עסקית מוכנה לשאילתות ולמסכים) מאושר.
+> <bdi dir="ltr"><code>Airflow</code></bdi> (מנהל תזמון ותלויות לעבודות שמתחילות
+> ומסתיימות) מתזמן את העבודות האלה, אבל אינו מפעיל את שירותי
+> ה־<bdi dir="ltr"><code>Streaming</code></bdi> (עיבוד רציף שממתין כל הזמן לאירועים
+> חדשים).
 > הדפדפן מתקשר רק עם ה־<bdi dir="ltr"><code>API</code></bdi> ולעולם לא ישירות עם <bdi dir="ltr"><code>MariaDB</code></bdi> או <bdi dir="ltr"><code>MinIO</code></bdi>.
 
 **מה הסוקר צריך להבין:** יש הפרדה בין תעבורה, חישוב, אחסון גולמי, שכבת הגשה
@@ -118,9 +143,11 @@ docker compose up -d
 
 **המסר:** מהירות ואמינות אינן אותה הבטחה.
 
-> המסלול החי נותן תמונת מצב מהירה ומסמן אותה כ־<bdi dir="ltr"><code>Provisional</code></bdi>. לאחר סגירת יום
+> המסלול החי נותן תמונת מצב מהירה ומסמן אותה כ־<bdi dir="ltr"><code>Provisional</code></bdi>
+> (תוצאה זמנית שעדיין לא עברה את כל בדיקות סוף היום). לאחר סגירת יום
 > המסחר, <bdi dir="ltr"><code>Spark Batch</code></bdi> בונה את היום מחדש מהמקור הגולמי ומפעיל בדיקות איכות.
-> רק תוצאה שעברה את השערים מתפרסמת כ־<bdi dir="ltr"><code>Certified</code></bdi>. כך המערכת אינה מעמידה פנים
+> רק תוצאה שעברה את השערים מתפרסמת כ־<bdi dir="ltr"><code>Certified</code></bdi>
+> (תוצאה מאושרת שנבנתה מחדש ועברה בדיקות איכות). כך המערכת אינה מעמידה פנים
 > שנתון חי כבר עבר בדיקה מלאה.
 
 ### שקף 6 — בחירת הטכנולוגיות
@@ -160,8 +187,11 @@ docker compose up -d
 
 **המסר:** המלצה טובה מציגה גם את התנאים שבהם היא מפסיקה להיות נכונה.
 
-> המערכת אינה מציגה מחיר קסם. היא מציגה <bdi dir="ltr"><code>Buy Zone</code></bdi>, ‏<bdi dir="ltr"><code>Stop</code></bdi>, שני יעדים, יחס
-> <bdi dir="ltr"><code>Risk/Reward</code></bdi> וגודל פוזיציה לפי מגבלות התיק. ההסבר בעברית מפרט למה התרחיש
+> המערכת אינה מציגה מחיר קסם. היא מציגה <bdi dir="ltr"><code>Buy Zone</code></bdi>
+> (טווח מחירים שבו תנאי הכניסה נחשבים סבירים), ‏<bdi dir="ltr"><code>Stop</code></bdi>
+> (מחיר שבו התזה נפסלת ומתכננים מראש את היציאה), ושני יעדי רווח. יחס
+> <bdi dir="ltr"><code>Risk/Reward</code></bdi> (כמה רווח מתוכנן ביחס לכל יחידת סיכון
+> עד מחיר העצירה) וגודל הפוזיציה מחושבים לפי מגבלות התיק. ההסבר בעברית מפרט למה התרחיש
 > קיבל את הציון שלו. המודל נמצא ב־<bdi dir="ltr"><code>Shadow Mode</code></bdi>, ולכן הוא אוסף ראיות ואינו
 > מסומן כ־<bdi dir="ltr"><code>Actionable</code></bdi>.
 >
@@ -174,9 +204,12 @@ docker compose up -d
 
 **המסר:** ניסוי אמין חשוב יותר מתשואה יפה.
 
-> ה־<bdi dir="ltr"><code>Backtest</code></bdi> משתמש רק בנתוני <bdi dir="ltr"><code>Certified Gold</code></bdi>. אות שנוצר בנר מסוים משפיע רק
-> מהנר הבא, כדי שלא להשתמש במידע עתידי. החישוב כולל עלויות ו־<bdi dir="ltr"><code>Slippage</code></bdi> ומשווה
-> מול <bdi dir="ltr"><code>SPY</code></bdi>. גם תוצאה חלשה היא שימושית, משום שהיא מונעת מאיתנו לקדם רעיון שלא
+> ה־<bdi dir="ltr"><code>Backtest</code></bdi> (ניסוי של כללי האסטרטגיה על נתוני עבר)
+> משתמש רק בנתוני <bdi dir="ltr"><code>Certified Gold</code></bdi>. אות שנוצר בנר מסוים משפיע רק
+> מהנר הבא, כדי שלא להשתמש במידע עתידי. החישוב כולל עלויות ו־<bdi dir="ltr"><code>Slippage</code></bdi>
+> (הפער האפשרי בין המחיר שתכננו לקבל לבין מחיר הביצוע בפועל) ומשווה מול
+> <bdi dir="ltr"><code>SPY</code></bdi> (קרן סל שעוקבת אחר מדד השוק האמריקאי
+> <bdi dir="ltr"><code>S&amp;P 500</code></bdi> ומשמשת נקודת ייחוס). גם תוצאה חלשה היא שימושית, משום שהיא מונעת מאיתנו לקדם רעיון שלא
 > עמד בבדיקה.
 
 ### שקף 10 — האתגרים
@@ -184,18 +217,36 @@ docker compose up -d
 **המסר:** האתגרים הפכו לעקרונות תכנון שניתנים להגנה.
 
 > שני האתגרים המרכזיים היו אמון והתאוששות. כדי לשלב מהירות עם אמינות הפרדתי
-> בין <bdi dir="ltr"><code>Provisional</code></bdi> ל־<bdi dir="ltr"><code>Certified</code></bdi>. כדי להפוך <bdi dir="ltr"><code>Retry</code></bdi> לבטוח השתמשתי ב־<bdi dir="ltr"><code>Checkpoint</code></bdi>,
-> <bdi dir="ltr"><code>Business Keys</code></bdi> ו־<bdi dir="ltr"><code>Upsert</code></bdi>. בהשלמה היסטורית לא כתבתי ישירות למסד. הנתונים עברו
-> דרך <bdi dir="ltr"><code>Kafka</code></bdi>, ‏<bdi dir="ltr"><code>Bronze</code></bdi> ושערי האיכות כדי לשמור על אותו <bdi dir="ltr"><code>Lineage</code></bdi> כמו הנתונים החיים.
+> בין <bdi dir="ltr"><code>Provisional</code></bdi> ל־<bdi dir="ltr"><code>Certified</code></bdi>.
+> כדי להפוך <bdi dir="ltr"><code>Retry</code></bdi> (ניסיון חוזר לאחר תקלה) לבטוח
+> השתמשתי ב־<bdi dir="ltr"><code>Checkpoint</code></bdi> (מצב שמור שמאפשר לעיבוד
+> הרציף להמשיך מהמקום שבו נעצר), <bdi dir="ltr"><code>Business Keys</code></bdi>
+> (שדות שמזהים רשומה עסקית באופן ייחודי, למשל מניה וזמן האירוע) וב־<bdi dir="ltr"><code>Upsert</code></bdi>
+> (עדכון הרשומה אם היא קיימת, או הוספתה אם אינה קיימת). בהשלמה היסטורית לא
+> כתבתי ישירות למסד. הנתונים עברו דרך <bdi dir="ltr"><code>Kafka</code></bdi>,
+> ‏<bdi dir="ltr"><code>Bronze</code></bdi> ושערי האיכות כדי לשמור על אותו
+> <bdi dir="ltr"><code>Lineage</code></bdi> (יכולת לעקוב מתוצאה סופית אל המקור,
+> הריצה, גרסת הקוד וגרסת הנתונים) כמו הנתונים החיים.
 
 ### שקף 11 — המשך הדרך
 
 **המסר:** יש מוצר עובד, אך קיימים תנאים ברורים לפני שימוש רחב יותר.
 
 > היום קיימת מערכת מקומית מלאה עם מסלול חי, מסלול מאושר, נתונים היסטוריים
-> וממשק <bdi dir="ltr"><code>Web</code></bdi>. לפני פתיחת <bdi dir="ltr"><code>Decision Support</code></bdi> פעיל נדרשים 20 ימי <bdi dir="ltr"><code>Shadow Mode</code></bdi>,
-> בדיקת <bdi dir="ltr"><code>Calibration</code></bdi> ואישור אנושי. השלב הבא יכול לכלול <bdi dir="ltr"><code>SIP</code></bdi>, מעבר ל־<bdi dir="ltr"><code>S3</code></bdi>,
-> <bdi dir="ltr"><code>Observability</code></bdi> ואבטחת <bdi dir="ltr"><code>Production</code></bdi>. אלה שלבי המשך ולא יכולות שאני טוען שכבר
+> וממשק <bdi dir="ltr"><code>Web</code></bdi>. לפני פתיחת <bdi dir="ltr"><code>Decision Support</code></bdi>
+> (מערכת שתומכת בהחלטה אך אינה מחליטה או מבצעת מסחר במקום האדם) פעיל נדרשים
+> 20 ימי <bdi dir="ltr"><code>Shadow Mode</code></bdi>, בדיקת
+> <bdi dir="ltr"><code>Calibration</code></bdi> (בדיקה האם רמת הביטחון שהמערכת מציגה
+> באמת מתאימה לשיעור ההצלחה שנמדד) ואישור אנושי.
+>
+> השלב הבא יכול לכלול <bdi dir="ltr"><code>SIP</code></bdi> (הזנת שוק מאוחדת שמרכזת
+> עסקאות וציטוטים מכל הבורסות האמריקאיות, ולכן מלאה יותר מהזנת
+> <bdi dir="ltr"><code>IEX</code></bdi> החלקית שבה משתמשים כעת), מעבר ל־<bdi dir="ltr"><code>S3</code></bdi>
+> (שירות אחסון האובייקטים של <bdi dir="ltr"><code>AWS</code></bdi>, המקביל הענני
+> לתפקיד של <bdi dir="ltr"><code>MinIO</code></bdi>), ‏<bdi dir="ltr"><code>Observability</code></bdi>
+> (מדדים, לוגים והתראות שמאפשרים להבין את בריאות המערכת) ואבטחת
+> <bdi dir="ltr"><code>Production</code></bdi> (הקשחה הנדרשת להפעלה אמיתית עבור
+> משתמשים). אלה שלבי המשך ולא יכולות שאני טוען שכבר
 > מימשתי.
 
 ### שקף 12 — מעבר לדמו
@@ -245,7 +296,9 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 1. בחר את <bdi dir="ltr"><code>AAPL</code></bdi> בבורר המניות.
 2. לחץ על <bdi dir="ltr"><code>7D</code></bdi>. המתן שהגרף ייטען והצבע על תגית מספר התוצאות ועל טווח התאריכים.
 3. לחץ על <bdi dir="ltr"><code>30D</code></bdi>. הצבע על כך שהטווח והגרף השתנו, ולא רק הכותרת.
-4. הצבע על קו המחיר ועל הקו המקווקו של <bdi dir="ltr"><code>SMA 20</code></bdi>. אין צורך לנסות לנבא מה יקרה למחיר.
+4. הצבע על קו המחיר ועל הקו המקווקו של <bdi dir="ltr"><code>SMA 20</code></bdi>
+   (ממוצע פשוט של 20 מחירי הסגירה האחרונים, שמחליק תנודות קצרות). אין צורך
+   לנסות לנבא מה יקרה למחיר.
 
 **מה הקהל צריך לראות:** הנתונים אינם תמונה קבועה. החלפת הטווח יוצרת קריאה
 חדשה ל־<bdi dir="ltr"><code>API</code></bdi>, והגרף, סטטוס הנתונים והממוצע הנע מתעדכנים בהתאם.
@@ -280,10 +333,14 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 4. לחץ על <bdi dir="ltr"><code>Messages</code></bdi>.
 5. בחר הודעות אחרונות ולחץ על כפתור הטעינה, אם הוא מופיע.
 6. פתח הודעה אחת בלבד.
-7. הצבע על השדה <bdi dir="ltr"><code>key</code></bdi>. זהו מפתח ההודעה.
-8. הצבע על השדה <bdi dir="ltr"><code>partition</code></bdi>. זו המחיצה שבה היא נשמרה.
-9. הצבע על השדה <bdi dir="ltr"><code>offset</code></bdi>. זהו מספר המיקום שלה במחיצה.
-10. פתח את גוף ה־<bdi dir="ltr"><code>JSON</code></bdi> והצבע על שם המניה ועל זמן האירוע.
+7. הצבע על השדה <bdi dir="ltr"><code>key</code></bdi> (מפתח שמאפשר לנתב אירועים
+   הקשורים לאותה ישות, למשל אותה מניה, לאותה מחיצה).
+8. הצבע על השדה <bdi dir="ltr"><code>partition</code></bdi> (מחיצה: רצף מסודר אחד
+   בתוך הנושא, שמאפשר לחלק עומס בלי לאבד סדר בתוך המחיצה).
+9. הצבע על השדה <bdi dir="ltr"><code>offset</code></bdi> (מספר סידורי עולה שמציין
+   את המיקום המדויק של ההודעה בתוך המחיצה).
+10. פתח את גוף ה־<bdi dir="ltr"><code>JSON</code></bdi> (פורמט טקסט מובנה של שמות
+    שדות וערכים) והצבע על שם המניה ועל זמן האירוע.
 
 **אם אינך רואה הודעה:**
 
@@ -319,16 +376,23 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 
 **מה לעשות על המסך — בדיוק לפי הסדר:**
 
-1. במסך הבית לחץ על ה־<bdi dir="ltr"><code>Bucket</code></bdi> בשם <bdi dir="ltr"><code>marketpilot-bronze</code></bdi>.
+1. במסך הבית לחץ על ה־<bdi dir="ltr"><code>Bucket</code></bdi> (מכל לוגי לאובייקטים,
+   בדומה לתיקייה ראשית בענן) בשם <bdi dir="ltr"><code>marketpilot-bronze</code></bdi>.
 2. לחץ על התיקייה <bdi dir="ltr"><code>source=alpaca</code></bdi>. המשמעות: מקור האירוע הוא ספק נתוני השוק <bdi dir="ltr"><code>Alpaca</code></bdi>.
 3. פתח <bdi dir="ltr"><code>event=market_bar_1m</code></bdi>. זהו אירוע של נר שוק באורך דקה.
 4. המשך בתיקיות התאריך: <bdi dir="ltr"><code>year=...</code></bdi> → <bdi dir="ltr"><code>month=...</code></bdi> → <bdi dir="ltr"><code>day=...</code></bdi>.
 5. פתח מניה, למשל <bdi dir="ltr"><code>symbol=AAPL</code></bdi>, ואז <bdi dir="ltr"><code>topic=market.bars.1m.v1</code></bdi>.
 6. פתח <bdi dir="ltr"><code>partition=0</code></bdi>, ואז קובץ אחד שמתחיל ב־<bdi dir="ltr"><code>offset=</code></bdi> ומסתיים ב־<bdi dir="ltr"><code>.json</code></bdi>.
-7. בתוך הקובץ הצבע רק על: <bdi dir="ltr"><code>symbol</code></bdi>, ‏<bdi dir="ltr"><code>event_time_utc</code></bdi>, מחירי
-<bdi dir="ltr"><code>open/high/low/close</code></bdi>, ‏<bdi dir="ltr"><code>volume</code></bdi>, ‏<bdi dir="ltr"><code>ingested_at_utc</code></bdi> ו־<bdi dir="ltr"><code>schema_version</code></bdi>.
+7. בתוך הקובץ הצבע רק על: <bdi dir="ltr"><code>symbol</code></bdi> (סימול המניה),
+   ‏<bdi dir="ltr"><code>event_time_utc</code></bdi> (המועד שבו הנר התרחש בשוק לפי
+   שעון עולמי), מחירי <bdi dir="ltr"><code>open/high/low/close</code></bdi> (פתיחה,
+   גבוה, נמוך וסגירה של הנר), ‏<bdi dir="ltr"><code>volume</code></bdi> (כמות המניות
+   שנסחרה), ‏<bdi dir="ltr"><code>ingested_at_utc</code></bdi> (המועד שבו המערכת
+   קלטה את האירוע) ו־<bdi dir="ltr"><code>schema_version</code></bdi> (גרסת מבנה
+   הנתונים שמאפשרת לשנות את החוזה באופן מבוקר).
 
-אם הגעת לנתון היסטורי, ייתכן שתראה שם אירוע או נושא של <bdi dir="ltr"><code>backfill</code></bdi>. זה בסדר:
+אם הגעת לנתון היסטורי, ייתכן שתראה שם אירוע או נושא של <bdi dir="ltr"><code>Backfill</code></bdi>
+(טעינה תחומה של נתוני עבר כדי להשלים תקופה חסרה). זה בסדר:
 הסבר שמדובר בנתונים שהשלמנו לצורך ההיסטוריה והבדיקה; אל תציג אותם כאילו הם
 נקלטו ברגע זה.
 
@@ -360,10 +424,12 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 
 **מה לעשות על המסך:**
 
-1. פתח את רשימת ה־<bdi dir="ltr"><code>DAGs</code></bdi>.
+1. פתח את רשימת ה־<bdi dir="ltr"><code>DAGs</code></bdi> (תהליכים שמוגדרים
+   כמשימות עם סדר ותלויות; משימה מאוחרת אינה מתחילה לפני שקודמתה הצליחה).
 2. בחר ריצה ירוקה ומוצלחת של <bdi dir="ltr"><code>historical_market_backfill</code></bdi>.
 אל תבחר את הריצה האחרונה באופן אוטומטי; בדוק קודם שהסטטוס שלה ירוק.
-3. פתח את תצוגת <bdi dir="ltr"><code>Grid</code></bdi> או <bdi dir="ltr"><code>Graph</code></bdi> והצבע על סדר המשימות הירוקות.
+3. פתח את תצוגת <bdi dir="ltr"><code>Grid</code></bdi> (טבלת ריצות ומשימות) או
+   <bdi dir="ltr"><code>Graph</code></bdi> (תרשים התלויות) והצבע על סדר המשימות הירוקות.
 4. אל תלחץ על <bdi dir="ltr"><code>Trigger DAG</code></bdi> מול הקהל. ריצה מוצלחת קיימת היא הראיה הבטוחה יותר.
 
 **מה הקהל צריך לראות:** העבודה המאושרת אינה כפתור קסם. יש לה שלבים, תלויות
@@ -394,9 +460,12 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 
 1. ודא שמופיעים 11 סימולים ברשימת המעקב.
 2. בחר את <bdi dir="ltr"><code>AAPL</code></bdi> כמקרה עם היסטוריה מאושרת ועשירה.
-3. עבור אל <bdi dir="ltr"><code>AMZN</code></bdi> כמקרה שנוסף ל־<bdi dir="ltr"><code>Watchlist</code></bdi> וחושב במסלול החי.
-4. בחר סימול שמציג <bdi dir="ltr"><code>INSUFFICIENT DATA</code></bdi> והסבר מדוע עצירת מסקנה היא תוצאה תקינה.
-5. הצבע על הסטטוס: <bdi dir="ltr"><code>PROVISIONAL</code></bdi>, ‏<bdi dir="ltr"><code>CERTIFIED</code></bdi>, ‏<bdi dir="ltr"><code>STALE</code></bdi> או
+3. עבור אל <bdi dir="ltr"><code>AMZN</code></bdi> כמקרה שנוסף ל־<bdi dir="ltr"><code>Watchlist</code></bdi>
+   (רשימת המניות שהמשתמש בחר לעקוב אחריהן) וחושב במסלול החי.
+4. בחר סימול שמציג <bdi dir="ltr"><code>INSUFFICIENT DATA</code></bdi> (אין מספיק
+   נתונים טריים ומאושרים כדי לחשב תרחיש אמין) והסבר מדוע עצירת מסקנה היא תוצאה תקינה.
+5. הצבע על הסטטוס: <bdi dir="ltr"><code>PROVISIONAL</code></bdi>, ‏<bdi dir="ltr"><code>CERTIFIED</code></bdi>,
+   ‏<bdi dir="ltr"><code>STALE</code></bdi> (הנתון קיים אך עבר את מגבלת הטריות) או
 <bdi dir="ltr"><code>INSUFFICIENT DATA</code></bdi> — מה שמופיע בפועל.
 6. עבור על כרטיס התרחיש בסדר: <bdi dir="ltr"><code>Buy Zone</code></bdi>, ‏<bdi dir="ltr"><code>Stop</code></bdi>, ‏<bdi dir="ltr"><code>Target 1</code></bdi>,
 <bdi dir="ltr"><code>Target 2</code></bdi>, ‏<bdi dir="ltr"><code>Risk/Reward</code></bdi> וגודל הפוזיציה.
@@ -433,8 +502,10 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 **מה לעשות על המסך:**
 
 1. בחר את הריצה המפורסמת שהמזהה שלה מתחיל ב־<bdi dir="ltr"><code>2bf99281</code></bdi>.
-2. ודא שהמסך מציג את טווח הנתונים, מספר התצפיות ואת עקומת ההון.
-3. הצבע על מדדי התוצאה ועל ההשוואה ל־<bdi dir="ltr"><code>SPY</code></bdi>.
+2. ודא שהמסך מציג את טווח הנתונים, מספר התצפיות ואת עקומת ההון (שינוי הערך
+   המצטבר של האסטרטגיה לאורך הניסוי).
+3. הצבע על מדדי התוצאה ועל ההשוואה ל־<bdi dir="ltr"><code>SPY</code></bdi>
+   (מדד הייחוס שבודק אם האסטרטגיה הוסיפה ערך לעומת השוק הרחב).
 4. אם יש פירוט אסטרטגיה או עלויות, הצבע עליו ואמור שהן נכללות בניסוי ולא הוסתרו.
 
 **מה הקהל צריך לראות:** זו ריצה מתועדת שאפשר לחזור עליה: יש קלטים, גרסה,
@@ -469,7 +540,49 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 - אם הנתון החי ישן, אמור זאת בכנות. שירות בריא ונתון טרי הן שתי בדיקות שונות.
 - אל תתחיל תיקון ארוך מול הקהל. עבור לראיה החלופית והמשך לדבר.
 
-## שלושה מושגים שחובה לדעת
+## מילון מושגים שכדאי לדעת לפני ההצגה
+
+אין צורך להקריא את החלק הזה בדמו. הוא נועד כדי שתוכל לענות בביטחון אם הסוקר
+עוצר ושואל מה משמעותו של מושג שמופיע במסך או במצגת.
+
+### <bdi dir="ltr"><code>IEX</code></bdi> לעומת <bdi dir="ltr"><code>SIP</code></bdi>
+
+<bdi dir="ltr"><code>IEX</code></bdi> היא בורסה אמריקאית אחת. בחבילת הנתונים החינמית
+של <bdi dir="ltr"><code>Alpaca</code></bdi> מתקבלת הזנה שמבוססת עליה, ולכן היא מציגה
+רק חלק מהעסקאות בשוק. ‏<bdi dir="ltr"><code>SIP</code></bdi> הוא מנגנון האיחוד הרשמי
+של נתוני הבורסות האמריקאיות: הוא מרכז עסקאות וציטוטי קנייה ומכירה מכל זירות
+המסחר המשתתפות. לכן <bdi dir="ltr"><code>SIP</code></bdi> מלא יותר, אבל בדרך כלל דורש
+הרשאה או תשלום. בפרויקט הנוכחי הנתונים החיים נשארים ב־<bdi dir="ltr"><code>IEX</code></bdi>,
+והמערכת מורידה את רמת הביטחון בהתאם למגבלה הזאת.
+
+### <bdi dir="ltr"><code>Bronze</code></bdi>, ‏<bdi dir="ltr"><code>Silver</code></bdi> ו־<bdi dir="ltr"><code>Gold</code></bdi>
+
+אלה שלוש דרגות הבשלה של אותו מידע. ‏<bdi dir="ltr"><code>Bronze</code></bdi> הוא
+העותק הגולמי שנשמר כפי שהתקבל. ‏<bdi dir="ltr"><code>Silver</code></bdi> הוא מידע
+שנוקה, נורמל ואורגן למבנה אחיד. ‏<bdi dir="ltr"><code>Gold</code></bdi> הוא מידע
+מוכן לצריכה עסקית, למשל גרף, אינדיקטור או תרחיש החלטה. ההפרדה מאפשרת לחזור
+למקור גם אם בעתיד נשנה את לוגיקת העיבוד.
+
+### <bdi dir="ltr"><code>Streaming</code></bdi> לעומת <bdi dir="ltr"><code>Batch</code></bdi>
+
+<bdi dir="ltr"><code>Streaming</code></bdi> הוא שירות ארוך־חיים שמחכה לאירועים
+ומעבד אותם ברצף כדי לתת תוצאה מהירה. ‏<bdi dir="ltr"><code>Batch</code></bdi> היא
+עבודה עם התחלה וסיום שמעבדת טווח ידוע, למשל יום מסחר שלם. המסלול החי נותן
+מהירות; המסלול האצוותי בונה מחדש את התוצאה ומוסיף בדיקות איכות סמכותיות.
+
+### <bdi dir="ltr"><code>Provisional</code></bdi> לעומת <bdi dir="ltr"><code>Certified</code></bdi>
+
+<bdi dir="ltr"><code>Provisional</code></bdi> פירושו “מהיר אך זמני”: התוצאה זמינה
+למשתמש, אך עוד לא עברה את כל בדיקות סוף היום. ‏<bdi dir="ltr"><code>Certified</code></bdi>
+פירושו “מאושר”: התוצאה חושבה מחדש מהמקור הגולמי ועברה את שערי האיכות. זהו
+לא הבדל עיצובי אלא הבטחה שונה לגבי רמת האמון בנתון.
+
+### <bdi dir="ltr"><code>Backfill</code></bdi> ו־<bdi dir="ltr"><code>Replay</code></bdi>
+
+<bdi dir="ltr"><code>Backfill</code></bdi> הוא תהליך יזום שמביא נתוני עבר לתקופה
+חסרה. ‏<bdi dir="ltr"><code>Replay</code></bdi> הוא עיבוד מחדש של אירועים שכבר נשמרו.
+בפרויקט הנתונים ההיסטוריים אינם “נשתלים” ישירות במסד: הם עוברים דרך אותו
+מסלול אירועים, אחסון ובדיקות, כדי לשמור על התנהגות ועל עקיבות זהות לנתונים החיים.
 
 ### <bdi dir="ltr"><code>Checkpoint</code></bdi>
 
@@ -483,11 +596,61 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 ומחלקים ב־20. הוא מחליק רעש ועוזר לראות כיוון, אך הוא מפגר אחרי המחיר ואינו
 אות קנייה בפני עצמו.
 
+### <bdi dir="ltr"><code>EMA</code></bdi>, ‏<bdi dir="ltr"><code>RSI</code></bdi>, ‏<bdi dir="ltr"><code>MACD</code></bdi> ו־<bdi dir="ltr"><code>ATR</code></bdi>
+
+- <bdi dir="ltr"><code>EMA</code></bdi> (ממוצע נע מעריכי) דומה לממוצע נע, אך נותן
+  משקל גבוה יותר למחירים האחרונים ולכן מגיב מהר יותר לשינוי.
+- <bdi dir="ltr"><code>RSI</code></bdi> (מדד עוצמה יחסית) מודד מומנטום בסולם
+  <bdi dir="ltr"><code>0–100</code></bdi>. ערך קיצוני הוא סימן לבדיקה, לא פקודת קנייה
+  או מכירה אוטומטית.
+- <bdi dir="ltr"><code>MACD</code></bdi> (מדד מגמה ומומנטום המבוסס על הפער בין שני
+  ממוצעים מעריכיים) עוזר לזהות שינוי בעוצמת המגמה.
+- <bdi dir="ltr"><code>ATR</code></bdi> (טווח אמיתי ממוצע) מודד תנודתיות — כמה המחיר
+  נע בדרך כלל — ולא את כיוון התנועה. המערכת נעזרת בו כדי להתאים מרחקי עצירה
+  ויעדים לתנודתיות של כל מניה.
+
+### <bdi dir="ltr"><code>Risk/Reward</code></bdi>
+
+היחס בין הרווח המתוכנן לבין ההפסד המתוכנן. לדוגמה, אם הסיכון עד מחיר העצירה
+הוא 10 שקלים והיעד מציע 20 שקלים, היחס הוא <bdi dir="ltr"><code>2:1</code></bdi>.
+היחס אינו חוזה שהיעד יושג; הוא מאפשר לבדוק מראש אם פוטנציאל התרחיש מצדיק את
+הסיכון שלו.
+
+### <bdi dir="ltr"><code>Lineage</code></bdi>
+
+עקיבות מלאה של הנתון: מאיזה מקור ואירוע הגיע, איזו ריצה עיבדה אותו, באיזו
+גרסת קוד ובאיזו גרסת נתונים. כך אפשר להסביר תוצאה, לשחזר אותה ולברר תקלה
+בלי לנחש.
+
+### <bdi dir="ltr"><code>Freshness</code></bdi>
+
+מדד לגיל הנתון ביחס לזמן שבו ציפינו לקבלו. שירות יכול להיות בריא ועדיין
+להציג נתון ישן, למשל כאשר השוק סגור או כשהמקור הפסיק לשלוח מידע. לכן המערכת
+בודקת בנפרד זמינות שירותים וטריות נתונים.
+
+### <bdi dir="ltr"><code>Slippage</code></bdi>, ‏<bdi dir="ltr"><code>Drawdown</code></bdi> ו־<bdi dir="ltr"><code>Benchmark</code></bdi>
+
+- <bdi dir="ltr"><code>Slippage</code></bdi> הוא ההפרש בין מחיר הביצוע שתוכנן לבין
+  המחיר שבו היה אפשר לבצע בפועל. מוסיפים אותו לבדיקה כדי לא להציג תוצאה
+  אופטימית מדי.
+- <bdi dir="ltr"><code>Drawdown</code></bdi> הוא שיעור הירידה משיא מקומי לשפל שבא
+  אחריו. הוא עוזר להבין כמה כאב וסיכון היו בדרך, גם אם התשואה הסופית חיובית.
+- <bdi dir="ltr"><code>Benchmark</code></bdi> הוא מדד ייחוס. בפרויקט זהו
+  <bdi dir="ltr"><code>SPY</code></bdi>, כדי להשוות את האסטרטגיה לחלופה פשוטה של
+  חשיפה לשוק הרחב.
+
 ### <bdi dir="ltr"><code>Idempotency</code></bdi>
 
 היכולת להריץ פעולה שוב בלי ליצור תוצאה עסקית כפולה. ב־<bdi dir="ltr"><code>MarketPilot</code></bdi>
 משתמשים במפתחות עסקיים, מזהים דטרמיניסטיים ו־<bdi dir="ltr"><code>Upsert</code></bdi>. המטרה
 אינה למנוע כל <bdi dir="ltr"><code>Retry</code></bdi>, אלא להפוך אותו לבטוח.
+
+### <bdi dir="ltr"><code>Calibration</code></bdi>
+
+בדיקה האם ציון הביטחון של המערכת מתאים למה שקרה בפועל. אם תרחישים עם
+<bdi dir="ltr"><code>80%</code></bdi> ביטחון מצליחים רק בחצי מהמקרים, הציון אינו
+מכויל היטב. זו אחת הסיבות לתקופת הצל: קודם אוספים מספיק תוצאות אמיתיות,
+ורק אחר כך מחליטים אם אפשר להציג את התרחישים כתמיכה פעילה בהחלטה.
 
 ## המשפט לזכור אם אינך יודע תשובה
 
