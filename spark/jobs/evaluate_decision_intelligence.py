@@ -12,6 +12,16 @@ import pymysql
 from pymysql.cursors import DictCursor
 
 from marketpilot.decision_intelligence.evaluation import evaluate_path
+from marketpilot.decision_intelligence.hybrid import PriceBar, label_recommendation_path
+
+
+def _price_bar(row: dict[str, object]) -> PriceBar:
+    return PriceBar(
+        event_time_utc=row["event_time_utc"],
+        high=Decimal(row["high_price"]),
+        low=Decimal(row["low_price"]),
+        close=Decimal(row["close_price"]),
+    )
 
 
 def main() -> None:
@@ -116,6 +126,82 @@ def main() -> None:
                         ),
                     )
                     published += 1
+
+            cursor.execute(
+                """
+                SELECT f.snapshot_id,f.symbol_id,f.as_of_utc,r.valid_until_utc,
+                       r.buy_zone_low,r.buy_zone_high,r.stop_price,r.target_1,r.target_2
+                FROM fact_decision_feature_snapshot f
+                JOIN fact_opportunity_recommendation r ON r.recommendation_id=f.snapshot_id
+                WHERE f.certification_status='CERTIFIED' AND DATE(f.as_of_utc)<%s
+                """,
+                (evaluation_date,),
+            )
+            for snapshot in cursor.fetchall():
+                cursor.execute(
+                    """
+                    SELECT event_time_utc,high_price,low_price,close_price
+                    FROM fact_market_bar_1m
+                    WHERE symbol_id=%s AND certification_status='CERTIFIED'
+                      AND event_time_utc>=%s AND event_time_utc<=%s
+                    ORDER BY event_time_utc
+                    """,
+                    (snapshot["symbol_id"], snapshot["as_of_utc"], snapshot["valid_until_utc"]),
+                )
+                entry_bars = [_price_bar(row) for row in cursor.fetchall()]
+                cursor.execute(
+                    """
+                    SELECT event_time_utc,high_price,low_price,close_price
+                    FROM fact_market_bar_1m
+                    WHERE symbol_id=%s AND certification_status='CERTIFIED'
+                      AND event_time_utc>%s AND DATE(event_time_utc)<=%s
+                    ORDER BY event_time_utc
+                    """,
+                    (snapshot["symbol_id"], snapshot["as_of_utc"], evaluation_date),
+                )
+                outcome_rows = cursor.fetchall()
+                distinct_sessions = {row["event_time_utc"].date() for row in outcome_rows}
+                if entry_bars and len(distinct_sessions) < 10:
+                    continue
+                label = label_recommendation_path(
+                    zone_low=Decimal(snapshot["buy_zone_low"]),
+                    zone_high=Decimal(snapshot["buy_zone_high"]),
+                    stop=Decimal(snapshot["stop_price"]),
+                    target_1=Decimal(snapshot["target_1"]),
+                    target_2=Decimal(snapshot["target_2"]),
+                    entry_window_bars=entry_bars,
+                    outcome_bars=[_price_bar(row) for row in outcome_rows],
+                )
+                cursor.execute(
+                    """
+                    INSERT INTO fact_decision_label (
+                        snapshot_id,horizon_sessions,entry_filled,entry_time_utc,entry_price,
+                        outcome,target_before_stop,observed_close,observed_high,observed_low,
+                        evaluated_through_date,pipeline_run_id,code_version,label_schema_version
+                    ) VALUES (%s,10,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,2)
+                    ON DUPLICATE KEY UPDATE entry_filled=VALUES(entry_filled),
+                        entry_time_utc=VALUES(entry_time_utc),entry_price=VALUES(entry_price),
+                        outcome=VALUES(outcome),target_before_stop=VALUES(target_before_stop),
+                        observed_close=VALUES(observed_close),observed_high=VALUES(observed_high),
+                        observed_low=VALUES(observed_low),evaluated_through_date=VALUES(evaluated_through_date),
+                        pipeline_run_id=VALUES(pipeline_run_id),code_version=VALUES(code_version)
+                    """,
+                    (
+                        snapshot["snapshot_id"],
+                        label.entry_filled,
+                        label.entry_time_utc,
+                        label.entry_price,
+                        label.outcome,
+                        label.target_before_stop,
+                        label.observed_close,
+                        label.observed_high,
+                        label.observed_low,
+                        evaluation_date,
+                        args.run_id,
+                        os.environ.get("MARKETPILOT_CODE_VERSION", "development"),
+                    ),
+                )
+                published += 1
         connection.commit()
         print(json.dumps({"event": "recommendations_evaluated", "count": published}))
     except Exception:

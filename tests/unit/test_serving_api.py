@@ -63,6 +63,21 @@ class FakeReadRepository:
             "published_backtest_runs": 3,
         }
 
+    def decision_model_status(self) -> dict[str, Any]:
+        return {
+            "model_version": "decision-intelligence-v2-hybrid-preview",
+            "model_family": "LOGISTIC_REGRESSION",
+            "status": "PREVIEW",
+            "feature_schema_version": 2,
+            "trained_from_date": date(2024, 9, 1),
+            "trained_through_date": date(2026, 8, 31),
+            "activation_threshold": "0.60",
+            "calibration_method": "sigmoid",
+            "promotion_eligible": False,
+            "promotion_reasons": ["live shadow gate is incomplete"],
+            "metrics": {"brier_score": 0.2},
+        }
+
     @staticmethod
     def _opportunity() -> dict[str, Any]:
         return {
@@ -367,6 +382,9 @@ def test_decision_alerts_and_shadow_progress_are_bounded() -> None:
     assert status.json()["completed_sessions"] == 3
     assert status.json()["historical_certified_sessions"] == 41
     assert client.get("/api/v1/decision-alerts?limit=101").status_code == 422
+    model = client.get("/api/v1/decision-model/status")
+    assert model.status_code == 200
+    assert model.json()["status"] == "PREVIEW"
 
 
 def test_market_bars_enforce_filters_pagination_and_aware_bounds() -> None:

@@ -4,7 +4,8 @@ USER root
 WORKDIR /opt/marketpilot
 ENV PYTHONPATH=/opt/marketpilot/src
 RUN python3 -m pip install --no-cache-dir \
-    PyMySQL==1.2.0 exchange-calendars==4.13.2 'boto3>=1.35,<2'
+    PyMySQL==1.2.0 exchange-calendars==4.13.2 'boto3>=1.35,<2' \
+    joblib==1.5.2 numpy==2.2.6 scikit-learn==1.6.1
 RUN mkdir -p /tmp/marketpilot-ivy /checkpoints && \
     chown -R spark:spark /tmp/marketpilot-ivy /checkpoints
 

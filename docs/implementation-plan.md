@@ -399,3 +399,25 @@ The implementation is complete, but promotion is intentionally not complete. The
 non-actionable until 20 distinct real certified market sessions have accumulated and a separate
 review records an explicit `APPROVED` decision. No test or backfill may fabricate that elapsed-time
 gate. Runtime evidence is in `docs/phase14-verification.md`.
+
+# Phase 15 — Hybrid Decision Intelligence (implemented; data collection required)
+
+The implementation adds point-in-time feature snapshots, entry-aware ten-session labels, a
+checksum-protected model registry, calibrated Logistic Regression and Histogram Gradient Boosting
+candidates, chronological walk-forward evaluation and fail-safe scoring. The existing v1 rules
+remain authoritative while every v2 model is `PREVIEW`.
+
+Operational completion is deliberately separate from code completion. Training requires 24 months
+of certified IEX history, at least 300 entered scenarios and all promotion gates in ADR-009. The
+bounded historical acquisition DAG must be run in windows of no more than 31 calendar days. A
+successful validation starts a new 20-real-session v2 Shadow Mode; it does not inherit v1 days and
+still requires explicit human approval before `ACTIVE`.
+
+Acceptance evidence:
+
+- deterministic unit tests cover `NO_ENTRY`, target-first, stop-first and same-bar ambiguity;
+- historical calculations reject future bars relative to `as_of_utc`;
+- model artifacts are SHA-256 verified before scoring;
+- missing or invalid artifacts publish `FALLBACK`, never a stale probability;
+- API clients remain backward-compatible because new fields are optional;
+- the Opportunity Center distinguishes Rule Score, Model Probability and Data Confidence.

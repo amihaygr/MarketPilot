@@ -9,13 +9,44 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from uuid import NAMESPACE_URL, uuid5
 
+import boto3
 import pymysql
 from pymysql.cursors import DictCursor
 
 from marketpilot.corporate_actions.adjustments import adjust_bars_for_splits
+from marketpilot.decision_intelligence.hybrid import decision_feature_payload, hybrid_action
 from marketpilot.decision_intelligence.rules import DecisionInputs, PortfolioRisk, build_decision
+from marketpilot.decision_intelligence.scoring import load_artifact, score_payload
 
 SPARK_UTC = timezone.utc  # noqa: UP017 -- Spark 3.5.8 image uses Python 3.10.
+
+
+def _load_current_model(cursor: DictCursor) -> tuple[dict[str, object] | None, str | None]:
+    cursor.execute(
+        """
+        SELECT model_version,status,artifact_uri,artifact_sha256,activation_threshold,
+               trained_through_date
+        FROM decision_model_registry
+        WHERE status IN ('ACTIVE','PREVIEW')
+        ORDER BY FIELD(status,'ACTIVE','PREVIEW'),created_at_utc DESC LIMIT 1
+        """
+    )
+    registry = cursor.fetchone()
+    if not registry:
+        return None, "no registered hybrid model"
+    try:
+        bucket, key = str(registry["artifact_uri"])[5:].split("/", 1)
+        client = boto3.client(
+            "s3",
+            endpoint_url=os.environ["MINIO_ENDPOINT"],
+            aws_access_key_id=os.environ["MINIO_ROOT_USER"],
+            aws_secret_access_key=os.environ["MINIO_ROOT_PASSWORD"],
+        )
+        body = client.get_object(Bucket=bucket, Key=key)["Body"].read()
+        registry["artifact"] = load_artifact(body, str(registry["artifact_sha256"]))
+        return registry, None
+    except Exception as error:  # artifact failures must degrade to deterministic v1
+        return registry, f"{type(error).__name__}: {error}"
 
 
 def _ema(values: list[Decimal], period: int) -> Decimal:
@@ -167,6 +198,7 @@ def main() -> None:
                 ("decision-intelligence-v1",),
             )
             shadow_row = cursor.fetchone() or {"promotion_status": "COLLECTING"}
+            model_registry, model_error = _load_current_model(cursor)
             cursor.execute(
                 """
                 SELECT s.symbol_id, s.symbol FROM user_watchlist_symbol w
@@ -186,9 +218,10 @@ def main() -> None:
                 SELECT f.event_time_utc,f.open_price,f.high_price,f.low_price,
                        f.close_price,f.volume,f.source_name
                 FROM fact_market_bar_1m f JOIN dim_symbol s ON s.symbol_id=f.symbol_id
-                WHERE s.symbol='SPY' AND {status_filter}
+                WHERE s.symbol='SPY' AND {status_filter} AND f.event_time_utc<=%s
                 ORDER BY f.event_time_utc DESC LIMIT 10000
-                """
+                """,
+                (as_of.replace(tzinfo=None),),
             )
             spy_rows = list(reversed(cursor.fetchall()))
             spy_15m_closes = [Decimal(row["close_price"]) for row in _aggregate(spy_rows, 15)]
@@ -203,10 +236,10 @@ def main() -> None:
                     SELECT event_time_utc, open_price, high_price, low_price,
                            close_price, volume, source_name
                     FROM fact_market_bar_1m
-                    WHERE symbol_id=%s AND {status_filter}
+                    WHERE symbol_id=%s AND {status_filter} AND event_time_utc<=%s
                     ORDER BY event_time_utc DESC LIMIT 10000
                     """,
-                    (symbol["symbol_id"],),
+                    (symbol["symbol_id"], as_of.replace(tzinfo=None)),
                 )
                 rows = list(reversed(cursor.fetchall()))
                 if rows:
@@ -295,6 +328,32 @@ def main() -> None:
                         f"decision-intelligence-v1:{args.certification_status}",
                     )
                 )
+                feature_payload = decision_feature_payload(inputs, decision)
+                cursor.execute(
+                    """
+                    INSERT INTO fact_decision_feature_snapshot (
+                        snapshot_id,symbol_id,as_of_utc,feature_schema_version,feature_json,
+                        market_data_time_utc,fundamentals_as_of_utc,certification_status,
+                        feed_name,pipeline_run_id,code_version,data_version
+                    ) VALUES (%s,%s,%s,2,%s,%s,%s,%s,%s,%s,%s,'decision-feature-v2')
+                    ON DUPLICATE KEY UPDATE feature_json=VALUES(feature_json),
+                        market_data_time_utc=VALUES(market_data_time_utc),
+                        fundamentals_as_of_utc=VALUES(fundamentals_as_of_utc),
+                        pipeline_run_id=VALUES(pipeline_run_id),code_version=VALUES(code_version)
+                    """,
+                    (
+                        recommendation_id,
+                        symbol["symbol_id"],
+                        as_of.replace(tzinfo=None),
+                        json.dumps(feature_payload, sort_keys=True, separators=(",", ":")),
+                        latest["event_time_utc"],
+                        fundamental_time,
+                        args.certification_status,
+                        inputs.feed,
+                        args.run_id,
+                        os.environ.get("MARKETPILOT_CODE_VERSION", "development"),
+                    ),
+                )
                 lifecycle = (
                     "INSUFFICIENT_DATA"
                     if decision.action == "INSUFFICIENT DATA"
@@ -368,6 +427,61 @@ def main() -> None:
                         ),
                         args.run_id,
                         os.environ.get("MARKETPILOT_CODE_VERSION", "development"),
+                    ),
+                )
+                model_status = "FALLBACK"
+                model_version = "decision-intelligence-v2-hybrid"
+                probability = expected_model_r = None
+                positive_drivers: tuple[str, ...] = ()
+                negative_drivers: tuple[str, ...] = ()
+                if model_registry and not model_error:
+                    model_status = str(model_registry["status"])
+                    model_version = str(model_registry["model_version"])
+                    score = score_payload(model_registry["artifact"], feature_payload)
+                    probability = score.probability
+                    expected_model_r = score.expected_r
+                    positive_drivers = score.positive_drivers
+                    negative_drivers = score.negative_drivers
+                    if model_status == "ACTIVE":
+                        published_action = hybrid_action(
+                            rules_action=decision.action,
+                            success_probability=probability,
+                            activation_threshold=Decimal(model_registry["activation_threshold"]),
+                            price=inputs.price,
+                            zone_low=decision.buy_zone_low,
+                            zone_high=decision.buy_zone_high,
+                            model_status="ACTIVE",
+                        )
+                        cursor.execute(
+                            """
+                            UPDATE fact_opportunity_recommendation
+                            SET action=%s, actionable=%s
+                            WHERE recommendation_id=%s
+                            """,
+                            (published_action, published_action == "BUY ZONE", recommendation_id),
+                        )
+                cursor.execute(
+                    """
+                    INSERT INTO fact_decision_model_prediction (
+                        recommendation_id,model_version,model_status,success_probability,
+                        expected_r,calibration_status,top_positive_drivers_json,
+                        top_negative_drivers_json
+                    ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+                    ON DUPLICATE KEY UPDATE model_status=VALUES(model_status),
+                        success_probability=VALUES(success_probability),
+                        expected_r=VALUES(expected_r),calibration_status=VALUES(calibration_status),
+                        top_positive_drivers_json=VALUES(top_positive_drivers_json),
+                        top_negative_drivers_json=VALUES(top_negative_drivers_json)
+                    """,
+                    (
+                        recommendation_id,
+                        model_version,
+                        model_status,
+                        probability,
+                        expected_model_r,
+                        "CALIBRATED" if probability is not None else "UNAVAILABLE",
+                        json.dumps(positive_drivers),
+                        json.dumps(negative_drivers),
                     ),
                 )
                 alert_type = None

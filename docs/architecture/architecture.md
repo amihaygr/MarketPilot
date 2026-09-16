@@ -313,7 +313,25 @@ watchlist tables and can read only symbol identifiers needed for validation. Bro
 schema-bounded and symbol-validated before a transaction replaces the saved watchlist. No
 component submits an order or reads an Alpaca brokerage balance.
 
-## 19. Capacity assumptions
+## 19. Hybrid Decision Intelligence
+
+Phase 15 keeps the deterministic Decision Intelligence rules authoritative for Buy Zone, Stop,
+targets, freshness and portfolio-risk gates. A separately versioned probability model estimates
+the conditional chance that Target 1 is reached before Stop within ten XNYS sessions, but only
+after the market actually traded through the published Buy Zone.
+
+Point-in-time feature snapshots and labels are stored in MariaDB Gold. `NO_ENTRY` is measured
+separately and never treated as a losing trade. Calibrated Logistic Regression and Histogram
+Gradient Boosting candidates are evaluated with expanding chronological walk-forward folds. Model
+artifacts and manifests are checksum-protected in MinIO; registry, validation metrics and
+predictions remain queryable in MariaDB.
+
+`PREVIEW` predictions are visible but cannot change the v1 action. An `ACTIVE` model must first
+pass automatic validation gates, collect 20 new live certified sessions for v2 and receive human
+approval. Missing artifacts, checksum failures and feature-schema failures result in `FALLBACK` to
+the deterministic rules. The browser continues to read all results only through the Backend API.
+
+## 20. Capacity assumptions
 
 The MVP workload is small, but the local stack is resource-heavy. A practical workstation target is:
 

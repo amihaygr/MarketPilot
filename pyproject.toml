@@ -30,6 +30,11 @@ dev = [
   "ruff>=0.8",
   "pyyaml>=6.0",
 ]
+ml = [
+  "joblib==1.5.2",
+  "numpy==2.2.6",
+  "scikit-learn==1.6.1",
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/marketpilot"]

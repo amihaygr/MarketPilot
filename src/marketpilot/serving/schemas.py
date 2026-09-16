@@ -66,6 +66,14 @@ class OpportunityRead(ApiModel):
     feed_name: str
     model_version: str
     explanations: list[str]
+    success_probability: Decimal | None = Field(default=None, ge=0, le=1)
+    expected_r: Decimal | None = None
+    model_status: Literal["PREVIEW", "ACTIVE", "FALLBACK"] = "FALLBACK"
+    probability_model_version: str | None = None
+    top_positive_drivers: list[str] = Field(default_factory=list)
+    top_negative_drivers: list[str] = Field(default_factory=list)
+    trained_through_date: date | None = None
+    calibration_status: Literal["CALIBRATED", "UNCALIBRATED", "UNAVAILABLE"] = "UNAVAILABLE"
 
 
 class OpportunityListResponse(ApiModel):
@@ -102,6 +110,20 @@ class DecisionEvaluationStatus(ApiModel):
     historical_first_session_date: date | None
     historical_latest_session_date: date | None
     published_backtest_runs: int = Field(ge=0)
+
+
+class DecisionModelStatus(ApiModel):
+    model_version: str
+    model_family: Literal["LOGISTIC_REGRESSION", "HIST_GRADIENT_BOOSTING"] | None = None
+    status: Literal["PREVIEW", "ACTIVE", "FALLBACK", "REJECTED"]
+    feature_schema_version: int = Field(ge=1)
+    trained_from_date: date | None = None
+    trained_through_date: date | None = None
+    activation_threshold: Decimal = Field(ge=Decimal("0.60"), le=1)
+    calibration_method: str | None = None
+    promotion_eligible: bool
+    promotion_reasons: list[str]
+    metrics: dict[str, object]
 
 
 class PortfolioState(ApiModel):

@@ -22,6 +22,7 @@ from marketpilot.serving.schemas import (
     BacktestRunPage,
     DecisionAlertListResponse,
     DecisionEvaluationStatus,
+    DecisionModelStatus,
     FreshnessResponse,
     HealthResponse,
     IndicatorPage,
@@ -230,6 +231,14 @@ def create_app(
         return DecisionEvaluationStatus.model_validate(
             resolved_repository.decision_evaluation_status()
         )
+
+    @app.get(
+        "/api/v1/decision-model/status",
+        response_model=DecisionModelStatus,
+        tags=["decisions"],
+    )
+    def decision_model_status() -> DecisionModelStatus:
+        return DecisionModelStatus.model_validate(resolved_repository.decision_model_status())
 
     @app.get("/api/v1/sec-filings", response_model=SecFilingPage, tags=["sec"])
     def sec_filings(

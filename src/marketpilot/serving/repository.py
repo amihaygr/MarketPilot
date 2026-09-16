@@ -24,6 +24,8 @@ class ReadRepository(Protocol):
 
     def opportunity_history(self, *, symbol: str, limit: int) -> list[Row]: ...
 
+    def decision_model_status(self) -> Row: ...
+
     def list_market_bars(
         self,
         *,
@@ -159,15 +161,28 @@ class MariaDbReadRepository:
                    r.market_price, r.buy_zone_low, r.buy_zone_high, r.stop_price,
                    r.target_1, r.target_2, r.risk_reward_1, r.risk_reward_2,
                    r.potential_profit_1_pct, r.potential_profit_2_pct,
-                   r.valid_until_utc, r.feed_name, r.model_version, r.explanation_json
+                   r.valid_until_utc, r.feed_name, r.model_version, r.explanation_json,
+                   p.success_probability,p.expected_r,
+                   COALESCE(p.model_status,'FALLBACK') model_status,
+                   p.model_version probability_model_version,
+                   p.top_positive_drivers_json,p.top_negative_drivers_json,
+                   registry.trained_through_date,p.calibration_status
             FROM fact_opportunity_recommendation r
             JOIN dim_symbol symbols ON symbols.symbol_id=r.symbol_id
+            LEFT JOIN fact_decision_model_prediction p
+              ON p.recommendation_id=r.recommendation_id
+             AND p.model_version=(
+                 SELECT p2.model_version FROM fact_decision_model_prediction p2
+                 WHERE p2.recommendation_id=r.recommendation_id
+                 ORDER BY (p2.model_status='ACTIVE') DESC,p2.scored_at_utc DESC LIMIT 1
+             )
+            LEFT JOIN decision_model_registry registry ON registry.model_version=p.model_version
             JOIN (
                 SELECT symbol_id, MAX(as_of_utc) AS latest
                 FROM fact_opportunity_recommendation GROUP BY symbol_id
             ) latest ON latest.symbol_id=r.symbol_id AND latest.latest=r.as_of_utc
             WHERE 1=1 {symbol_filter}
-            ORDER BY r.opportunity_score DESC, symbols.symbol
+            ORDER BY COALESCE(p.expected_r,-999) DESC, r.opportunity_score DESC, symbols.symbol
             """,
             parameters,
         )
@@ -183,14 +198,60 @@ class MariaDbReadRepository:
                    r.market_price, r.buy_zone_low, r.buy_zone_high, r.stop_price,
                    r.target_1, r.target_2, r.risk_reward_1, r.risk_reward_2,
                    r.potential_profit_1_pct, r.potential_profit_2_pct,
-                   r.valid_until_utc, r.feed_name, r.model_version, r.explanation_json
+                   r.valid_until_utc, r.feed_name, r.model_version, r.explanation_json,
+                   p.success_probability,p.expected_r,
+                   COALESCE(p.model_status,'FALLBACK') model_status,
+                   p.model_version probability_model_version,
+                   p.top_positive_drivers_json,p.top_negative_drivers_json,
+                   registry.trained_through_date,p.calibration_status
             FROM fact_opportunity_recommendation r
             JOIN dim_symbol symbols ON symbols.symbol_id=r.symbol_id
+            LEFT JOIN fact_decision_model_prediction p
+              ON p.recommendation_id=r.recommendation_id
+             AND p.model_version=(
+                 SELECT p2.model_version FROM fact_decision_model_prediction p2
+                 WHERE p2.recommendation_id=r.recommendation_id
+                 ORDER BY (p2.model_status='ACTIVE') DESC,p2.scored_at_utc DESC LIMIT 1
+             )
+            LEFT JOIN decision_model_registry registry ON registry.model_version=p.model_version
             WHERE symbols.symbol=%s ORDER BY r.as_of_utc DESC LIMIT %s
             """,
             (symbol, limit),
         )
         return [_public_opportunity(row) for row in rows]
+
+    def decision_model_status(self) -> Row:
+        rows = self._fetch_all(
+            """
+            SELECT model_version,model_family,status,feature_schema_version,
+                   trained_from_date,trained_through_date,activation_threshold,
+                   calibration_method,promotion_eligible,promotion_reasons_json,metrics_json
+            FROM decision_model_registry
+            ORDER BY (status='ACTIVE') DESC,created_at_utc DESC LIMIT 1
+            """
+        )
+        if not rows:
+            return {
+                "model_version": "decision-intelligence-v2-hybrid",
+                "model_family": None,
+                "status": "FALLBACK",
+                "feature_schema_version": 2,
+                "trained_from_date": None,
+                "trained_through_date": None,
+                "activation_threshold": "0.60",
+                "calibration_method": None,
+                "promotion_eligible": False,
+                "promotion_reasons": ["no trained model is registered"],
+                "metrics": {},
+            }
+        row = _normalize_datetimes(rows[0])
+        for source, target in (
+            ("promotion_reasons_json", "promotion_reasons"),
+            ("metrics_json", "metrics"),
+        ):
+            raw = row.pop(source)
+            row[target] = raw if isinstance(raw, (list, dict)) else __import__("json").loads(raw)
+        return row
 
     def decision_alerts(self, *, limit: int) -> list[Row]:
         rows = self._fetch_all(
@@ -617,4 +678,16 @@ def _public_opportunity(row: Row) -> Row:
     public = _normalize_datetimes(row)
     raw = public.pop("explanation_json", "[]")
     public["explanations"] = raw if isinstance(raw, list) else __import__("json").loads(raw)
+    for source, target in (
+        ("top_positive_drivers_json", "top_positive_drivers"),
+        ("top_negative_drivers_json", "top_negative_drivers"),
+    ):
+        raw_drivers = public.pop(source, None)
+        public[target] = (
+            raw_drivers
+            if isinstance(raw_drivers, list)
+            else __import__("json").loads(raw_drivers or "[]")
+        )
+    public["model_status"] = public.get("model_status") or "FALLBACK"
+    public["calibration_status"] = public.get("calibration_status") or "UNAVAILABLE"
     return public
