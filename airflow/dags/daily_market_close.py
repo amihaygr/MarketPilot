@@ -1,5 +1,6 @@
 """Certify one completed XNYS session through ordered, bounded Spark jobs."""
 
+import os
 from datetime import timedelta
 
 import pendulum
@@ -29,6 +30,7 @@ def _resolve_daily_scope() -> dict[str, object] | None:
         logical_date,
         context["run_id"],
         params.get("expected_bars_override"),
+        minimum_coverage_pct=int(os.environ.get("DAILY_MINIMUM_COVERAGE_PCT", "80")),
     )
 
 
@@ -48,6 +50,7 @@ with DAG(
         "retry_delay": timedelta(minutes=5),
         "retry_exponential_backoff": True,
         "execution_timeout": timedelta(minutes=45),
+        "priority_weight": 100,
     },
     tags=["marketpilot", "batch", "certification"],
 ) as dag:

@@ -16,12 +16,17 @@ def prepare_daily_scope(
     logical_date_value: str,
     airflow_run_id: str,
     expected_bars_override: int | None = None,
+    minimum_coverage_pct: int = 100,
 ) -> dict[str, object] | None:
     """Return one session scope, or ``None`` when the exchange is closed."""
+    if not 1 <= int(minimum_coverage_pct) <= 100:
+        raise ValueError("minimum_coverage_pct must be in [1, 100]")
     logical_date = date.fromisoformat(logical_date_value)
     expected_bars = _expected_bars(logical_date, expected_bars_override)
     if expected_bars == 0:
         return None
+    if expected_bars_override is None:
+        expected_bars = math.ceil(expected_bars * int(minimum_coverage_pct) / 100)
     return {
         "logical_date": logical_date.isoformat(),
         "run_id": _stable_run_id("daily", airflow_run_id, logical_date.isoformat()),

@@ -1,5 +1,17 @@
 # Data Quality Failure Runbook
 
+## Daily market-bar coverage
+
+The local free Alpaca IEX feed is partial and does not guarantee one observation
+for every XNYS minute. `daily_market_close` therefore requires at least the
+configured `DAILY_MINIMUM_COVERAGE_PCT` of expected exchange minutes per symbol;
+the default is 80 percent. This threshold does not fabricate missing bars and
+does not weaken the other blocking checks.
+
+Do not lower the threshold to rescue a demo. A session still fails when a symbol
+is missing, ingestion is stale, required fields are null, business keys are
+duplicated, OHLC values are inconsistent, or schema/date checks fail.
+
 1. Keep the failed partition unpublished.
 2. Record check name, observed value, expected value, dataset and run ID.
 3. Compare source count, Bronze count, Silver count and Gold count.

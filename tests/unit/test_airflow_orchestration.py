@@ -23,6 +23,26 @@ def test_daily_scope_uses_xnys_calendar_and_stable_retry_run_id() -> None:
     assert first["expected_bars_per_symbol"] == 390
 
 
+def test_daily_scope_applies_explicit_partial_feed_coverage_threshold() -> None:
+    scope = prepare_daily_scope(
+        "2026-08-24",
+        "scheduled__2026-08-24",
+        minimum_coverage_pct=80,
+    )
+
+    assert scope is not None
+    assert scope["expected_bars_per_symbol"] == 312
+
+
+def test_daily_scope_rejects_invalid_coverage_threshold() -> None:
+    with pytest.raises(ValueError, match="minimum_coverage_pct"):
+        prepare_daily_scope(
+            "2026-08-24",
+            "scheduled__2026-08-24",
+            minimum_coverage_pct=0,
+        )
+
+
 def test_daily_scope_short_circuits_weekend_unless_explicitly_overridden() -> None:
     assert prepare_daily_scope("2026-08-22", "manual__weekend") is None
     forced = prepare_daily_scope("2026-08-22", "manual__weekend", 171)
@@ -105,6 +125,13 @@ def test_airflow_dags_never_launch_or_reference_streaming_application() -> None:
     assert "stream_market_bars.py" not in dag_sources
     assert "docker compose" not in dag_sources.lower()
     assert "docker.sock" not in dag_sources.lower()
+
+
+def test_daily_certification_has_priority_over_queued_historical_work() -> None:
+    source = (ROOT / "airflow" / "dags" / "daily_market_close.py").read_text(encoding="utf-8")
+
+    assert '"priority_weight": 100' in source
+    assert 'pool="spark_batch_pool"' in source
 
 
 def test_sec_dag_is_bounded_and_rate_limited_by_pool() -> None:

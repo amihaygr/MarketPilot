@@ -9,7 +9,12 @@ database, Scheduler, API Server and DAG Processor. The UI is exposed locally at
 - `daily_market_close`: weekdays at 16:30 `America/New_York`. The first task checks
   the XNYS calendar and short-circuits holidays and weekends. A successful session
   runs Bronze to Silver, blocking Silver quality checks, then atomic Gold Certified
-  publication.
+  publication. The daily completeness gate uses `DAILY_MINIMUM_COVERAGE_PCT=80`
+  for the partial Alpaca IEX feed. Missing symbols, stale ingestion, nulls,
+  duplicates, schema errors and OHLC inconsistencies remain blocking failures.
+  Daily certification has higher pool priority than queued historical work, so a
+  long backfill yields the next available Spark slot without interrupting a task
+  that is already running.
 - `backfill_replay`: manual only. It validates a maximum 31-calendar-day range and a
   subset of `MARKET_SYMBOLS`, skips closed sessions, and dynamically maps the same
   three bounded Spark jobs for each eligible date.
