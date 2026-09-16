@@ -41,4 +41,15 @@ docker compose up -d
 
 כאשר כל הבדיקות ירוקות, הצג את המצגת ועבור לדמו החי בשקופית 12.
 
+## מסלול ההדגמה המומלץ ליום ההצגה
+
+- <bdi dir="ltr"><code>AAPL</code></bdi> — המקרה היציב: היסטוריה מאושרת, גרף עשיר ו־<bdi dir="ltr"><code>SMA 20</code></bdi> מלא.
+- <bdi dir="ltr"><code>AMZN</code></bdi> — המקרה החי: מניה שנוספה ל־<bdi dir="ltr"><code>Watchlist</code></bdi>, קיבלה תרחיש <bdi dir="ltr"><code>PROVISIONAL</code></bdi> ונכנסה למסלול השלמת היסטוריה.
+- כל 11 הסימולים — הוכחה שהמערכת מדרגת, ממתינה או מסרבת להסיק מסקנה כאשר חסרים נתונים.
+
+מונה <bdi dir="ltr"><code>Shadow Mode</code></bdi> אינו מספר שצריך להסתיר. נכון לבדיקת
+<bdi dir="ltr"><code>2026-09-16</code></bdi> הוא עומד על <bdi dir="ltr"><code>1/20</code></bdi>.
+הוא מתקדם רק לאחר יום מסחר אמיתי שריצת האישור היומית שלו הסתיימה בהצלחה;
+<bdi dir="ltr"><code>Backfill</code></bdi> ו־52 הימים ההיסטוריים המאושרים אינם מקדמים אותו.
+
 </div>

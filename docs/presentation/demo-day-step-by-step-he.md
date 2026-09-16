@@ -164,6 +164,11 @@ docker compose up -d
 > <bdi dir="ltr"><code>Risk/Reward</code></bdi> וגודל פוזיציה לפי מגבלות התיק. ההסבר בעברית מפרט למה התרחיש
 > קיבל את הציון שלו. המודל נמצא ב־<bdi dir="ltr"><code>Shadow Mode</code></bdi>, ולכן הוא אוסף ראיות ואינו
 > מסומן כ־<bdi dir="ltr"><code>Actionable</code></bdi>.
+>
+> בדמו אראה שלושה מצבים אמיתיים: <bdi dir="ltr"><code>AAPL</code></bdi> עם היסטוריה עשירה,
+> <bdi dir="ltr"><code>AMZN</code></bdi> שנוספה לרשימת המעקב וקיבלה חישוב חי, וסימול שמסומן
+> <bdi dir="ltr"><code>INSUFFICIENT DATA</code></bdi>. המצב האחרון אינו תקלה; הוא מוכיח ששערי
+> האיכות יכולים לעצור מסקנה כשאין בסיס מספק.
 
 ### שקף 9 — בדיקה היסטורית
 
@@ -356,8 +361,8 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 **מה לעשות על המסך:**
 
 1. פתח את רשימת ה־<bdi dir="ltr"><code>DAGs</code></bdi>.
-2. בחר ריצה מוצלחת של <bdi dir="ltr"><code>daily_market_close</code></bdi> או
-<bdi dir="ltr"><code>historical_market_backfill</code></bdi>.
+2. בחר ריצה ירוקה ומוצלחת של <bdi dir="ltr"><code>historical_market_backfill</code></bdi>.
+אל תבחר את הריצה האחרונה באופן אוטומטי; בדוק קודם שהסטטוס שלה ירוק.
 3. פתח את תצוגת <bdi dir="ltr"><code>Grid</code></bdi> או <bdi dir="ltr"><code>Graph</code></bdi> והצבע על סדר המשימות הירוקות.
 4. אל תלחץ על <bdi dir="ltr"><code>Trigger DAG</code></bdi> מול הקהל. ריצה מוצלחת קיימת היא הראיה הבטוחה יותר.
 
@@ -387,12 +392,15 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 
 **מה לעשות על המסך:**
 
-1. בחר מניה מתוך רשימת המעקב, למשל <bdi dir="ltr"><code>AAPL</code></bdi>.
-2. הצבע על הסטטוס: <bdi dir="ltr"><code>PROVISIONAL</code></bdi>, ‏<bdi dir="ltr"><code>CERTIFIED</code></bdi>, ‏<bdi dir="ltr"><code>STALE</code></bdi> או
+1. ודא שמופיעים 11 סימולים ברשימת המעקב.
+2. בחר את <bdi dir="ltr"><code>AAPL</code></bdi> כמקרה עם היסטוריה מאושרת ועשירה.
+3. עבור אל <bdi dir="ltr"><code>AMZN</code></bdi> כמקרה שנוסף ל־<bdi dir="ltr"><code>Watchlist</code></bdi> וחושב במסלול החי.
+4. בחר סימול שמציג <bdi dir="ltr"><code>INSUFFICIENT DATA</code></bdi> והסבר מדוע עצירת מסקנה היא תוצאה תקינה.
+5. הצבע על הסטטוס: <bdi dir="ltr"><code>PROVISIONAL</code></bdi>, ‏<bdi dir="ltr"><code>CERTIFIED</code></bdi>, ‏<bdi dir="ltr"><code>STALE</code></bdi> או
 <bdi dir="ltr"><code>INSUFFICIENT DATA</code></bdi> — מה שמופיע בפועל.
-3. עבור על כרטיס התרחיש בסדר: <bdi dir="ltr"><code>Buy Zone</code></bdi>, ‏<bdi dir="ltr"><code>Stop</code></bdi>, ‏<bdi dir="ltr"><code>Target 1</code></bdi>,
+6. עבור על כרטיס התרחיש בסדר: <bdi dir="ltr"><code>Buy Zone</code></bdi>, ‏<bdi dir="ltr"><code>Stop</code></bdi>, ‏<bdi dir="ltr"><code>Target 1</code></bdi>,
 <bdi dir="ltr"><code>Target 2</code></bdi>, ‏<bdi dir="ltr"><code>Risk/Reward</code></bdi> וגודל הפוזיציה.
-4. פתח את ההסבר בעברית, ובחר סיבה אחת טכנית וסיבה אחת פונדמנטלית בלבד.
+7. פתח את ההסבר בעברית, ובחר סיבה אחת טכנית וסיבה אחת פונדמנטלית בלבד.
 
 **מה הקהל צריך לראות:** המוצר לא זורק “קנה” עם מספר אחד. הוא מראה תרחיש,
 הנחות, סיכון, תנאי ביטול וסטטוס אמינות.
@@ -407,6 +415,11 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 > חשוב גם מה שהמערכת לא עושה: היא לא מבצעת פקודת קנייה. היא נמצאת במצב
 > צל, כלומר אוספת ומודדת את איכות התרחישים לפני שמציגים אותם כהמלצה מעשית. האדם
 > נשאר מקבל ההחלטה.
+>
+> נכון לבדיקת ההכנה יש 52 ימי מסחר היסטוריים מאושרים, אך מונה הצל הוא
+> <bdi dir="ltr"><code>1/20</code></bdi>. ההיסטוריה אינה נספרת כזמן חי. המונה עולה רק
+> אחרי יום מסחר אמיתי שבו כל ריצת האישור היומית הסתיימה בהצלחה. אם הריצה
+> נכשלת, היום אינו נספר — זו התנהגות בטוחה ומכוונת.
 
 **למה זה קיים:** זה מחבר בין המידע ההנדסי לבין פעולה אחראית. אם אין מספיק
 נתונים או שהמידע ישן, המערכת אמורה לומר “להמתין” ולא להעמיד פנים שהיא יודעת.

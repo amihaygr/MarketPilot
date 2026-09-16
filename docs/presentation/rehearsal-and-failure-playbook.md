@@ -51,8 +51,9 @@
 - [ ] ⁦`docker compose ps`⁩ מציג את השירותים הנדרשים כבריאים.
 - [ ] ⁦Project Story⁩, ⁦Presenter Console⁩, ⁦Dashboard⁩, ⁦Opportunity Center⁩ ו־⁦Backtesting Lab⁩ מחזירים ⁦HTTP 200⁩.
 - [ ] ⁦Opportunity Center⁩ מציג בנפרד ⁦Historical Evidence⁩ ו־⁦Live Shadow Mode⁩.
-- [ ] נבחר ⁦Symbol⁩ עם נתונים.
-- [ ] שני ⁦Kafka Topics⁩, ⁦Bronze object⁩ וה־⁦Airflow run⁩ הסופי פתוחים מראש.
+- [ ] ברשימת המעקב מופיעים 11 סימולים; <bdi dir="ltr"><code>AAPL</code></bdi> ו־<bdi dir="ltr"><code>AMZN</code></bdi> נבדקו מראש.
+- [ ] מונה <bdi dir="ltr"><code>Shadow Mode</code></bdi> נקרא מהמסך בזמן אמת; אין לשנן מספר ישן.
+- [ ] שני <bdi dir="ltr"><code>Kafka Topics</code></bdi>, אובייקט <bdi dir="ltr"><code>Bronze</code></bdi> וריצת <bdi dir="ltr"><code>Airflow</code></bdi> ירוקה פתוחים מראש.
 - [ ] ⁦Backtesting Lab⁩ מציג 41 ⁦sessions⁩, 46,749 ⁦observations⁩ ו-1,059 ⁦trades⁩.
 - [ ] זום הדפדפן ו־⁦resolution⁩ מאפשרים קריאה מרחוק.
 - [ ] התראות, ⁦Teams⁩, ⁦WhatsApp⁩ ודואר מושתקים.
@@ -85,6 +86,18 @@
 1. עבור ל־⁦`7D`⁩ או ⁦Symbol⁩ אחר שהוכן מראש.
 2. אל תיצור ⁦event⁩ ידני לצורך ההצגה.
 3. הראה ⁦Evidence⁩ מתוארך וציין שהוא ⁦snapshot⁩.
+
+### סימול מציג <bdi dir="ltr"><code>INSUFFICIENT DATA</code></bdi>
+
+1. אל תציג זאת כתקלה ואל תשנה נתונים מול הקהל.
+2. אמור שהמערכת חסמה מסקנה מפני שהיסטוריית המחיר או הנתונים הפונדמנטליים אינם מספיקים.
+3. עבור אל <bdi dir="ltr"><code>AAPL</code></bdi> כדי להראות תרחיש מלא, ואז חזור והדגש את שער האיכות.
+
+### מונה <bdi dir="ltr"><code>Shadow Mode</code></bdi> עדיין נמוך
+
+1. הצג את המספר האמיתי שמופיע במסך.
+2. הסבר ש־<bdi dir="ltr"><code>Backfill</code></bdi> אינו מקדם אותו, משום שהוא יודע את העבר מראש.
+3. ציין שכשל בריצה היומית אינו נספר כהצלחה; רק יום חי שאושר מקצה לקצה מקדם את המונה.
 
 ### ⁦Kafka UI⁩ אינו זמין
 
