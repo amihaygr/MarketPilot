@@ -6,9 +6,9 @@
 
 ## מתחילים כאן
 
-1. [הורדת המצגת הסופית בגרסת RTL כהה](output/MarketPilot-Final-Presentation-Dark-RTL.pptx) — 12 שקופיות בתבנית כהה ואחידה, עם כיווניות עברית מלאה והערות מציג לכל שקופית.
-2. [תרחיש הדמו החי](live-demo-script-he.md) — שש דקות, תחנה אחר תחנה.
-3. [דף הליווי המלא](demo-day-step-by-step-he.md) — תסריט ההצגה והמעברים.
+1. [הורדת המצגת הסופית בגרסת RTL כהה](output/MarketPilot-Final-Presentation-Dark-RTL-v2.pptx) — 12 שקופיות בתבנית כהה ואחידה, עם כיווניות עברית מלאה והערות מציג לכל שקופית.
+2. [מדריך ההצגה והדמו המלא](demo-day-step-by-step-he.md) — מה מפעילים, מה אומרים בכל שקף, לאן עוברים בדמו ומה עושים במקרה תקלה.
+3. [תרחיש הדמו החי](live-demo-script-he.md) — גרסת כיס של שש דקות, תחנה אחר תחנה.
 
 ## חומרי לימוד והכנה
 
@@ -27,11 +27,17 @@
 
 ## הפעלת הדמו
 
-הרץ מתיקיית הפרויקט:
+פתח <bdi dir="ltr"><code>PowerShell</code></bdi>, עבור לתיקיית הפרויקט והריץ:
+
+<div dir="ltr" align="left">
 
 ```powershell
+Set-Location "C:\Users\Amichai\Documents\naya_college_de\final_project\MarketPilot"
+docker compose up -d
 .\scripts\demo-preflight.ps1 -OpenPages
 ```
+
+</div>
 
 כאשר כל הבדיקות ירוקות, הצג את המצגת ועבור לדמו החי בשקופית 12.
 

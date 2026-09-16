@@ -191,7 +191,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   const slide = presentation.slides.add();
   base(slide);
   label(slide, "MARKETPILOT · FINAL PROJECT", 68, 58, 430, C.teal, "left");
-  text(slide, rtl("מערכת נתונים\nשמחברת בין שוק חי,\nאמון והחלטה"), 540, 132, 670, 246, {
+  text(slide, rtl("MarketPilot\nמהמידע הגולמי\nלתרחיש החלטה"), 540, 132, 670, 246, {
     size: 58,
     bold: true,
     color: C.white,
@@ -200,7 +200,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   });
   text(
     slide,
-    rtl(`פלטפורמת ${iso("Data Engineering")} מקומית לנתוני שוק, דיווחי ${iso("SEC")}, ניתוח טכני ובדיקת החלטות על ההיסטוריה`),
+    rtl(`פלטפורמת ${iso("Data Engineering")} מקומית שמחברת נתוני שוק, דיווחי ${iso("SEC")}, ניתוח טכני ובדיקות היסטוריות למוצר מחקר אחד`),
     630,
     392,
     580,
@@ -228,7 +228,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   notes(
     slide,
     "00:00–00:30",
-    "פתח במשפט אחד: MarketPilot היא פלטפורמת מחקר לסוחר. היא לא שולחת פקודות מסחר. היא מחברת מידע חי, מקור גולמי, בדיקות איכות והסבר שניתן לשחזר. אל תפרט עדיין את הטכנולוגיות.",
+    "פתח בטבעיות: MarketPilot נולדה מהפער שבין המספר שהסוחר רואה לבין היכולת לסמוך עליו. בניתי פלטפורמת מחקר שמחברת מידע חי, מקור גולמי, בדיקות איכות והסבר שאפשר לשחזר. היא אינה שולחת פקודות מסחר. שמור את שמות הטכנולוגיות לשקפים הבאים.",
     "docs/project-context.md; docs/architecture/architecture.md",
   );
 }
@@ -238,7 +238,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   const slide = presentation.slides.add();
   base(slide);
   label(slide, "THE PROBLEM", 64, 42, 260, C.teal, "left");
-  text(slide, rtl("סוחר רואה מספר.\nאבל האם אפשר לסמוך עליו?"), 420, 122, 790, 132, {
+  text(slide, rtl("המספר על המסך\nהוא רק תחילת השאלה"), 420, 122, 790, 132, {
     size: 44,
     bold: true,
     color: C.white,
@@ -247,7 +247,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   });
   text(
     slide,
-    rtl("מחיר לבדו אינו מסביר אם הנתון טרי, אם החברה פרסמה מידע מהותי, ואם רעיון מסחר שרד בדיקה היסטורית הוגנת."),
+    rtl("כדי לקבל החלטה אחראית צריך לדעת מתי הנתון הגיע, מאיזה מקור, מה השתנה בחברה, ואיך אותו רעיון התנהג בעבר."),
     530,
     270,
     680,
@@ -272,7 +272,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   notes(
     slide,
     "00:30–01:15",
-    "הצג את הבעיה מנקודת המבט של הסוחר: יש הרבה מסכים ומספרים, אבל קשה לדעת מה טרי, מה נבדק ומה אפשר לשחזר. ארבע השאלות בתחתית הן דרישות המוצר, לא רשימת פיצ'רים.",
+    "ספר את הבעיה מנקודת המבט של משתמש אמיתי: יש שפע של גרפים, חדשות ומספרים, אבל המידע מפוזר וקשה לדעת מה טרי ומה אמין. ארבע השאלות בתחתית הפכו לדרישות המוצר. MarketPilot צריכה להראות מה קורה, להוכיח את איכות הנתון, להוסיף הקשר עסקי ולבדוק רעיון על העבר.",
     "docs/project-context.md",
   );
 }
@@ -281,7 +281,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 {
   const slide = presentation.slides.add();
   base(slide);
-  title(slide, "מה המערכת נותנת לסוחר", "PRODUCT VALUE", 3, false);
+  title(slide, "ממערכת נתונים לכלי מחקר לסוחר", "PRODUCT VALUE", 3, false);
   const stages = [
     ["04", "מסבירה", "תרחיש החלטה\nעם סיכון והקשר", C.amber],
     ["03", "בודקת", "איכות נתונים\nוהיסטוריה", C.blue],
@@ -315,7 +315,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   notes(
     slide,
     "01:15–02:00",
-    "הסבר את שרשרת הערך מימין לשמאל. מתחילים באיסוף, מוסיפים הקשר, בודקים את האיכות וההיסטוריה, ורק אז מציגים תרחיש החלטה. הדגש שהמערכת עוזרת לחשוב ואינה מבצעת קנייה או מבטיחה רווח.",
+    "הסבר את שרשרת הערך מימין לשמאל. המערכת קודם אוספת עובדות, אחר כך מבינה את ההקשר, בודקת שהנתון ראוי לשימוש, ורק בסוף מציגה תרחיש החלטה. התוצאה שימושית לסוחר משום שהיא כוללת גם סיכון והסבר. היא תומכת בהחלטה, אך אינה מחליפה שיקול דעת ואינה מבצעת קנייה.",
     "docs/project-context.md; docs/decisions/ADR-008-decision-intelligence.md",
   );
 }
@@ -324,27 +324,30 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 {
   const slide = presentation.slides.add();
   base(slide);
-  title(slide, "ארכיטקטורת המערכת", "SYSTEM ARCHITECTURE", 4);
-  text(slide, rtl("הזרימה מוצגת מימין לשמאל, מן המקור אל המשתמש"), 744, 106, 472, 30, {
-    size: 21,
+  title(slide, "איך הנתון עובר מהמקור למסך", "SYSTEM ARCHITECTURE", 4);
+  text(slide, rtl("שלושה מסלולים חולקים מקור אחד: חי, גולמי ומאושר"), 690, 112, 526, 30, {
+    size: 20,
     color: C.mutedDark,
     align: "right",
   });
 
-  const n1 = node(slide, "Alpaca + SEC", "מקורות", 1045, 238, 155, C.teal);
-  const n2 = node(slide, "Python", "קליטה וחוזה", 850, 238, 150, C.teal);
-  const n3 = node(slide, "Kafka", "תעבורה ו־Replay", 655, 238, 150, C.blue);
-  const n4 = node(slide, "Spark", "Streaming + Batch", 460, 238, 150, C.blue);
-  const n5 = node(slide, "MariaDB Gold", "נתון מוכן ליישום", 255, 238, 160, C.amber);
-  const n6 = node(slide, "API + Web", "המוצר למשתמש", 60, 238, 150, C.teal);
+  label(slide, "LIVE PATH", 1086, 174, 120, C.teal, "right");
+  const n1 = node(slide, "Alpaca + SEC", "מקורות נתונים", 1042, 214, 164, C.teal);
+  const n2 = node(slide, "Python", "קליטה וחוזי מידע", 845, 214, 158, C.teal);
+  const n3 = node(slide, "Kafka", "תעבורה ו־Replay", 648, 214, 158, C.blue);
+  const n4 = node(slide, "Spark", "Streaming + Batch", 451, 214, 158, C.blue);
+  const n5 = node(slide, "MariaDB Gold", "מידע מוכן למוצר", 244, 214, 168, C.amber);
+  const n6 = node(slide, "API + Web", "החוויה למשתמש", 48, 214, 158, C.teal);
   connectLeft(slide, n1, n2);
   connectLeft(slide, n2, n3);
   connectLeft(slide, n3, n4, C.blue);
   connectLeft(slide, n4, n5, C.amber);
   connectLeft(slide, n5, n6, C.teal);
 
-  const bronze = node(slide, "MinIO Bronze", "מקור גולמי ובלתי משתנה", 650, 430, 190, C.teal, true);
-  const silver = node(slide, "MinIO Silver", "Parquet נקי וקנוני", 425, 430, 190, C.blue, true);
+  label(slide, "CERTIFIED PATH", 1030, 390, 176, C.blue, "right");
+  const bronze = node(slide, "MinIO Bronze", "מקור גולמי ובלתי משתנה", 702, 422, 210, C.teal, true);
+  const silver = node(slide, "MinIO Silver", "Parquet נקי וקנוני", 450, 422, 210, C.blue, true);
+  const airflow = node(slide, "Airflow", "תזמון ובקרה בלבד", 48, 422, 210, C.amber, true);
   slide.shapes.connect(n3, bronze, {
     kind: "elbow",
     fromSide: "bottom",
@@ -360,13 +363,33 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
     line: { style: "dashed", fill: C.amber, width: 2 },
     tail: { type: "triangle", width: "sm", length: "sm" },
   });
-  text(slide, "Airflow", 222, 448, 150, 30, { font: MONO, size: 20, bold: true, color: C.amber, align: "center" });
-  text(slide, rtl("מתזמן עבודות תחומות בלבד"), 160, 486, 272, 28, { size: 18, color: C.mutedDark, align: "right" });
-  text(slide, rtl(`הדפדפן מדבר רק עם ה־${iso("API")}`), 62, 352, 260, 30, { size: 19, color: C.teal, bold: true, align: "right" });
+  slide.shapes.connect(airflow, silver, {
+    kind: "straight",
+    fromSide: "right",
+    toSide: "left",
+    line: { style: "dashed", fill: C.amber, width: 2 },
+    tail: { type: "triangle", width: "sm", length: "sm" },
+  });
+  label(slide, "BROWSER BOUNDARY", 48, 330, 210, C.teal, "left");
+  text(slide, rtl("הדפדפן מתקשר רק עם שכבת ה־API"), 48, 354, 300, 30, {
+    size: 18,
+    color: C.mutedDark,
+    align: "right",
+  });
+  text(slide, rtl("Airflow אינו מפעיל שירותי Streaming. הוא מתזמן רק עבודות שמתחילות ומסתיימות."), 48, 536, 612, 58, {
+    size: 18,
+    color: C.mutedDark,
+    align: "right",
+  });
+  text(slide, rtl("Bronze שומר את הראיה. Silver מנקה ומנרמל. Gold מוכן לצריכת המוצר."), 702, 536, 504, 58, {
+    size: 18,
+    color: C.mutedDark,
+    align: "right",
+  });
   notes(
     slide,
     "02:00–03:15",
-    "עקוב אחר החצים מימין לשמאל. המקורות נכנסים לשירותי Python, עוברים דרך Kafka, מעובדים ב-Spark ומגיעים ל-Gold. במקביל נשמר מקור גולמי ב-Bronze ונבנה Silver. Airflow מתזמן עבודות שמסתיימות, אך אינו מנהל את חיי שירותי ה-Streaming. ציין שהדפדפן פונה רק ל-API.",
+    "פתח במשפט: זהו אותו נתון בשלוש רמות של אמון. עקוב אחר השורה העליונה מימין לשמאל: Alpaca ו-SEC הם המקורות, Python מאחד אותם לחוזים ברורים, Kafka מפריד בין היצרן לצרכנים, Spark מעבד, ו-MariaDB Gold מגיש את התוצאה ל-API ול-Web. אחר כך עבור למסלול התחתון: Kafka נשמר גם ב-Bronze, Spark Batch מנקה ל-Silver, ורק אחרי בדיקות מפרסם Gold מאושר. Airflow מתזמן את העבודות התחומות במסלול הזה. הוא אינו מפעיל את שירות ה-Streaming. סיים בגבול האבטחה: הדפדפן מתקשר רק עם ה-API.",
     "docs/architecture/architecture.md; docs/decisions/ADR-001-storage-strategy.md; ADR-002-airflow-boundary.md; ADR-003-streaming-lifecycle.md",
   );
 }
@@ -375,7 +398,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 {
   const slide = presentation.slides.add();
   base(slide);
-  title(slide, "שני מסלולים, שתי הבטחות", "LIVE VS CERTIFIED", 5, false);
+  title(slide, "מהיר בזמן אמת, מאושר אחרי בדיקה", "LIVE VS CERTIFIED", 5, false);
   text(slide, rtl("מהיר עכשיו"), 940, 142, 274, 42, { size: 30, bold: true, color: C.teal, align: "right" });
   text(slide, rtl("המסלול החי מספק תמונת מצב בזמן שהשוק פעיל"), 660, 186, 554, 32, { size: 22, color: C.mutedDark, align: "right" });
   const liveLabels = ["Gold PROVISIONAL", "Spark Streaming", "Kafka", "Alpaca"];
@@ -402,28 +425,30 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 {
   const slide = presentation.slides.add();
   base(slide);
-  title(slide, "בחירות טכנולוגיות עם סיבה", "TECHNOLOGY CHOICES", 6, false);
+  title(slide, "לכל טכנולוגיה יש תפקיד ברור", "TECHNOLOGY CHOICES", 6, false);
   const rows = [
-    ["Kafka", `שומר סדר לפי ${iso("Offset")} ומאפשר ${iso("Replay")} בין צרכנים נפרדים`, C.teal],
-    ["Spark", `מנוע אחד לעיבוד ${iso("Streaming")} ולעיבוד ${iso("Batch")}`, C.blue],
-    ["Airflow", "מנהל סדר, תלויות וניסיונות חוזרים של עבודות תחומות", C.amber],
-    ["MinIO", `שומר ${iso("Bronze")} גולמי, ${iso("Silver")} בפורמט ${iso("Parquet")} וארכיון`, C.teal],
-    ["MariaDB", `מגיש ${iso("Gold")} מוכן ל־${iso("API")} עם מפתחות עסקיים ו־${iso("Upsert")}`, C.blue],
-    ["Docker Compose", "מעלה סביבה מקומית שחוזרת על עצמה ומבודדת שירותים", C.amber],
+    ["Kafka", "מפריד בין מפיק הנתונים לצרכנים", "Replay בלי לחבר שירותים ישירות", C.teal],
+    ["Spark", "מעבד את אותו מודל ב־Streaming וב־Batch", "מהירות בזמן אמת וחישוב חוזר מאושר", C.blue],
+    ["Airflow", "מתזמן סדר, תלויות וניסיונות חוזרים", "ריצה תחומה שניתנת למעקב ולשחזור", C.amber],
+    ["MinIO", "שומר Bronze גולמי ו־Silver ב־Parquet", "המקור נשאר זמין לביקורת ולעיבוד מחדש", C.teal],
+    ["MariaDB", "מגיש Gold מוכן ל־API", "שאילתות מהירות וכתיבה בטוחה עם Upsert", C.blue],
+    ["Docker Compose", "מנהל את השירותים ארוכי החיים", "אותה סביבת פיתוח עולה באופן עקבי", C.amber],
   ];
-  text(slide, rtl("החלטה הנדסית"), 560, 132, 650, 28, { size: 17, bold: true, color: C.mutedDark, align: "right" });
-  text(slide, "Technology", 72, 132, 250, 28, { font: MONO, size: 15, bold: true, color: C.mutedDark, align: "left" });
+  text(slide, rtl("למה בחרתי בה"), 820, 132, 390, 28, { size: 17, bold: true, color: C.mutedDark, align: "right" });
+  text(slide, rtl("התפקיד במערכת"), 360, 132, 390, 28, { size: 17, bold: true, color: C.mutedDark, align: "right" });
+  text(slide, "TECHNOLOGY", 72, 132, 220, 28, { font: MONO, size: 14, bold: true, color: C.mutedDark, align: "left" });
   rule(slide, 64, 174, 1152, C.lineDark, 1);
-  rows.forEach(([tech, why, accent], index) => {
-    const y = 194 + index * 72;
-    text(slide, tech, 72, y, 260, 34, { font: MONO, size: 23, bold: true, color: accent, align: "left", valign: "middle" });
-    text(slide, rtl(why), 390, y, 820, 36, { size: 23, color: C.white, align: "right", valign: "middle" });
-    if (index < rows.length - 1) rule(slide, 64, y + 55, 1152, C.lineDark, 1);
+  rows.forEach(([tech, role, why, accent], index) => {
+    const y = 188 + index * 72;
+    text(slide, tech, 72, y + 8, 230, 34, { font: MONO, size: 21, bold: true, color: accent, align: "left", valign: "middle" });
+    text(slide, rtl(role), 330, y, 420, 50, { size: 19, color: C.white, align: "right", valign: "middle" });
+    text(slide, rtl(why), 790, y, 420, 50, { size: 19, color: C.mutedDark, align: "right", valign: "middle" });
+    if (index < rows.length - 1) rule(slide, 64, y + 58, 1152, C.lineDark, 1);
   });
   notes(
     slide,
     "04:15–05:05",
-    "אל תקריא את כל השורות. בחר שלוש דוגמאות: Kafka להפרדה ול-Replay, MinIO לשמירת המקור הגולמי, ו-Airflow לניהול עבודות תחומות. אם נשאלת למה המערכת מורכבת, הסבר שכל רכיב פותר כשל אחר ולא נבחר רק כדי להוסיף טכנולוגיה.",
+    "אל תקריא את הטבלה שורה אחר שורה. הסבר את עקרון הבחירה: כל רכיב נכנס משום שהוא פותר סיכון אחר. Kafka מפריד בין המקור לצרכנים ומאפשר Replay. Spark נותן מנוע חישוב משותף למסלול החי ולחישוב החוזר. MinIO שומר את הראיה הגולמית מחוץ למסד המגיש. MariaDB נותן ל-API מודל SQL מהיר. Airflow מנהל סדר וניסיונות חוזרים של עבודות שמסתיימות, ו-Docker Compose שומר על מחזור החיים של השירותים המתמשכים. אם יש זמן, הוסף: יכולתי לבנות הכול בסקריפט אחד, אבל כל תקלה הייתה הופכת לתקלה בכל המערכת, בלי Replay ובלי גבולות אחריות ברורים.",
     "docs/architecture/architecture.md",
   );
 }
@@ -432,7 +457,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 {
   const slide = presentation.slides.add();
   base(slide);
-  title(slide, "המוצר מתחיל בנתון שאפשר לבדוק", "PRODUCT EVIDENCE", 7, false);
+  title(slide, "מסך אחד, עם יכולת לרדת עד המקור", "PRODUCT EVIDENCE", 7, false);
   await addImage(slide, "dashboard.png", 58, 150, 825, 474, "MarketPilot Data Command Center screenshot");
   text(slide, rtl("מסך המחקר הראשי"), 918, 160, 298, 48, { size: 30, bold: true, color: C.white, align: "right" });
   text(slide, rtl(`מחיר, נפח, ${iso("Indicators")}, דיווחי חברה וטריות נתונים במקום אחד.`), 918, 222, 298, 86, {
@@ -454,7 +479,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   notes(
     slide,
     "05:05–05:45",
-    "הצג את צילום המסך כראיה, לא כקישוט. הסבר שהמשתמש רואה נתון עסקי פשוט, אך כל ערך מגיע דרך API וכולל מצב פרסום וטריות. המספרים בצד נלקחו מהצילום המתוארך ל-16 בספטמבר 2026.",
+    "הצג את צילום המסך כראיה, לא כקישוט. המשתמש מקבל תמונת מחקר אחת: מחיר, נפח, אינדיקטורים, דיווחי חברה וטריות. מאחורי כל ערך יש API, סטטוס פרסום ו-Lineage. המסך מפשט את המורכבות, אך אינו מסתיר אותה. אם שואלים על המספרים, ציין שהם Snapshot מתוארך ולא נתון שיווקי קבוע.",
     "docs/presentation/assets/dashboard.png; docs/final-presentation-verification.md",
   );
 }
@@ -463,7 +488,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 {
   const slide = presentation.slides.add();
   base(slide);
-  title(slide, "מתוצאה טכנית לתרחיש החלטה", "DECISION INTELLIGENCE", 8);
+  title(slide, "המלצה שמראה גם את הסיכון", "DECISION INTELLIGENCE", 8);
   await addImage(slide, "opportunity-center.png", 48, 142, 830, 492, "MarketPilot Opportunity Center screenshot");
   text(slide, rtl("לא מחיר קסם"), 920, 154, 290, 38, { size: 28, bold: true, color: C.white, align: "right" });
   const items = [
@@ -484,7 +509,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   notes(
     slide,
     "05:45–06:35",
-    "הסבר שהמערכת מציגה תרחיש שלם: טווח כניסה, נקודת ביטול, יעדים וגודל פוזיציה. Shadow Mode עדיין 1 מתוך 20 ולכן ההמלצה אינה Actionable. הנתונים ההיסטוריים מעשירים את המחקר, אך אינם מתחזים לימי תצפית חיים.",
+    "פתח כך: המלצה בלי נקודת ביטול ובלי גודל פוזיציה היא רק דעה. MarketPilot מציגה תרחיש שלם: Buy Zone, Stop, שני יעדים, יחס Risk/Reward וגודל פוזיציה שמכבד את מגבלות התיק. אחר כך הסבר את הגבול: Shadow Mode עדיין אוסף ראיות חיות ולכן הפלט אינו Actionable. ההיסטוריה משמשת למחקר ולבדיקה, אך אינה מזייפת זמן אמיתי.",
     "docs/phase14-verification.md; docs/decisions/ADR-008-decision-intelligence.md",
   );
 }
@@ -493,7 +518,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 {
   const slide = presentation.slides.add();
   base(slide);
-  title(slide, "היסטוריה שנבדקת בלי לייפות", "HISTORICAL VALIDATION", 9, false);
+  title(slide, "בדיקה היסטורית שלא מסתירה חיכוך", "HISTORICAL VALIDATION", 9, false);
   await addImage(slide, "backtesting.png", 52, 134, 840, 486, "MarketPilot Backtesting Lab screenshot");
   text(slide, rtl("ריצה מאושרת"), 930, 148, 280, 36, { size: 26, bold: true, color: C.white, align: "right" });
   const facts = [
@@ -515,7 +540,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   notes(
     slide,
     "06:35–07:25",
-    "הדגש שהמטרה אינה להציג תשואה מושלמת. המטרה היא להוכיח ניסוי שחזורי והוגן: Certified input בלבד, אות משפיע מהנר הבא, ועלויות אינן מוסתרות. ציין בכנות שהתוצאות משתנות בין הנכסים ואינן הבטחת תשואה.",
+    "הדגש שהמטרה אינה לייצר גרף יפה אלא ניסוי שאפשר לבקר. הקלט כולל רק Certified Gold. אות שנוצר בנר מסוים יכול להשפיע רק מהנר הבא, כדי למנוע Look-ahead. עלויות ו-Slippage מפחיתים את התוצאה במקום להיעלם מהמודל. כך גם תוצאה חלשה היא מידע שימושי. ביצועי עבר אינם הבטחת תשואה.",
     "docs/phase14-historical-evidence-verification.md; docs/decisions/ADR-005-historical-backtesting.md",
   );
 }
@@ -524,7 +549,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 {
   const slide = presentation.slides.add();
   base(slide);
-  title(slide, "החלטות הנדסיות מרכזיות", "ENGINEERING CHALLENGES", 10);
+  title(slide, "האתגרים שהפכו לעקרונות תכנון", "ENGINEERING CHALLENGES", 10);
   text(slide, rtl("המתח"), 920, 132, 290, 26, { size: 16, bold: true, color: C.mutedDark, align: "right" });
   text(slide, rtl("ההחלטה"), 110, 132, 680, 26, { size: 16, bold: true, color: C.mutedDark, align: "right" });
   rule(slide, 64, 170, 1152, C.lineDark, 1);
@@ -545,7 +570,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   notes(
     slide,
     "07:25–08:15",
-    "בחר שני אתגרים והסבר אותם כסיפור של החלטה. לדוגמה: רצינו נתון מהיר בלי להעמיד פנים שהוא מאושר, ולכן הפרדנו Provisional מ-Certified. רצינו Retry בטוח, ולכן השתמשנו ב-Checkpoint, Business Keys ו-Upsert. אלה החלטות שאתה יכול לייחס לעצמך.",
+    "בחר שני אתגרים והצג את דרך החשיבה. הראשון: רציתי נתון מהיר, אבל לא רציתי לכנות יום פתוח 'מאושר'. לכן הפרדתי Provisional מ-Certified. השני: במערכת מבוזרת Retry הוא חלק מהחיים, ולכן לא ניסיתי למנוע כל ניסיון חוזר. תכננתי Business Keys, Checkpoint ו-Upsert כך שהניסיון החוזר יהיה בטוח. אם נשאר זמן, הסבר מדוע ה-Backfill עובר דרך Bronze ולא כותב ישירות למסד.",
     "docs/decisions/ADR-003-streaming-lifecycle.md; ADR-004-provisional-certified-publication.md; ADR-007-certified-historical-acquisition.md",
   );
 }
@@ -554,7 +579,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
 {
   const slide = presentation.slides.add();
   base(slide);
-  title(slide, "מה עובד היום ומה מגיע בהמשך", "ROADMAP", 11, false);
+  title(slide, "מה כבר עובד, ומה נדרש לפני Production", "ROADMAP", 11, false);
   text(slide, rtl("המטרה אינה להוסיף עוד טכנולוגיה. המטרה היא להרחיב אמון, כיסוי ותפעול."), 505, 124, 710, 42, {
     size: 22,
     color: C.mutedDark,
@@ -582,7 +607,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   notes(
     slide,
     "08:15–08:55",
-    "פתח במה שכבר עובד: מערכת מקומית מלאה והיסטוריה מאושרת. לאחר 20 ימים חיים ייבדקו Calibration ותוצאות Shadow Mode, ורק החלטה אנושית נפרדת תוכל לקדם את המצב. ענן, SIP, Elastic ואבטחה מלאה הם הרחבות עתידיות ולא חלק מן המימוש הנוכחי.",
+    "הפרד בבירור בין קיים לעתידי. היום יש פלטפורמה מקומית מלאה, מסלולי Live ו-Certified, היסטוריה מאושרת ומוצר Web. לפני שהמלצה תהפוך ל-Decision Support פעיל נדרשים 20 ימי Shadow Mode, בדיקת Calibration ואישור אנושי מתועד. בהמשך אפשר להוסיף SIP, מעבר ל-S3, Observability ואבטחת Production. אל תציג אותם כאילו כבר מומשו.",
     "docs/implementation-plan.md; docs/phase14-verification.md",
   );
 }
@@ -592,7 +617,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   const slide = presentation.slides.add();
   base(slide);
   label(slide, "LIVE DEMO · 06:00", 64, 44, 280, C.teal, "left");
-  text(slide, rtl("עכשיו מוכיחים את זה בלייב"), 520, 98, 694, 62, {
+  text(slide, rtl("עוברים מהסיפור למערכת"), 520, 98, 694, 62, {
     size: 42,
     bold: true,
     color: C.white,
@@ -636,7 +661,7 @@ function connectLeft(slide, fromShape, toShape, color = C.teal) {
   notes(
     slide,
     "08:55–09:10",
-    "סיים את חלק המצגת ועבור לדמו. אמור: עכשיו אעקוב אחרי אותה שרשרת במערכת עצמה. המסלול הוא Dashboard, Kafka, MinIO, Airflow, Opportunity Center ו-Backtesting. פתח את סקריפט הדמו והתחל את הטיימר.",
+    "עצור לשנייה ועבור לדמו במשפט נקי: עד עכשיו הסברתי את ההיגיון. עכשיו אראה את אותה שרשרת במערכת עצמה. נעבור מהמסך העסקי לאירוע ב-Kafka, לראיית המקור ב-MinIO, לריצה המאושרת ב-Airflow, ולבסוף לתרחיש ההחלטה ולבדיקה ההיסטורית. פתח את סקריפט הדמו והתחל את הטיימר.",
     "docs/presentation/live-demo-script-he.md; scripts/demo-preflight.ps1",
   );
 }

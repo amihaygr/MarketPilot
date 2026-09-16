@@ -4,7 +4,6 @@ import re
 from pathlib import Path
 
 DOCS_DIR = Path(__file__).parents[2] / "docs"
-PRESENTATION_DIR = DOCS_DIR / "presentation"
 HEBREW = re.compile(r"[\u0590-\u05ff]")
 LATIN_WORD = re.compile(r"[A-Za-z]{2,}")
 NUMERIC_DIRECTIONAL_RUN = re.compile(
@@ -31,12 +30,6 @@ def test_hebrew_presentation_markdown_has_complete_rtl_isolation() -> None:
         assert text.rstrip().endswith("</div>")
         assert text.count('<bdi dir="ltr">') == text.count("</bdi>")
         assert text.count('<bdo dir="ltr">') == text.count("</bdo>")
-
-        if path.parent == PRESENTATION_DIR:
-            assert "<bdi" not in text
-            assert "<bdo" not in text
-            assert "<code>" not in text
-            assert '<a dir="ltr"' not in text
 
         ltr_block_depth = 0
         in_fenced_code = False
