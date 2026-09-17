@@ -2,8 +2,8 @@
 
 # מדריך ההצגה והדמו של <bdi dir="ltr"><code>MarketPilot</code></bdi>
 
-זהו המסמך המרכזי ליום ההצגה. הוא בנוי למסלול של כ־<bdi dir="ltr"><code>15 minutes</code></bdi>:
-כ־9 דקות למצגת וכ־6 דקות לדמו החי. אין צורך לשנן את הנוסח. צריך להבין את
+זהו המסמך המרכזי ליום ההצגה. הוא בנוי למסלול של כ־<bdi dir="ltr"><code>15</code></bdi> דקות:
+כ־<bdi dir="ltr"><code>9</code></bdi> דקות למצגת וכ־<bdi dir="ltr"><code>6</code></bdi> דקות לדמו החי. אין צורך לשנן את הנוסח. צריך להבין את
 הרעיון של כל תחנה ולדבר במילים טבעיות.
 
 מונח טכני שאינו מובן מאליו מוסבר בסוגריים מיד אחרי הופעתו הראשונה. לאחר
@@ -47,11 +47,11 @@ docker compose up -d
 
 ## הכנה לפני כניסת הקהל
 
-1. פתח את המצגת: [MarketPilot-Final-Presentation.pptx](output/MarketPilot-Final-Presentation.pptx).
+1. פתח את המצגת: [<bdi dir="ltr"><code>MarketPilot-Final-Presentation.pptx</code></bdi>](output/MarketPilot-Final-Presentation.pptx).
 2. התחבר מראש ל־<bdi dir="ltr"><code>MinIO</code></bdi> ול־<bdi dir="ltr"><code>Airflow</code></bdi>.
 3. סגור את קובץ <bdi dir="ltr"><code>.env</code></bdi> וכל חלון שעלול לחשוף סיסמה או מפתח.
 4. במסך הראשי בחר <bdi dir="ltr"><code>AAPL</code></bdi> וטווח <bdi dir="ltr"><code>7D</code></bdi>.
-5. ודא שבגרף מופיעים לפחות 5 ימי מסחר, שהפערים מחוץ לשעות המסחר נשארים גלויים ושכיסוי <bdi dir="ltr"><code>SMA 20</code></bdi> גבוה מ־<bdi dir="ltr"><code>80%</code></bdi>.
+5. ודא שבגרף מופיעים לפחות <bdi dir="ltr"><code>5</code></bdi> ימי מסחר, שהפערים מחוץ לשעות המסחר נשארים גלויים ושכיסוי <bdi dir="ltr"><code>SMA 20</code></bdi> גבוה מ־<bdi dir="ltr"><code>80%</code></bdi>.
 6. פתח מראש הודעה אחת ב־<bdi dir="ltr"><code>Kafka UI</code></bdi> ואובייקט אחד ב־<bdi dir="ltr"><code>MinIO Bronze</code></bdi>.
 7. ב־<bdi dir="ltr"><code>Airflow</code></bdi> פתח את ריצת התיקון הירוקה <bdi dir="ltr"><code>repair__2026-09-16__20260917</code></bdi> של <bdi dir="ltr"><code>historical_market_backfill</code></bdi>.
 8. במעבדת הבדיקה ההיסטורית בחר ריצה במצב <bdi dir="ltr"><code>Published</code></bdi> שמכסה כמה שבועות; אין להסתמך על מזהה קבוע.
@@ -64,7 +64,7 @@ docker compose up -d
 | <bdi dir="ltr"><code>00:00–02:00</code></bdi> | שקפים <bdi dir="ltr"><code>1–3</code></bdi> | הבעיה והערך לסוחר |
 | <bdi dir="ltr"><code>02:00–05:05</code></bdi> | שקפים <bdi dir="ltr"><code>4–6</code></bdi> | ארכיטקטורה ובחירות טכנולוגיות |
 | <bdi dir="ltr"><code>05:05–08:55</code></bdi> | שקפים <bdi dir="ltr"><code>7–11</code></bdi> | המוצר, האתגרים והמשך הדרך |
-| <bdi dir="ltr"><code>08:55–09:10</code></bdi> | שקף 12 | מעבר לדמו |
+| <bdi dir="ltr"><code>08:55–09:10</code></bdi> | שקף <bdi dir="ltr"><code>12</code></bdi> | מעבר לדמו |
 | <bdi dir="ltr"><code>09:10–15:00</code></bdi> | דמו חי | הוכחה מקצה לקצה |
 
 אם הזמן מתקצר, אל תוותר על הבעיה, הארכיטקטורה והדמו. קצר את פירוט הטכנולוגיות
@@ -74,7 +74,7 @@ docker compose up -d
 
 ## חלק א: מה לומר במצגת
 
-### שקף 1 — פתיחה
+### שקף <bdi dir="ltr"><code>1</code></bdi> — פתיחה
 
 **המסר:** המערכת מחברת מידע גולמי לתרחיש החלטה שניתן להסביר.
 
@@ -86,7 +86,7 @@ docker compose up -d
 
 **מעבר:** “כדי להבין למה צריך מערכת כזאת, נתחיל מהבעיה.”
 
-### שקף 2 — הבעיה
+### שקף <bdi dir="ltr"><code>2</code></bdi> — הבעיה
 
 **המסר:** מחיר לבדו חסר הקשר ואמון.
 
@@ -96,7 +96,7 @@ docker compose up -d
 > קורה עכשיו, האם הנתון אמין, מה השתנה בחברה, ומה קרה כשבדקנו את הרעיון
 > על נתוני עבר.
 
-### שקף 3 — הערך למשתמש
+### שקף <bdi dir="ltr"><code>3</code></bdi> — הערך למשתמש
 
 **המסר:** המערכת בונה אמון בשלבים לפני שהיא מציגה תרחיש.
 
@@ -106,7 +106,7 @@ docker compose up -d
 > סיכון־סיכוי. כך נחסך זמן מחקר, והסיבה לכל תוצאה נשארת גלויה. ההחלטה
 > והביצוע נשארים בידי המשתמש.
 
-### שקף 4 — הארכיטקטורה
+### שקף <bdi dir="ltr"><code>4</code></bdi> — הארכיטקטורה
 
 **המסר:** אותו נתון עובר במסלולים נפרדים למהירות, ראיה גולמית ואישור; שכבת ההחלטה אינה עוקפת אותם.
 
@@ -140,7 +140,7 @@ docker compose up -d
 **מה הסוקר צריך להבין:** יש הפרדה בין תעבורה, חישוב, אחסון גולמי, שכבת הגשה
 ותזמור. כל רכיב מקבל אחריות מוגדרת.
 
-### שקף 5 — <bdi dir="ltr"><code>Provisional</code></bdi> לעומת <bdi dir="ltr"><code>Certified</code></bdi>
+### שקף <bdi dir="ltr"><code>5</code></bdi> — <bdi dir="ltr"><code>Provisional</code></bdi> לעומת <bdi dir="ltr"><code>Certified</code></bdi>
 
 **המסר:** מהירות ואמינות אינן אותה הבטחה.
 
@@ -151,7 +151,7 @@ docker compose up -d
 > (תוצאה מאושרת שנבנתה מחדש ועברה בדיקות איכות). כך המערכת אינה מעמידה פנים
 > שנתון חי כבר עבר בדיקה מלאה.
 
-### שקף 6 — בחירת הטכנולוגיות
+### שקף <bdi dir="ltr"><code>6</code></bdi> — בחירת הטכנולוגיות
 
 **המסר:** הכלים מוכרים מהקורס, אבל כל אחד נבחר לתפקיד שמתאים לחוזקות שלו.
 
@@ -176,7 +176,7 @@ docker compose up -d
 נכונה להיקף, למטרות הלמידה ולארכיטקטורה של הפרויקט. במערכת גדולה או בענן
 ייתכן שהיינו בוחרים שירותים מנוהלים או חלופות אחרות.
 
-### שקף 7 — המסך הראשי
+### שקף <bdi dir="ltr"><code>7</code></bdi> — המסך הראשי
 
 **המסר:** המורכבות ההנדסית משרתת חוויה פשוטה.
 
@@ -184,7 +184,7 @@ docker compose up -d
 > וטריות במקום אחד. כל תוצאה מגיעה דרך <bdi dir="ltr"><code>Backend API</code></bdi> וכוללת מצב פרסום. אפשר
 > להתחיל מהמספר שעל המסך ולרדת עד האירוע המקורי ששמור ב־<bdi dir="ltr"><code>Bronze</code></bdi>.
 
-### שקף 8 — <bdi dir="ltr"><code>Opportunity Center</code></bdi>
+### שקף <bdi dir="ltr"><code>8</code></bdi> — <bdi dir="ltr"><code>Opportunity Center</code></bdi>
 
 **המסר:** המלצה טובה מציגה גם את התנאים שבהם היא מפסיקה להיות נכונה.
 
@@ -207,7 +207,7 @@ docker compose up -d
 > <bdi dir="ltr"><code>INSUFFICIENT DATA</code></bdi>. המצב האחרון אינו תקלה; הוא מוכיח ששערי
 > האיכות יכולים לעצור מסקנה כשאין בסיס מספק.
 
-### שקף 9 — בדיקה היסטורית
+### שקף <bdi dir="ltr"><code>9</code></bdi> — בדיקה היסטורית
 
 **המסר:** ניסוי אמין חשוב יותר מתשואה יפה.
 
@@ -219,7 +219,7 @@ docker compose up -d
 > <bdi dir="ltr"><code>S&amp;P 500</code></bdi> ומשמשת נקודת ייחוס). גם תוצאה חלשה היא שימושית, משום שהיא מונעת מאיתנו לקדם רעיון שלא
 > עמד בבדיקה.
 
-### שקף 10 — האתגרים
+### שקף <bdi dir="ltr"><code>10</code></bdi> — האתגרים
 
 **המסר:** האתגרים הפכו לעקרונות תכנון שניתנים להגנה.
 
@@ -235,14 +235,14 @@ docker compose up -d
 > <bdi dir="ltr"><code>Lineage</code></bdi> (יכולת לעקוב מתוצאה סופית אל המקור,
 > הריצה, גרסת הקוד וגרסת הנתונים) כמו הנתונים החיים.
 
-### שקף 11 — המשך הדרך
+### שקף <bdi dir="ltr"><code>11</code></bdi> — המשך הדרך
 
 **המסר:** יש מוצר עובד, אך קיימים תנאים ברורים לפני שימוש רחב יותר.
 
 > היום קיימת מערכת מקומית מלאה עם מסלול חי, מסלול מאושר, נתונים היסטוריים
 > וממשק <bdi dir="ltr"><code>Web</code></bdi>. לפני פתיחת <bdi dir="ltr"><code>Decision Support</code></bdi>
 > (מערכת שתומכת בהחלטה אך אינה מחליטה או מבצעת מסחר במקום האדם) פעיל נדרשים
-> 20 ימי <bdi dir="ltr"><code>Shadow Mode</code></bdi>, בדיקת
+> <bdi dir="ltr"><code>20</code></bdi> ימי <bdi dir="ltr"><code>Shadow Mode</code></bdi>, בדיקת
 > <bdi dir="ltr"><code>Calibration</code></bdi> (בדיקה האם רמת הביטחון שהמערכת מציגה
 > באמת מתאימה לשיעור ההצלחה שנמדד) ואישור אנושי.
 >
@@ -259,10 +259,10 @@ docker compose up -d
 > בנוסף יישמתי את תשתית <bdi dir="ltr"><code>Phase 15</code></bdi>: יצירת
 > <bdi dir="ltr"><code>Point-in-time features</code></bdi>, ‏<bdi dir="ltr"><code>Labels</code></bdi>,
 > אימון והשוואת מודלים, ‏<bdi dir="ltr"><code>Walk-Forward Validation</code></bdi> ורישום
-> <bdi dir="ltr"><code>Artifact</code></bdi>. כרגע אין 24 חודשי נתונים ואין לפחות
-> 300 כניסות תקפות, ולכן המערכת מסרבת לאמן או לפרסם הסתברות ועוברת ל־<bdi dir="ltr"><code>FALLBACK</code></bdi>.
+> <bdi dir="ltr"><code>Artifact</code></bdi>. כרגע אין <bdi dir="ltr"><code>24</code></bdi> חודשי נתונים ואין לפחות
+> <bdi dir="ltr"><code>300</code></bdi> כניסות תקפות, ולכן המערכת מסרבת לאמן או לפרסם הסתברות ועוברת ל־<bdi dir="ltr"><code>FALLBACK</code></bdi>.
 
-### שקף 12 — מעבר לדמו
+### שקף <bdi dir="ltr"><code>12</code></bdi> — מעבר לדמו
 
 > עד עכשיו הסברתי את ההיגיון. עכשיו אראה את אותה שרשרת במערכת עצמה: נתחיל
 > במסך העסקי, נעבור לאירוע ב־<bdi dir="ltr"><code>Kafka</code></bdi>, נראה את המקור ב־<bdi dir="ltr"><code>MinIO</code></bdi> ואת ריצת האישור
@@ -300,7 +300,7 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 המסלול מתחיל במה שהמשתמש רואה, יורד למקור הנתון כדי להוכיח אמינות, וחוזר
 בסוף לערך העסקי. אם דף נטען לאט, המשך לדבר על מה שכבר פתוח במקום לחכות בשקט.
 
-### תחנה 1 — המסך הראשי
+### תחנה <bdi dir="ltr"><code>1</code></bdi> — המסך הראשי
 
 **פתח:** <bdi dir="ltr"><code>http://localhost:3000/</code></bdi>
 
@@ -310,7 +310,7 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 2. לחץ על <bdi dir="ltr"><code>7D</code></bdi>. המתן שהגרף ייטען והצבע על תגית מספר התוצאות ועל טווח התאריכים.
 3. לחץ על <bdi dir="ltr"><code>30D</code></bdi>. הצבע על כך שהטווח והגרף השתנו, ולא רק הכותרת.
 4. הצבע על קו המחיר ועל הקו המקווקו של <bdi dir="ltr"><code>SMA 20</code></bdi>
-   (ממוצע פשוט של 20 מחירי הסגירה האחרונים, שמחליק תנודות קצרות). אין צורך
+   (ממוצע פשוט של <bdi dir="ltr"><code>20</code></bdi> מחירי הסגירה האחרונים, שמחליק תנודות קצרות). אין צורך
    לנסות לנבא מה יקרה למחיר.
 
 **מה הקהל צריך לראות:** הנתונים אינם תמונה קבועה. החלפת הטווח יוצרת קריאה
@@ -319,8 +319,8 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 **מה לומר, במילים טבעיות:**
 
 > אני מתחיל בכוונה מהמסך שהמשתמש פוגש. כאן אפשר לבחור מניה ולראות אותה גם
-> בטווח קצר וגם בטווח רחב יותר. ב־7 ימים יש אצלנו 5 ימי מסחר ו־1,950 נרות
-> של דקה. ב־30 ימים יש 21 ימי מסחר ו־8,190 נרות. זה נותן לי הקשר: האם מה
+> בטווח קצר וגם בטווח רחב יותר. ב־<bdi dir="ltr"><code>7</code></bdi> ימים יש אצלנו <bdi dir="ltr"><code>5</code></bdi> ימי מסחר ו־<bdi dir="ltr"><code>1,950</code></bdi> נרות
+> של דקה. ב־<bdi dir="ltr"><code>30</code></bdi> ימים יש <bdi dir="ltr"><code>21</code></bdi> ימי מסחר ו־<bdi dir="ltr"><code>8,190</code></bdi> נרות. זה נותן לי הקשר: האם מה
 > שאני רואה עכשיו הוא תנועה של כמה דקות, או חלק מתמונה רחבה יותר.
 >
 > הקו המקווקו הוא הממוצע הנע של עשרים הסגירות האחרונות. הוא לא אומר לי
@@ -331,7 +331,7 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 
 **מעבר:** “עכשיו נרד מן הגרף אל האירוע שהגיע למערכת.”
 
-### תחנה 2 — <bdi dir="ltr"><code>Kafka UI</code></bdi>
+### תחנה <bdi dir="ltr"><code>2</code></bdi> — <bdi dir="ltr"><code>Kafka UI</code></bdi>
 
 **פתח את הקישור הזה:** <bdi dir="ltr"><code>http://localhost:8085/</code></bdi>
 
@@ -383,7 +383,7 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 
 **מעבר:** “עכשיו אראה את העותק הגולמי שנשמר עבור ביקורת ושחזור.”
 
-### תחנה 3 — <bdi dir="ltr"><code>MinIO Bronze</code></bdi>
+### תחנה <bdi dir="ltr"><code>3</code></bdi> — <bdi dir="ltr"><code>MinIO Bronze</code></bdi>
 
 **פתח:** <bdi dir="ltr"><code>http://localhost:9001/</code></bdi>
 
@@ -431,7 +431,7 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 
 **מעבר:** “העותק נשמר; עכשיו נראה מי מנהל את העיבוד המאושר שלו.”
 
-### תחנה 4 — <bdi dir="ltr"><code>Airflow</code></bdi>
+### תחנה <bdi dir="ltr"><code>4</code></bdi> — <bdi dir="ltr"><code>Airflow</code></bdi>
 
 **פתח:** <bdi dir="ltr"><code>http://localhost:8080/</code></bdi>
 
@@ -440,7 +440,7 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 1. פתח את רשימת ה־<bdi dir="ltr"><code>DAGs</code></bdi> (תהליכים שמוגדרים
    כמשימות עם סדר ותלויות; משימה מאוחרת אינה מתחילה לפני שקודמתה הצליחה).
 2. בחר את ריצת התיקון הירוקה <bdi dir="ltr"><code>repair__2026-09-16__20260917</code></bdi> של <bdi dir="ltr"><code>historical_market_backfill</code></bdi>.
-אל תבחר את הריצה האחרונה באופן אוטומטי; בדוק קודם שהסטטוס שלה ירוק.
+   אל תבחר את הריצה האחרונה באופן אוטומטי; בדוק קודם שהסטטוס שלה ירוק.
 3. פתח את תצוגת <bdi dir="ltr"><code>Grid</code></bdi> (טבלת ריצות ומשימות) או
    <bdi dir="ltr"><code>Graph</code></bdi> (תרשים התלויות) והצבע על סדר המשימות הירוקות.
 4. אל תלחץ על <bdi dir="ltr"><code>Trigger DAG</code></bdi> מול הקהל. ריצה מוצלחת קיימת היא הראיה הבטוחה יותר.
@@ -453,7 +453,7 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 > מנהל התזמור הוא מנהל העבודה של התהליכים שמתחילים ומסתיימים. כאן רואים בדיוק
 > מה קרה ובאיזה סדר: מעבדים את המקור הגולמי לשכבה נקייה, בודקים איכות,
 > מפרסמים לשכבת ההגשה ורק אחר כך ממשיכים לחישובי הניתוח. ריצת התיקון המוצגת
-> רכשה מחדש את 16 בספטמבר, העבירה 11 סימולים דרך שער הכיסוי ופרסמה אותם כ־<bdi dir="ltr"><code>CERTIFIED</code></bdi>.
+> רכשה מחדש את <bdi dir="ltr"><code>16</code></bdi> בספטמבר, העבירה <bdi dir="ltr"><code>11</code></bdi> סימולים דרך שער הכיסוי ופרסמה אותם כ־<bdi dir="ltr"><code>CERTIFIED</code></bdi>.
 >
 > חשוב להדגיש מה מנהל התזמור לא עושה: הוא לא מפעיל את שירות ההודעות, לא
 > מפעיל את העיבוד הרציף ולא מנהל את חיי הדשבורד. אלה שירותים ארוכי־חיים.
@@ -465,22 +465,22 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 
 **מעבר:** “אחרי שהנתונים עברו מסלול מבוקר, אפשר לתת להם ערך למשתמש.”
 
-### תחנה 5 — <bdi dir="ltr"><code>Opportunity Center</code></bdi>
+### תחנה <bdi dir="ltr"><code>5</code></bdi> — <bdi dir="ltr"><code>Opportunity Center</code></bdi>
 
 **פתח:** <bdi dir="ltr"><code>http://localhost:3000/opportunities.html</code></bdi>
 
 **מה לעשות על המסך:**
 
-1. ודא שמופיעים 11 סימולים ברשימת המעקב.
+1. ודא שמופיעים <bdi dir="ltr"><code>11</code></bdi> סימולים ברשימת המעקב.
 2. בחר את <bdi dir="ltr"><code>META</code></bdi> והראה תרחיש <bdi dir="ltr"><code>BUY ZONE</code></bdi>.
 3. עבור אל <bdi dir="ltr"><code>AAPL</code></bdi> והראה מדוע מחיר מעל טווח הכניסה הופך את הפעולה ל־<bdi dir="ltr"><code>WATCH BREAKOUT</code></bdi> ולא ל־<bdi dir="ltr"><code>BUY</code></bdi> עיוור.
 4. בחר סימול שמציג <bdi dir="ltr"><code>INSUFFICIENT DATA</code></bdi> (אין מספיק
    נתונים טריים ומאושרים כדי לחשב תרחיש אמין) והסבר מדוע עצירת מסקנה היא תוצאה תקינה.
 5. הצבע על הסטטוס: <bdi dir="ltr"><code>PROVISIONAL</code></bdi>, ‏<bdi dir="ltr"><code>CERTIFIED</code></bdi>,
    ‏<bdi dir="ltr"><code>STALE</code></bdi> (הנתון קיים אך עבר את מגבלת הטריות) או
-<bdi dir="ltr"><code>INSUFFICIENT DATA</code></bdi> — מה שמופיע בפועל.
+   <bdi dir="ltr"><code>INSUFFICIENT DATA</code></bdi> — מה שמופיע בפועל.
 6. עבור על כרטיס התרחיש בסדר: <bdi dir="ltr"><code>Buy Zone</code></bdi>, ‏<bdi dir="ltr"><code>Stop</code></bdi>, ‏<bdi dir="ltr"><code>Target 1</code></bdi>,
-<bdi dir="ltr"><code>Target 2</code></bdi>, ‏<bdi dir="ltr"><code>Risk/Reward</code></bdi> וגודל הפוזיציה.
+   <bdi dir="ltr"><code>Target 2</code></bdi>, ‏<bdi dir="ltr"><code>Risk/Reward</code></bdi> וגודל הפוזיציה.
 7. הצבע על שלושת המושגים הנפרדים: <bdi dir="ltr"><code>Rule Score</code></bdi>, ‏<bdi dir="ltr"><code>Model Probability</code></bdi> ו־<bdi dir="ltr"><code>Data Confidence</code></bdi>.
 8. פתח את ההסבר בעברית, ובחר סיבה אחת טכנית וסיבה אחת פונדמנטלית בלבד.
 
@@ -498,7 +498,7 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 > צל, כלומר אוספת ומודדת את איכות התרחישים לפני שמציגים אותם כהמלצה מעשית. האדם
 > נשאר מקבל ההחלטה.
 >
-> נכון לבדיקת ההכנה יש 53 ימי מסחר היסטוריים מאושרים, אך מונה הצל של
+> נכון לבדיקת ההכנה יש <bdi dir="ltr"><code>53</code></bdi> ימי מסחר היסטוריים מאושרים, אך מונה הצל של
 > <bdi dir="ltr"><code>v1</code></bdi> הוא <bdi dir="ltr"><code>2/20</code></bdi>.
 > ההיסטוריה אינה נספרת כזמן חי. המונה עולה רק
 > אחרי יום מסחר אמיתי שבו כל ריצת האישור היומית הסתיימה בהצלחה. אם הריצה
@@ -515,7 +515,7 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 
 **מעבר:** “ולפני שסומכים על רעיון כזה, צריך לבדוק איך הוא התנהג בעבר.”
 
-### תחנה 6 — <bdi dir="ltr"><code>Backtesting Lab</code></bdi>
+### תחנה <bdi dir="ltr"><code>6</code></bdi> — <bdi dir="ltr"><code>Backtesting Lab</code></bdi>
 
 **פתח:** <bdi dir="ltr"><code>http://localhost:3000/backtesting.html</code></bdi>
 
@@ -553,9 +553,9 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 
 ## אם משהו לא עובד
 
-- אם המסך הראשי אינו זמין, הצג את צילום המסך בשקף 7.
+- אם המסך הראשי אינו זמין, הצג את צילום המסך בשקף <bdi dir="ltr"><code>7</code></bdi>.
 - אם <bdi dir="ltr"><code>Kafka UI</code></bdi> אינו זמין, עבור לאובייקט <bdi dir="ltr"><code>Bronze</code></bdi> והסבר שהנתיב מכיל את מיקום ההודעה.
-- אם <bdi dir="ltr"><code>MinIO</code></bdi> אינו זמין, הצג את שקף 4 ואת צילום המסך המוכן.
+- אם <bdi dir="ltr"><code>MinIO</code></bdi> אינו זמין, הצג את שקף <bdi dir="ltr"><code>4</code></bdi> ואת צילום המסך המוכן.
 - אם <bdi dir="ltr"><code>Airflow</code></bdi> אינו זמין, הצג את מסמך האימות ואת סדר המשימות בשקף.
 - אם הנתון החי ישן, אמור זאת בכנות. שירות בריא ונתון טרי הן שתי בדיקות שונות.
 - אל תתחיל תיקון ארוך מול הקהל. עבור לראיה החלופית והמשך לדבר.
@@ -612,8 +612,8 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 
 ### <bdi dir="ltr"><code>SMA 20</code></bdi>
 
-ממוצע נע פשוט של 20 נרות. בכל נקודה מחברים את 20 מחירי הסגירה האחרונים
-ומחלקים ב־20. הוא מחליק רעש ועוזר לראות כיוון, אך הוא מפגר אחרי המחיר ואינו
+ממוצע נע פשוט של <bdi dir="ltr"><code>20</code></bdi> נרות. בכל נקודה מחברים את <bdi dir="ltr"><code>20</code></bdi> מחירי הסגירה האחרונים
+ומחלקים ב־<bdi dir="ltr"><code>20</code></bdi>. הוא מחליק רעש ועוזר לראות כיוון, אך הוא מפגר אחרי המחיר ואינו
 אות קנייה בפני עצמו.
 
 ### <bdi dir="ltr"><code>EMA</code></bdi>, ‏<bdi dir="ltr"><code>RSI</code></bdi>, ‏<bdi dir="ltr"><code>MACD</code></bdi> ו־<bdi dir="ltr"><code>ATR</code></bdi>
@@ -632,7 +632,7 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 ### <bdi dir="ltr"><code>Risk/Reward</code></bdi>
 
 היחס בין הרווח המתוכנן לבין ההפסד המתוכנן. לדוגמה, אם הסיכון עד מחיר העצירה
-הוא 10 שקלים והיעד מציע 20 שקלים, היחס הוא <bdi dir="ltr"><code>2:1</code></bdi>.
+הוא <bdi dir="ltr"><code>10</code></bdi> שקלים והיעד מציע <bdi dir="ltr"><code>20</code></bdi> שקלים, היחס הוא <bdi dir="ltr"><code>2:1</code></bdi>.
 היחס אינו חוזה שהיעד יושג; הוא מאפשר לבדוק מראש אם פוטנציאל התרחיש מצדיק את
 הסיכון שלו.
 

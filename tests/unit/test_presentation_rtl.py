@@ -10,6 +10,8 @@ NUMERIC_DIRECTIONAL_RUN = re.compile(
     r"[+\-−‎]?\d+(?:[.,:]\d+)*(?:[–—-]\d+(?:[.,:]\d+)*)+|"
     r"[+\-−‎]?\d+(?:[.,]\d+)*%|\d+/\d+"
 )
+ASCII_DIGIT = re.compile(r"\d")
+ORDERED_LIST_MARKER = re.compile(r"^\s*(?:>\s*)?\d+\.\s+")
 PROTECTED_FRAGMENT = re.compile(
     r"\u2066.*?\u2069|"
     r"<bdi\b[^>]*>.*?</bdi>|<bdo\b[^>]*>.*?</bdo>|"
@@ -52,3 +54,8 @@ def test_hebrew_presentation_markdown_has_complete_rtl_isolation() -> None:
             assert not NUMERIC_DIRECTIONAL_RUN.search(unisolated), (
                 f"{path.name}:{line_number} contains an unisolated numeric run: {unisolated}"
             )
+            if path.name == "demo-day-step-by-step-he.md":
+                prose = ORDERED_LIST_MARKER.sub("", unisolated)
+                assert not ASCII_DIGIT.search(prose), (
+                    f"{path.name}:{line_number} contains an unisolated digit: {prose}"
+                )
