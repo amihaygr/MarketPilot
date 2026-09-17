@@ -21,6 +21,7 @@ RAW_BIDI_CONTROL = re.compile(r"[\u200e\u200f\u202a-\u202e\u2066-\u2069]")
 DIRECTIONAL_INLINE_CODE_WITHOUT_OVERRIDE = re.compile(
     r'<bdi dir="ltr"><code>[^<]*[0-9_./:%=–—-][^<]*</code></bdi>'
 )
+INLINE_CODE_WITHOUT_DIRECTION = re.compile(r'<code(?!\s+dir="ltr")>')
 MISALIGNED_ENGLISH_HEADING = re.compile(
     r'<h[1-6]\b[^>]*dir="ltr"[^>]*align="right"', re.IGNORECASE
 )
@@ -49,6 +50,10 @@ def test_hebrew_presentation_markdown_has_complete_rtl_isolation() -> None:
         assert not DIRECTIONAL_INLINE_CODE_WITHOUT_OVERRIDE.search(text), (
             f"{path.name} contains an LTR identifier or numeric range without an explicit "
             "character-order override; nest bdo[dir=ltr] inside the bdi isolation"
+        )
+        assert not INLINE_CODE_WITHOUT_DIRECTION.search(text), (
+            f"{path.name} contains inline code without dir=ltr. GitHub may strip outer "
+            "bdi/bdo wrappers, so the surviving code element must carry the direction"
         )
         assert not MISALIGNED_ENGLISH_HEADING.search(text), (
             f"{path.name} contains an English-only heading aligned to the RTL edge"
