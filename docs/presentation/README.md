@@ -37,9 +37,9 @@ docker compose up -d
 נכון ל־<bdi dir="ltr"><code>2026-09-17</code></bdi>:
 
 - <bdi dir="ltr"><code>11</code></bdi> נכסים במעקב.
-- <bdi dir="ltr"><code>72,850</code></bdi> נרות דקה ב־<bdi dir="ltr"><code>Gold</code></bdi>, מהם <bdi dir="ltr"><code>65,616 CERTIFIED</code></bdi>.
+- <bdi dir="ltr"><code>162,743</code></bdi> נרות דקה ב־<bdi dir="ltr"><code>Gold</code></bdi>, מהם <bdi dir="ltr"><code>154,206 CERTIFIED</code></bdi>.
 - <bdi dir="ltr"><code>937</code></bdi> רשומות דיווחי <bdi dir="ltr"><code>SEC</code></bdi>.
-- <bdi dir="ltr"><code>53</code></bdi> ימי מסחר היסטוריים מאושרים ו־<bdi dir="ltr"><code>11</code></bdi> ריצות <bdi dir="ltr"><code>Backtest</code></bdi> מפורסמות.
+- <bdi dir="ltr"><code>76</code></bdi> ימי מסחר היסטוריים מאושרים ו־<bdi dir="ltr"><code>12</code></bdi> ריצות <bdi dir="ltr"><code>Backtest</code></bdi> מפורסמות.
 - שער <bdi dir="ltr"><code>v1 Shadow Mode</code></bdi> עומד על <bdi dir="ltr"><code>2/20</code></bdi>.
 - מודל <bdi dir="ltr"><code>v2</code></bdi> במצב <bdi dir="ltr"><code>FALLBACK</code></bdi>; כללי <bdi dir="ltr"><code>v1</code></bdi> פעילים ואין הסתברות מומצאת.
 

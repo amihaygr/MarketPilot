@@ -6,6 +6,8 @@ import pytest
 
 from marketpilot.analytics.mariadb import publish_analytics_partition
 from marketpilot.analytics.rules import (
+    ANALYTICS_BAR_INTERVAL,
+    ANALYTICS_SOURCE_NAME,
     INDICATOR_CODES,
     SIGNAL_CODES,
     resolve_analytics_scope,
@@ -60,6 +62,8 @@ def test_analytics_scope_is_bounded_and_versioned_catalogues_are_unique() -> Non
     assert scope.lookback_days == 10
     assert len(INDICATOR_CODES) == len(set(INDICATOR_CODES)) == 4
     assert len(SIGNAL_CODES) == len(set(SIGNAL_CODES)) == 5
+    assert ANALYTICS_SOURCE_NAME == "alpaca"
+    assert ANALYTICS_BAR_INTERVAL == "1Min"
     with pytest.raises(ValueError, match="between 1 and 31"):
         resolve_analytics_scope("2026-08-28", scope.run_id, 32)
 

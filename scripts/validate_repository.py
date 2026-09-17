@@ -26,24 +26,30 @@ SECRET_PATTERNS = (
 )
 FALLBACK_SKIP_DIRECTORIES = {
     ".git",
+    ".architecture-build",
     ".pytest_cache",
     ".ruff_cache",
     ".presentation-build",
-    ".architecture-build",
+    ".skill-staging",
     "__pycache__",
     "node_modules",
+    "output",
+    "tmp",
 }
 
 
 def repository_files() -> list[Path]:
     """Return tracked files so local secrets and vendored dependencies stay out of scans."""
-    result = subprocess.run(
-        ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
-        cwd=ROOT,
-        capture_output=True,
-        check=False,
-    )
-    if result.returncode == 0:
+    try:
+        result = subprocess.run(
+            ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
+            cwd=ROOT,
+            capture_output=True,
+            check=False,
+        )
+    except FileNotFoundError:
+        result = None
+    if result is not None and result.returncode == 0:
         return [ROOT / Path(value.decode("utf-8")) for value in result.stdout.split(b"\0") if value]
 
     return [

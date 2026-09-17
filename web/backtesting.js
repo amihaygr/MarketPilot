@@ -29,9 +29,22 @@ async function loadRuns() {
       showMessage("No backtests have been published yet. Trigger historical_backtest in Airflow to create the first run.");
       return;
     }
+    elements["run-select"].value = preferredRun(page.items).run_id;
     await loadRun();
     setState("ready", "API healthy");
   } catch (error) { showFailure(error); }
+}
+
+function preferredRun(runs) {
+  return [...runs].sort((left, right) => {
+    const spanDifference = runSpanDays(right) - runSpanDays(left);
+    if (spanDifference !== 0) return spanDifference;
+    return right.symbols.length - left.symbols.length;
+  })[0];
+}
+
+function runSpanDays(run) {
+  return Math.round((Date.parse(`${run.end_date}T00:00:00Z`) - Date.parse(`${run.start_date}T00:00:00Z`)) / 86400000) + 1;
 }
 
 async function loadRun() {

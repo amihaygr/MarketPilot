@@ -31,6 +31,8 @@ from pyspark.sql.functions import (
 
 from marketpilot.analytics.mariadb import publish_analytics_partition
 from marketpilot.analytics.rules import (
+    ANALYTICS_BAR_INTERVAL,
+    ANALYTICS_SOURCE_NAME,
     INDICATOR_SCHEMA_VERSION,
     INDICATOR_VERSION,
     SIGNAL_MODEL_VERSION,
@@ -109,6 +111,8 @@ def main() -> None:
         JOIN dim_symbol d ON d.symbol_id = f.symbol_id
         WHERE f.event_time_utc >= '{start.isoformat()} 00:00:00'
           AND f.event_time_utc < '{end.isoformat()} 00:00:00'
+          AND f.source_name = '{ANALYTICS_SOURCE_NAME}'
+          AND f.bar_interval = '{ANALYTICS_BAR_INTERVAL}'
     ) analytics_source"""
     spark = build_batch_spark_session("marketpilot-market-analytics")
     spark.sparkContext.setLogLevel(os.environ.get("SPARK_LOG_LEVEL", "WARN"))

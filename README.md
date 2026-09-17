@@ -1,5 +1,9 @@
 # MarketPilot
 
+[![Quality](https://github.com/amihaygr/MarketPilot/actions/workflows/quality.yml/badge.svg)](https://github.com/amihaygr/MarketPilot/actions/workflows/quality.yml)
+
+![MarketPilot Opportunity Center](docs/presentation/assets/opportunity-center.png)
+
 MarketPilot is a local, reproducible data platform for market research and
 explainable decision support. It combines live and historical market data, SEC
 company facts, immutable raw storage, governed batch certification, technical and
@@ -8,6 +12,24 @@ fundamental features, backtesting, and a browser-based research experience.
 It is a research system—not an order-execution platform and not a promise of
 profit.
 
+## Start here
+
+- [Explore the complete architecture](docs/architecture/architecture.md)
+- [Open the final architecture PDF](docs/architecture/output/MarketPilot.pdf)
+- [Download the final presentation](docs/presentation/output/MarketPilot-Final-Presentation.pptx)
+- [Follow the Hebrew presentation and live-demo guide](docs/presentation/demo-day-step-by-step-he.md)
+
+## What makes the project different
+
+- Live results remain visibly `PROVISIONAL`; bounded post-market processing
+  rebuilds the session and publishes `CERTIFIED` data only after quality gates.
+- Every market event retains an immutable Bronze record for replay, lineage and
+  failure investigation.
+- Decision scenarios separate transparent rule scores, data confidence and
+  model probability instead of presenting one ambiguous “confidence” number.
+- The hybrid model fails safely to deterministic rules until historical data,
+  walk-forward validation, calibration and human approval are complete.
+
 ## Final release at a glance
 
 Verified on 17 September 2026:
@@ -15,11 +37,11 @@ Verified on 17 September 2026:
 | Evidence | Verified value |
 |---|---:|
 | Tracked assets | 11 |
-| Gold market bars | 72,850 |
-| Certified bars | 65,616 |
+| Gold market bars | 162,743 |
+| Certified bars | 154,206 |
 | SEC records | 937 |
-| Certified historical sessions | 53 |
-| Published backtests | 11 |
+| Certified historical sessions | 76 |
+| Published backtests | 12 |
 | v1 live Shadow Mode | 2 / 20 sessions |
 | v2 hybrid model | `FALLBACK` |
 

@@ -29,11 +29,11 @@
 | מדד | ערך |
 |---|---:|
 | נכסים במעקב | 11 |
-| רשומות שוק ב־<bdi dir="ltr"><code>Gold</code></bdi> | <bdi dir="ltr"><code>72,850</code></bdi> |
-| נרות מאושרים | 65,616 |
+| רשומות שוק ב־<bdi dir="ltr"><code>Gold</code></bdi> | <bdi dir="ltr"><code>162,743</code></bdi> |
+| נרות מאושרים | <bdi dir="ltr"><code>154,206</code></bdi> |
 | רשומות <bdi dir="ltr"><code>SEC</code></bdi> | 937 |
-| ימי מסחר היסטוריים מאושרים | 53 |
-| ריצות <bdi dir="ltr"><code>Backtest</code></bdi> מפורסמות | 11 |
+| ימי מסחר היסטוריים מאושרים | <bdi dir="ltr"><code>76</code></bdi> |
+| ריצות <bdi dir="ltr"><code>Backtest</code></bdi> מפורסמות | <bdi dir="ltr"><code>12</code></bdi> |
 | שער <bdi dir="ltr"><code>Shadow Mode</code></bdi> של <bdi dir="ltr"><code>v1</code></bdi> | <bdi dir="ltr"><code>2/20</code></bdi> |
 | מצב המודל ההיברידי <bdi dir="ltr"><code>v2</code></bdi> | <bdi dir="ltr"><code>FALLBACK</code></bdi> |
 

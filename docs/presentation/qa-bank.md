@@ -12,8 +12,8 @@
 בזמן אמת. הוא ראיה טובה ל־<bdi dir="ltr">Backtesting</bdi>, אך שער ה־<bdi dir="ltr">Shadow</bdi> דורש 20 ימים עוקבים
 שבהם ההמלצה נוצרה לפני שהתוצאה הייתה ידועה. ההפרדה מוצגת במפורש בדשבורד.
 
-נכון לבדיקת <bdi dir="ltr"><code>2026-09-17</code></bdi>, קיימים 53 ימי מסחר
-היסטוריים מאושרים ו־11 ריצות <bdi dir="ltr"><code>Backtest</code></bdi>, אך המונה החי
+נכון לבדיקת <bdi dir="ltr"><code>2026-09-17</code></bdi>, קיימים <bdi dir="ltr"><code>76</code></bdi> ימי מסחר
+היסטוריים מאושרים ו־<bdi dir="ltr"><code>12</code></bdi> ריצות <bdi dir="ltr"><code>Backtest</code></bdi>, אך המונה החי
 עומד על <bdi dir="ltr"><code>2/20</code></bdi>. יום נכנס למונה רק לאחר שרשרת אישור
 יומית מוצלחת. זו התנהגות
 <bdi dir="ltr"><code>fail closed</code></bdi>, לא ניסיון להציג התקדמות מלאכותית.

@@ -254,10 +254,10 @@ The local stack is intentionally scoped to loopback development and demonstratio
 The release snapshot verified on 2026-09-17 contains:
 
 - 11 tracked symbols;
-- 72,850 Gold one-minute bars, including 65,616 `CERTIFIED` rows;
+- 162,743 Gold one-minute bars, including 154,206 `CERTIFIED` rows;
 - 937 SEC filing records;
-- 53 certified historical exchange sessions from 2026-07-06 through 2026-09-16;
-- 11 published backtest runs;
+- 76 certified historical exchange sessions from 2024-09-17 through 2026-09-16;
+- 12 published backtest runs;
 - v1 Shadow Mode at 2 of 20 live certified sessions;
 - v2 hybrid model in explicit `FALLBACK`, with no fabricated probability.
 

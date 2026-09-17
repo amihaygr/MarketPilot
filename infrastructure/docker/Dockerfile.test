@@ -2,7 +2,9 @@ FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 WORKDIR /opt/marketpilot
-COPY pyproject.toml README.md ./
+COPY AGENTS.md docker-compose.yml pyproject.toml README.md ./
+COPY .vscode ./.vscode
+COPY db/migrations ./db/migrations
 COPY src ./src
 COPY services ./services
 COPY tests ./tests

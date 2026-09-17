@@ -55,7 +55,7 @@ docker compose up -d
 6. פתח מראש הודעה אחת ב־<bdi dir="ltr"><code>Kafka UI</code></bdi> ואובייקט אחד ב־<bdi dir="ltr"><code>MinIO Bronze</code></bdi>.
 7. ב־<bdi dir="ltr"><code>Airflow</code></bdi> פתח את ריצת התיקון הירוקה <bdi dir="ltr"><code>repair__2026-09-16__20260917</code></bdi> של <bdi dir="ltr"><code>historical_market_backfill</code></bdi>.
 8. במעבדת הבדיקה ההיסטורית בחר ריצה במצב <bdi dir="ltr"><code>Published</code></bdi> שמכסה כמה שבועות; אין להסתמך על מזהה קבוע.
-9. במרכז ההזדמנויות ודא שמופיעים <bdi dir="ltr"><code>2/20</code></bdi>, <bdi dir="ltr"><code>53 certified sessions</code></bdi> ו־<bdi dir="ltr"><code>RULES ACTIVE · MODEL FALLBACK</code></bdi>.
+9. במרכז ההזדמנויות ודא שמופיעים <bdi dir="ltr"><code>2/20</code></bdi>, <bdi dir="ltr"><code>76 certified sessions</code></bdi> ו־<bdi dir="ltr"><code>RULES ACTIVE · MODEL FALLBACK</code></bdi>.
 
 ## ניהול הזמן
 
@@ -511,7 +511,7 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 > צל, כלומר אוספת ומודדת את איכות התרחישים לפני שמציגים אותם כהמלצה מעשית. האדם
 > נשאר מקבל ההחלטה.
 >
-> נכון לבדיקת ההכנה יש <bdi dir="ltr"><code>53</code></bdi> ימי מסחר היסטוריים מאושרים, אך מונה הצל של
+> נכון לבדיקת ההכנה יש <bdi dir="ltr"><code>76</code></bdi> ימי מסחר היסטוריים מאושרים, אך מונה הצל של
 > <bdi dir="ltr"><code>v1</code></bdi> הוא <bdi dir="ltr"><code>2/20</code></bdi>.
 > ההיסטוריה אינה נספרת כזמן חי. המונה עולה רק
 > אחרי יום מסחר אמיתי שבו כל ריצת האישור היומית הסתיימה בהצלחה. אם הריצה

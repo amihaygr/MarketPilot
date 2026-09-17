@@ -10,6 +10,9 @@ Verified locally on 2026-08-28 against the running Docker Compose platform.
 - `VOLUME_RATIO_20`: current volume divided by the prior 20-bar mean.
 - Explained observations for price/SMA crossings, RSI threshold crossings, and
   two-times-volume crossings.
+- Published analytics are calculated only from `Alpaca` `1Min` bars. Synthetic
+  verification events remain queryable for audit but cannot enter production
+  rolling windows.
 
 These observations are research context, not financial advice or order-execution
 instructions. Phase 9 publishes bounded snapshots. Near-real-time stateful

@@ -44,7 +44,12 @@ Thumbs.db
 
 # Local source bundles and extraction staging
 .marketpilot-staging/
+.skill-staging/
 MarketPilot_Engineering_Repository.zip
+
+# Local generated-document workspaces
+.architecture-build/
+/output/
 
 # Spark and Airflow local state
 spark-warehouse/

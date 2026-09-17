@@ -8,8 +8,8 @@ The product provides market monitoring, indicators, signals, historical analysis
 
 ## Final release baseline — 17 September 2026
 
-The presentation release contains 11 tracked assets, 72,850 Gold market bars,
-65,616 certified bars, 937 SEC records, 53 certified historical sessions and 11
+The presentation release contains 11 tracked assets, 162,743 Gold market bars,
+154,206 certified bars, 937 SEC records, 76 certified historical sessions and 12
 published backtests. The v1 Decision Intelligence safety gate has observed 2 of
 20 required live sessions.
 
