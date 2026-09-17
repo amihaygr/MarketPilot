@@ -567,48 +567,48 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 
 <h3 dir="ltr" align="right"><bdi dir="ltr"><code>IEX</code> vs. <code>SIP</code></bdi></h3>
 
-<bdi dir="ltr"><code>IEX</code></bdi> היא בורסה אמריקאית אחת. בחבילת הנתונים החינמית של
-<bdi dir="ltr"><code>Alpaca</code></bdi> מתקבלת הזנה שמבוססת עליה, ולכן היא מציגה רק חלק
+הזנת <bdi dir="ltr"><code>IEX</code></bdi> מבוססת על בורסה אמריקאית אחת. בחבילת
+הנתונים החינמית של <bdi dir="ltr"><code>Alpaca</code></bdi> היא מציגה רק חלק
 מהעסקאות בשוק.
 
-<bdi dir="ltr"><code>SIP</code></bdi> הוא מנגנון האיחוד הרשמי של נתוני הבורסות
+לעומתה, מנגנון <bdi dir="ltr"><code>SIP</code></bdi> מאחד רשמית את נתוני הבורסות
 האמריקאיות. הוא מרכז עסקאות וציטוטי קנייה ומכירה מכל זירות המסחר המשתתפות,
 ולכן הוא מלא יותר — אך בדרך כלל דורש הרשאה או תשלום. בפרויקט הנוכחי הנתונים
 החיים נשארים ב־<bdi dir="ltr"><code>IEX</code></bdi>, והמערכת מורידה את רמת הביטחון בהתאם.
 
 <h3 dir="ltr" align="right"><bdi dir="ltr"><code>Bronze</code> · <code>Silver</code> · <code>Gold</code></bdi></h3>
 
-<bdi dir="ltr"><code>Bronze</code></bdi> הוא העותק הגולמי שנשמר כפי שהתקבל.
+שכבת <bdi dir="ltr"><code>Bronze</code></bdi> היא העותק הגולמי שנשמר כפי שהתקבל.
 
-<bdi dir="ltr"><code>Silver</code></bdi> הוא מידע שנוקה, נורמל ואורגן למבנה אחיד.
+שכבת <bdi dir="ltr"><code>Silver</code></bdi> מכילה מידע שנוקה, נורמל ואורגן למבנה אחיד.
 
-<bdi dir="ltr"><code>Gold</code></bdi> הוא מידע מוכן לצריכה עסקית, למשל גרף,
+שכבת <bdi dir="ltr"><code>Gold</code></bdi> מכילה מידע מוכן לצריכה עסקית, למשל גרף,
 אינדיקטור או תרחיש החלטה. ההפרדה בין השכבות מאפשרת לחזור למקור גם אם בעתיד
 נשנה את לוגיקת העיבוד.
 
 <h3 dir="ltr" align="right"><bdi dir="ltr"><code>Streaming</code> vs. <code>Batch</code></bdi></h3>
 
-<bdi dir="ltr"><code>Streaming</code></bdi> הוא שירות ארוך־חיים שמחכה לאירועים
+עיבוד <bdi dir="ltr"><code>Streaming</code></bdi> פועל כשירות ארוך־חיים שמחכה לאירועים
 ומעבד אותם ברצף כדי לתת תוצאה מהירה.
 
-<bdi dir="ltr"><code>Batch</code></bdi> היא עבודה עם התחלה וסיום שמעבדת טווח ידוע,
+עבודת <bdi dir="ltr"><code>Batch</code></bdi> מתחילה, מעבדת טווח ידוע ומסתיימת,
 למשל יום מסחר שלם. המסלול החי נותן מהירות; המסלול האצוותי בונה מחדש את התוצאה
 ומוסיף בדיקות איכות סמכותיות.
 
 <h3 dir="ltr" align="right"><bdi dir="ltr"><code>Provisional</code> vs. <code>Certified</code></bdi></h3>
 
-<bdi dir="ltr"><code>Provisional</code></bdi> פירושו “מהיר אך זמני”: התוצאה זמינה
+סטטוס <bdi dir="ltr"><code>Provisional</code></bdi> פירושו “מהיר אך זמני”: התוצאה זמינה
 למשתמש, אך עוד לא עברה את כל בדיקות סוף היום.
 
-<bdi dir="ltr"><code>Certified</code></bdi> פירושו “מאושר”: התוצאה חושבה מחדש
+סטטוס <bdi dir="ltr"><code>Certified</code></bdi> פירושו “מאושר”: התוצאה חושבה מחדש
 מהמקור הגולמי ועברה את שערי האיכות. זהו לא הבדל עיצובי, אלא הבטחה שונה לגבי
 רמת האמון בנתון.
 
 <h3 dir="ltr" align="right"><bdi dir="ltr"><code>Backfill</code> / <code>Replay</code></bdi></h3>
 
-<bdi dir="ltr"><code>Backfill</code></bdi> הוא תהליך יזום שמביא נתוני עבר לתקופה חסרה.
+תהליך <bdi dir="ltr"><code>Backfill</code></bdi> מביא באופן יזום נתוני עבר לתקופה חסרה.
 
-<bdi dir="ltr"><code>Replay</code></bdi> הוא עיבוד מחדש של אירועים שכבר נשמרו.
+פעולת <bdi dir="ltr"><code>Replay</code></bdi> מעבדת מחדש אירועים שכבר נשמרו.
 בפרויקט הנתונים ההיסטוריים אינם “נשתלים” ישירות במסד: הם עוברים דרך אותו
 מסלול אירועים, אחסון ובדיקות, כדי לשמור על התנהגות ועל עקיבות זהות לנתונים החיים.
 
@@ -626,17 +626,17 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 
 <h3 dir="ltr" align="right"><bdi dir="ltr"><code>EMA</code> · <code>RSI</code> · <code>MACD</code> · <code>ATR</code></bdi></h3>
 
-<bdi dir="ltr"><code>EMA</code></bdi> (ממוצע נע מעריכי) דומה לממוצע נע, אך נותן
+מדד <bdi dir="ltr"><code>EMA</code></bdi> (ממוצע נע מעריכי) דומה לממוצע נע, אך נותן
 משקל גבוה יותר למחירים האחרונים ולכן מגיב מהר יותר לשינוי.
 
-<bdi dir="ltr"><code>RSI</code></bdi> (מדד עוצמה יחסית) מודד מומנטום בסולם
+מדד <bdi dir="ltr"><code>RSI</code></bdi> (מדד עוצמה יחסית) מודד מומנטום בסולם
 <bdi dir="ltr"><code>0–100</code></bdi>. ערך קיצוני הוא סימן לבדיקה, לא פקודת קנייה
 או מכירה אוטומטית.
 
-<bdi dir="ltr"><code>MACD</code></bdi> (מדד מגמה ומומנטום המבוסס על הפער בין שני
+מדד <bdi dir="ltr"><code>MACD</code></bdi> (מדד מגמה ומומנטום המבוסס על הפער בין שני
 ממוצעים מעריכיים) עוזר לזהות שינוי בעוצמת המגמה.
 
-<bdi dir="ltr"><code>ATR</code></bdi> (טווח אמיתי ממוצע) מודד תנודתיות — כמה המחיר
+מדד <bdi dir="ltr"><code>ATR</code></bdi> (טווח אמיתי ממוצע) מודד תנודתיות — כמה המחיר
 נע בדרך כלל — ולא את כיוון התנועה. המערכת נעזרת בו כדי להתאים מרחקי עצירה
 ויעדים לתנודתיות של כל מניה.
 
@@ -660,13 +660,13 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 
 <h3 dir="ltr" align="right"><bdi dir="ltr"><code>Slippage</code> · <code>Drawdown</code> · <code>Benchmark</code></bdi></h3>
 
-<bdi dir="ltr"><code>Slippage</code></bdi> הוא ההפרש בין מחיר הביצוע שתוכנן לבין
+המונח <bdi dir="ltr"><code>Slippage</code></bdi> מתאר את ההפרש בין מחיר הביצוע שתוכנן לבין
 המחיר שבו היה אפשר לבצע בפועל. מוסיפים אותו לבדיקה כדי לא להציג תוצאה אופטימית מדי.
 
-<bdi dir="ltr"><code>Drawdown</code></bdi> הוא שיעור הירידה משיא מקומי לשפל שבא
+המדד <bdi dir="ltr"><code>Drawdown</code></bdi> מתאר את שיעור הירידה משיא מקומי לשפל שבא
 אחריו. הוא עוזר להבין כמה כאב וסיכון היו בדרך, גם אם התשואה הסופית חיובית.
 
-<bdi dir="ltr"><code>Benchmark</code></bdi> הוא מדד ייחוס. בפרויקט זהו
+המונח <bdi dir="ltr"><code>Benchmark</code></bdi> מציין מדד ייחוס. בפרויקט זהו
 <bdi dir="ltr"><code>SPY</code></bdi>, כדי להשוות את האסטרטגיה לחלופה פשוטה של
 חשיפה לשוק הרחב.
 
@@ -685,13 +685,13 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 
 <h3 dir="ltr" align="right"><bdi dir="ltr"><code>Rule Score</code> · <code>Model Probability</code> · <code>Data Confidence</code></bdi></h3>
 
-<bdi dir="ltr"><code>Rule Score</code></bdi> הוא ציון שקוף שמסכם את הראיות
+ציון <bdi dir="ltr"><code>Rule Score</code></bdi> מסכם באופן שקוף את הראיות
 הטכניות והפונדמנטליות לפי נוסחה קבועה.
 
-<bdi dir="ltr"><code>Model Probability</code></bdi> היא הסתברות מכוילת להגיע ליעד
+השדה <bdi dir="ltr"><code>Model Probability</code></bdi> מציג הסתברות מכוילת להגיע ליעד
 הראשון לפני מחיר העצירה. היא מוצגת רק כאשר קיים מודל מאומן שעבר בדיקות מחוץ למדגם.
 
-<bdi dir="ltr"><code>Data Confidence</code></bdi> מתאר את איכות המקור, הכיסוי
+ציון <bdi dir="ltr"><code>Data Confidence</code></bdi> מתאר את איכות המקור, הכיסוי
 והטריות. הוא אינו סיכוי לרווח.
 
 <h3 dir="ltr" align="right"><bdi dir="ltr"><code>Walk-Forward Validation</code></bdi></h3>
