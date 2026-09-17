@@ -15,7 +15,8 @@ def test_dashboard_assets_are_versioned_and_interactive_controls_are_accessible(
     html = (PROJECT_ROOT / "web" / "index.html").read_text(encoding="utf-8")
 
     assert "styles.css?v=market-truth-2" in html
-    assert "app.js?v=market-truth-2" in html
+    assert "time.js?v=israel-time-1" in html
+    assert "app.js?v=israel-time-1" in html
     assert 'id="price-chart"' in html
     assert 'tabindex="0"' in html
     assert 'aria-label="Quick date ranges"' in html
@@ -41,6 +42,29 @@ def test_dashboard_uses_safe_dom_rendering_for_api_content() -> None:
     assert 'id="source-filter"' in (PROJECT_ROOT / "web" / "index.html").read_text(encoding="utf-8")
 
 
+def test_user_facing_timestamps_use_israel_time_without_mutating_api_time() -> None:
+    time_script = (PROJECT_ROOT / "web" / "time.js").read_text(encoding="utf-8")
+    dashboard = (PROJECT_ROOT / "web" / "index.html").read_text(encoding="utf-8")
+    opportunities = (PROJECT_ROOT / "web" / "opportunities.js").read_text(encoding="utf-8")
+    opportunity_page = (PROJECT_ROOT / "web" / "opportunities.html").read_text(encoding="utf-8")
+    showcase = (PROJECT_ROOT / "web" / "showcase.js").read_text(encoding="utf-8")
+    showcase_page = (PROJECT_ROOT / "web" / "showcase.html").read_text(encoding="utf-8")
+    dockerfile = (PROJECT_ROOT / "infrastructure" / "docker" / "Dockerfile.web").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'const TIME_ZONE = "Asia/Jerusalem"' in time_script
+    assert 'const TIME_ZONE_LABEL = "Israel time"' in time_script
+    assert "All timestamps shown in Israel time" in dashboard
+    assert "<th>Israel time</th>" in dashboard
+    assert "window.MarketPilotTime.formatTimestamp" in opportunities
+    assert "window.MarketPilotTime.formatTimestamp" in showcase
+    assert "time.js?v=israel-time-1" in opportunity_page
+    assert "time.js?v=israel-time-1" in showcase_page
+    assert "COPY web/time.js" in dockerfile
+    assert 'timeZone: "UTC"' not in (PROJECT_ROOT / "web" / "app.js").read_text(encoding="utf-8")
+
+
 def test_final_showcase_is_packaged_and_uses_the_existing_api_boundary() -> None:
     dashboard = (PROJECT_ROOT / "web" / "index.html").read_text(encoding="utf-8")
     showcase = (PROJECT_ROOT / "web" / "showcase.html").read_text(encoding="utf-8")
@@ -51,7 +75,7 @@ def test_final_showcase_is_packaged_and_uses_the_existing_api_boundary() -> None
 
     assert 'href="/showcase.html"' in dashboard
     assert "showcase.css?v=phase15-final" in showcase
-    assert "showcase.js?v=phase15-final" in showcase
+    assert "showcase.js?v=israel-time-1" in showcase
     assert 'fetch("/api/v1/freshness"' in script
     assert ".innerHTML" not in script
     assert 'connector.textContent = "←"' in script

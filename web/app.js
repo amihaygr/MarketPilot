@@ -788,29 +788,11 @@ function dateInput(value) {
 }
 
 function formatTimestamp(value) {
-  if (!value) return "—";
-  return new Intl.DateTimeFormat("en-GB", {
-    timeZone: "UTC",
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-  }).format(new Date(value));
+  return window.MarketPilotTime.formatTimestamp(value);
 }
 
 function formatCompactTimestamp(value) {
-  if (!value) return "No market bars";
-  return new Intl.DateTimeFormat("en-GB", {
-    timeZone: "UTC",
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(new Date(value));
+  return window.MarketPilotTime.formatCompactTimestamp(value);
 }
 
 function ageLabel(value) {

@@ -3,6 +3,7 @@ FROM nginx:1.27.5-alpine
 COPY infrastructure/nginx/web-app.conf /etc/nginx/conf.d/default.conf
 COPY web/index.html /usr/share/nginx/html/index.html
 COPY web/styles.css /usr/share/nginx/html/styles.css
+COPY web/time.js /usr/share/nginx/html/time.js
 COPY web/app.js /usr/share/nginx/html/app.js
 COPY web/opportunities.html /usr/share/nginx/html/opportunities.html
 COPY web/opportunities.css /usr/share/nginx/html/opportunities.css

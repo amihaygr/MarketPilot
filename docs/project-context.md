@@ -159,6 +159,8 @@ These are long-running Docker services.
 
 - Store timestamps in UTC.
 - Use `America/New_York` for schedules and market-session logic.
+- Convert user-facing dashboard timestamps with the named `Asia/Jerusalem` time zone and label
+  them as Israel time; never implement the display as a fixed UTC offset.
 - Do not use a fixed UTC offset for US market time.
 - Use a market calendar for holidays and early closes.
 

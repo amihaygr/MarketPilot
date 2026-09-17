@@ -181,7 +181,7 @@ async function loadLiveProof() {
     document.getElementById("proof-certification").textContent =
       data.symbols.find((item) => item.latest_certification_status)?.latest_certification_status || "NO DATA";
     document.getElementById("proof-generated").textContent =
-      `צילום מצב של Backend API · ${formatTimestamp(data.generated_at_utc)} UTC`;
+      `צילום מצב של Backend API · ${formatTimestamp(data.generated_at_utc)}`;
     document.getElementById("evidence-sessions").textContent = number(evaluation.historical_certified_sessions);
     document.getElementById("evidence-certified-bars").textContent = number(data.market.certified_count);
     document.getElementById("evidence-backtests").textContent = number(evaluation.published_backtest_runs);
@@ -203,13 +203,5 @@ function number(value) {
 }
 
 function formatTimestamp(value) {
-  return new Intl.DateTimeFormat("en-GB", {
-    timeZone: "UTC",
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  }).format(new Date(value));
+  return window.MarketPilotTime.formatTimestamp(value);
 }

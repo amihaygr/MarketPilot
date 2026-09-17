@@ -25,6 +25,10 @@ The platform is designed to answer five questions:
 
 The architecture therefore prioritizes immutable raw evidence, explicit schema versions, UTC event time, idempotent writes, quality gates, point-in-time features, and visible `PROVISIONAL`, `CERTIFIED`, `PREVIEW`, and `FALLBACK` states.
 
+UTC remains the storage and API contract. The Web App converts timestamps only at the presentation
+boundary with the named `Asia/Jerusalem` time zone, labels them as Israel time, and therefore follows
+Israeli daylight-saving changes without altering event identity or market-session logic.
+
 ## 3. System context
 
 | Actor or system | Interaction with MarketPilot |
