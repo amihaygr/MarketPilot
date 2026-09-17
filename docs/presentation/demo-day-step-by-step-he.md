@@ -565,128 +565,142 @@ Dashboard → Kafka → MinIO Bronze → Airflow → Opportunity Center → Back
 אין צורך להקריא את החלק הזה בדמו. הוא נועד כדי שתוכל לענות בביטחון אם הסוקר
 עוצר ושואל מה משמעותו של מושג שמופיע במסך או במצגת.
 
-### <bdi dir="ltr"><code>IEX</code></bdi> לעומת <bdi dir="ltr"><code>SIP</code></bdi>
+<h3 dir="ltr" align="right"><bdi dir="ltr"><code>IEX</code> vs. <code>SIP</code></bdi></h3>
 
-<bdi dir="ltr"><code>IEX</code></bdi> היא בורסה אמריקאית אחת. בחבילת הנתונים החינמית
-של <bdi dir="ltr"><code>Alpaca</code></bdi> מתקבלת הזנה שמבוססת עליה, ולכן היא מציגה
-רק חלק מהעסקאות בשוק. <bdi dir="ltr"><code>SIP</code></bdi> הוא מנגנון האיחוד הרשמי
-של נתוני הבורסות האמריקאיות: הוא מרכז עסקאות וציטוטי קנייה ומכירה מכל זירות
-המסחר המשתתפות. לכן <bdi dir="ltr"><code>SIP</code></bdi> מלא יותר, אבל בדרך כלל דורש
-הרשאה או תשלום. בפרויקט הנוכחי הנתונים החיים נשארים ב־<bdi dir="ltr"><code>IEX</code></bdi>,
-והמערכת מורידה את רמת הביטחון בהתאם למגבלה הזאת.
+<bdi dir="ltr"><code>IEX</code></bdi> היא בורסה אמריקאית אחת. בחבילת הנתונים החינמית של
+<bdi dir="ltr"><code>Alpaca</code></bdi> מתקבלת הזנה שמבוססת עליה, ולכן היא מציגה רק חלק
+מהעסקאות בשוק.
 
-### <bdi dir="ltr"><code>Bronze</code></bdi>, <bdi dir="ltr"><code>Silver</code></bdi> ו־<bdi dir="ltr"><code>Gold</code></bdi>
+<bdi dir="ltr"><code>SIP</code></bdi> הוא מנגנון האיחוד הרשמי של נתוני הבורסות
+האמריקאיות. הוא מרכז עסקאות וציטוטי קנייה ומכירה מכל זירות המסחר המשתתפות,
+ולכן הוא מלא יותר — אך בדרך כלל דורש הרשאה או תשלום. בפרויקט הנוכחי הנתונים
+החיים נשארים ב־<bdi dir="ltr"><code>IEX</code></bdi>, והמערכת מורידה את רמת הביטחון בהתאם.
 
-אלה שלוש דרגות הבשלה של אותו מידע. <bdi dir="ltr"><code>Bronze</code></bdi> הוא
-העותק הגולמי שנשמר כפי שהתקבל. <bdi dir="ltr"><code>Silver</code></bdi> הוא מידע
-שנוקה, נורמל ואורגן למבנה אחיד. <bdi dir="ltr"><code>Gold</code></bdi> הוא מידע
-מוכן לצריכה עסקית, למשל גרף, אינדיקטור או תרחיש החלטה. ההפרדה מאפשרת לחזור
-למקור גם אם בעתיד נשנה את לוגיקת העיבוד.
+<h3 dir="ltr" align="right"><bdi dir="ltr"><code>Bronze</code> · <code>Silver</code> · <code>Gold</code></bdi></h3>
 
-### <bdi dir="ltr"><code>Streaming</code></bdi> לעומת <bdi dir="ltr"><code>Batch</code></bdi>
+<bdi dir="ltr"><code>Bronze</code></bdi> הוא העותק הגולמי שנשמר כפי שהתקבל.
+
+<bdi dir="ltr"><code>Silver</code></bdi> הוא מידע שנוקה, נורמל ואורגן למבנה אחיד.
+
+<bdi dir="ltr"><code>Gold</code></bdi> הוא מידע מוכן לצריכה עסקית, למשל גרף,
+אינדיקטור או תרחיש החלטה. ההפרדה בין השכבות מאפשרת לחזור למקור גם אם בעתיד
+נשנה את לוגיקת העיבוד.
+
+<h3 dir="ltr" align="right"><bdi dir="ltr"><code>Streaming</code> vs. <code>Batch</code></bdi></h3>
 
 <bdi dir="ltr"><code>Streaming</code></bdi> הוא שירות ארוך־חיים שמחכה לאירועים
-ומעבד אותם ברצף כדי לתת תוצאה מהירה. <bdi dir="ltr"><code>Batch</code></bdi> היא
-עבודה עם התחלה וסיום שמעבדת טווח ידוע, למשל יום מסחר שלם. המסלול החי נותן
-מהירות; המסלול האצוותי בונה מחדש את התוצאה ומוסיף בדיקות איכות סמכותיות.
+ומעבד אותם ברצף כדי לתת תוצאה מהירה.
 
-### <bdi dir="ltr"><code>Provisional</code></bdi> לעומת <bdi dir="ltr"><code>Certified</code></bdi>
+<bdi dir="ltr"><code>Batch</code></bdi> היא עבודה עם התחלה וסיום שמעבדת טווח ידוע,
+למשל יום מסחר שלם. המסלול החי נותן מהירות; המסלול האצוותי בונה מחדש את התוצאה
+ומוסיף בדיקות איכות סמכותיות.
+
+<h3 dir="ltr" align="right"><bdi dir="ltr"><code>Provisional</code> vs. <code>Certified</code></bdi></h3>
 
 <bdi dir="ltr"><code>Provisional</code></bdi> פירושו “מהיר אך זמני”: התוצאה זמינה
-למשתמש, אך עוד לא עברה את כל בדיקות סוף היום. <bdi dir="ltr"><code>Certified</code></bdi>
-פירושו “מאושר”: התוצאה חושבה מחדש מהמקור הגולמי ועברה את שערי האיכות. זהו
-לא הבדל עיצובי אלא הבטחה שונה לגבי רמת האמון בנתון.
+למשתמש, אך עוד לא עברה את כל בדיקות סוף היום.
 
-### <bdi dir="ltr"><code>Backfill</code></bdi> ו־<bdi dir="ltr"><code>Replay</code></bdi>
+<bdi dir="ltr"><code>Certified</code></bdi> פירושו “מאושר”: התוצאה חושבה מחדש
+מהמקור הגולמי ועברה את שערי האיכות. זהו לא הבדל עיצובי, אלא הבטחה שונה לגבי
+רמת האמון בנתון.
 
-<bdi dir="ltr"><code>Backfill</code></bdi> הוא תהליך יזום שמביא נתוני עבר לתקופה
-חסרה. <bdi dir="ltr"><code>Replay</code></bdi> הוא עיבוד מחדש של אירועים שכבר נשמרו.
+<h3 dir="ltr" align="right"><bdi dir="ltr"><code>Backfill</code> / <code>Replay</code></bdi></h3>
+
+<bdi dir="ltr"><code>Backfill</code></bdi> הוא תהליך יזום שמביא נתוני עבר לתקופה חסרה.
+
+<bdi dir="ltr"><code>Replay</code></bdi> הוא עיבוד מחדש של אירועים שכבר נשמרו.
 בפרויקט הנתונים ההיסטוריים אינם “נשתלים” ישירות במסד: הם עוברים דרך אותו
 מסלול אירועים, אחסון ובדיקות, כדי לשמור על התנהגות ועל עקיבות זהות לנתונים החיים.
 
-### <bdi dir="ltr"><code>Checkpoint</code></bdi>
+<h3 dir="ltr" align="right"><bdi dir="ltr"><code>Checkpoint</code></bdi></h3>
 
-מצב שמאפשר ל־<bdi dir="ltr"><code>Streaming</code></bdi> להמשיך מהמקום שבו נעצר לאחר הפעלה
-מחדש. הוא שומר התקדמות ומיקומי קריאה. מחיקה שלו ללא תוכנית <bdi dir="ltr"><code>Replay</code></bdi>
-עלולה ליצור עיבוד חוזר או אובדן מצב.
+מצב שמאפשר ל־<bdi dir="ltr"><code>Streaming</code></bdi> להמשיך מהמקום שבו נעצר
+לאחר הפעלה מחדש. הוא שומר התקדמות ומיקומי קריאה. מחיקה שלו ללא תוכנית
+<bdi dir="ltr"><code>Replay</code></bdi> עלולה ליצור עיבוד חוזר או אובדן מצב.
 
-### <bdi dir="ltr"><code>SMA 20</code></bdi>
+<h3 dir="ltr" align="right"><bdi dir="ltr"><code>SMA 20</code></bdi></h3>
 
-ממוצע נע פשוט של <bdi dir="ltr"><code>20</code></bdi> נרות. בכל נקודה מחברים את <bdi dir="ltr"><code>20</code></bdi> מחירי הסגירה האחרונים
-ומחלקים ב־<bdi dir="ltr"><code>20</code></bdi>. הוא מחליק רעש ועוזר לראות כיוון, אך הוא מפגר אחרי המחיר ואינו
-אות קנייה בפני עצמו.
+ממוצע נע פשוט של <bdi dir="ltr"><code>20</code></bdi> נרות. בכל נקודה מחברים את
+<bdi dir="ltr"><code>20</code></bdi> מחירי הסגירה האחרונים ומחלקים ב־<bdi dir="ltr"><code>20</code></bdi>.
+הוא מחליק רעש ועוזר לראות כיוון, אך מפגר אחרי המחיר ואינו אות קנייה בפני עצמו.
 
-### <bdi dir="ltr"><code>EMA</code></bdi>, <bdi dir="ltr"><code>RSI</code></bdi>, <bdi dir="ltr"><code>MACD</code></bdi> ו־<bdi dir="ltr"><code>ATR</code></bdi>
+<h3 dir="ltr" align="right"><bdi dir="ltr"><code>EMA</code> · <code>RSI</code> · <code>MACD</code> · <code>ATR</code></bdi></h3>
 
-- <bdi dir="ltr"><code>EMA</code></bdi> (ממוצע נע מעריכי) דומה לממוצע נע, אך נותן
-  משקל גבוה יותר למחירים האחרונים ולכן מגיב מהר יותר לשינוי.
-- <bdi dir="ltr"><code>RSI</code></bdi> (מדד עוצמה יחסית) מודד מומנטום בסולם
-  <bdi dir="ltr"><code>0–100</code></bdi>. ערך קיצוני הוא סימן לבדיקה, לא פקודת קנייה
-  או מכירה אוטומטית.
-- <bdi dir="ltr"><code>MACD</code></bdi> (מדד מגמה ומומנטום המבוסס על הפער בין שני
-  ממוצעים מעריכיים) עוזר לזהות שינוי בעוצמת המגמה.
-- <bdi dir="ltr"><code>ATR</code></bdi> (טווח אמיתי ממוצע) מודד תנודתיות — כמה המחיר
-  נע בדרך כלל — ולא את כיוון התנועה. המערכת נעזרת בו כדי להתאים מרחקי עצירה
-  ויעדים לתנודתיות של כל מניה.
+<bdi dir="ltr"><code>EMA</code></bdi> (ממוצע נע מעריכי) דומה לממוצע נע, אך נותן
+משקל גבוה יותר למחירים האחרונים ולכן מגיב מהר יותר לשינוי.
 
-### <bdi dir="ltr"><code>Risk/Reward</code></bdi>
+<bdi dir="ltr"><code>RSI</code></bdi> (מדד עוצמה יחסית) מודד מומנטום בסולם
+<bdi dir="ltr"><code>0–100</code></bdi>. ערך קיצוני הוא סימן לבדיקה, לא פקודת קנייה
+או מכירה אוטומטית.
+
+<bdi dir="ltr"><code>MACD</code></bdi> (מדד מגמה ומומנטום המבוסס על הפער בין שני
+ממוצעים מעריכיים) עוזר לזהות שינוי בעוצמת המגמה.
+
+<bdi dir="ltr"><code>ATR</code></bdi> (טווח אמיתי ממוצע) מודד תנודתיות — כמה המחיר
+נע בדרך כלל — ולא את כיוון התנועה. המערכת נעזרת בו כדי להתאים מרחקי עצירה
+ויעדים לתנודתיות של כל מניה.
+
+<h3 dir="ltr" align="right"><bdi dir="ltr"><code>Risk/Reward</code></bdi></h3>
 
 היחס בין הרווח המתוכנן לבין ההפסד המתוכנן. לדוגמה, אם הסיכון עד מחיר העצירה
-הוא <bdi dir="ltr"><code>10</code></bdi> שקלים והיעד מציע <bdi dir="ltr"><code>20</code></bdi> שקלים, היחס הוא <bdi dir="ltr"><code>2:1</code></bdi>.
-היחס אינו חוזה שהיעד יושג; הוא מאפשר לבדוק מראש אם פוטנציאל התרחיש מצדיק את
-הסיכון שלו.
+הוא <bdi dir="ltr"><code>10</code></bdi> שקלים והיעד מציע <bdi dir="ltr"><code>20</code></bdi>
+שקלים, היחס הוא <bdi dir="ltr"><code>2:1</code></bdi>. היחס אינו חוזה שהיעד יושג;
+הוא מאפשר לבדוק מראש אם פוטנציאל התרחיש מצדיק את הסיכון שלו.
 
-### <bdi dir="ltr"><code>Lineage</code></bdi>
+<h3 dir="ltr" align="right"><bdi dir="ltr"><code>Lineage</code></bdi></h3>
 
 עקיבות מלאה של הנתון: מאיזה מקור ואירוע הגיע, איזו ריצה עיבדה אותו, באיזו
-גרסת קוד ובאיזו גרסת נתונים. כך אפשר להסביר תוצאה, לשחזר אותה ולברר תקלה
-בלי לנחש.
+גרסת קוד ובאיזו גרסת נתונים. כך אפשר להסביר תוצאה, לשחזר אותה ולברר תקלה בלי לנחש.
 
-### <bdi dir="ltr"><code>Freshness</code></bdi>
+<h3 dir="ltr" align="right"><bdi dir="ltr"><code>Freshness</code></bdi></h3>
 
 מדד לגיל הנתון ביחס לזמן שבו ציפינו לקבלו. שירות יכול להיות בריא ועדיין
 להציג נתון ישן, למשל כאשר השוק סגור או כשהמקור הפסיק לשלוח מידע. לכן המערכת
 בודקת בנפרד זמינות שירותים וטריות נתונים.
 
-### <bdi dir="ltr"><code>Slippage</code></bdi>, <bdi dir="ltr"><code>Drawdown</code></bdi> ו־<bdi dir="ltr"><code>Benchmark</code></bdi>
+<h3 dir="ltr" align="right"><bdi dir="ltr"><code>Slippage</code> · <code>Drawdown</code> · <code>Benchmark</code></bdi></h3>
 
-- <bdi dir="ltr"><code>Slippage</code></bdi> הוא ההפרש בין מחיר הביצוע שתוכנן לבין
-  המחיר שבו היה אפשר לבצע בפועל. מוסיפים אותו לבדיקה כדי לא להציג תוצאה
-  אופטימית מדי.
-- <bdi dir="ltr"><code>Drawdown</code></bdi> הוא שיעור הירידה משיא מקומי לשפל שבא
-  אחריו. הוא עוזר להבין כמה כאב וסיכון היו בדרך, גם אם התשואה הסופית חיובית.
-- <bdi dir="ltr"><code>Benchmark</code></bdi> הוא מדד ייחוס. בפרויקט זהו
-  <bdi dir="ltr"><code>SPY</code></bdi>, כדי להשוות את האסטרטגיה לחלופה פשוטה של
-  חשיפה לשוק הרחב.
+<bdi dir="ltr"><code>Slippage</code></bdi> הוא ההפרש בין מחיר הביצוע שתוכנן לבין
+המחיר שבו היה אפשר לבצע בפועל. מוסיפים אותו לבדיקה כדי לא להציג תוצאה אופטימית מדי.
 
-### <bdi dir="ltr"><code>Idempotency</code></bdi>
+<bdi dir="ltr"><code>Drawdown</code></bdi> הוא שיעור הירידה משיא מקומי לשפל שבא
+אחריו. הוא עוזר להבין כמה כאב וסיכון היו בדרך, גם אם התשואה הסופית חיובית.
+
+<bdi dir="ltr"><code>Benchmark</code></bdi> הוא מדד ייחוס. בפרויקט זהו
+<bdi dir="ltr"><code>SPY</code></bdi>, כדי להשוות את האסטרטגיה לחלופה פשוטה של
+חשיפה לשוק הרחב.
+
+<h3 dir="ltr" align="right"><bdi dir="ltr"><code>Idempotency</code></bdi></h3>
 
 היכולת להריץ פעולה שוב בלי ליצור תוצאה עסקית כפולה. ב־<bdi dir="ltr"><code>MarketPilot</code></bdi>
-משתמשים במפתחות עסקיים, מזהים דטרמיניסטיים ו־<bdi dir="ltr"><code>Upsert</code></bdi>. המטרה
-אינה למנוע כל <bdi dir="ltr"><code>Retry</code></bdi>, אלא להפוך אותו לבטוח.
+משתמשים במפתחות עסקיים, מזהים דטרמיניסטיים ו־<bdi dir="ltr"><code>Upsert</code></bdi>.
+המטרה אינה למנוע כל <bdi dir="ltr"><code>Retry</code></bdi>, אלא להפוך אותו לבטוח.
 
-### <bdi dir="ltr"><code>Calibration</code></bdi>
+<h3 dir="ltr" align="right"><bdi dir="ltr"><code>Calibration</code></bdi></h3>
 
 בדיקה האם ציון הביטחון של המערכת מתאים למה שקרה בפועל. אם תרחישים עם
 <bdi dir="ltr"><code>80%</code></bdi> ביטחון מצליחים רק בחצי מהמקרים, הציון אינו
 מכויל היטב. זו אחת הסיבות לתקופת הצל: קודם אוספים מספיק תוצאות אמיתיות,
 ורק אחר כך מחליטים אם אפשר להציג את התרחישים כתמיכה פעילה בהחלטה.
 
-### <bdi dir="ltr"><code>Rule Score</code></bdi>, <bdi dir="ltr"><code>Model Probability</code></bdi> ו־<bdi dir="ltr"><code>Data Confidence</code></bdi>
+<h3 dir="ltr" align="right"><bdi dir="ltr"><code>Rule Score</code> · <code>Model Probability</code> · <code>Data Confidence</code></bdi></h3>
 
-<bdi dir="ltr"><code>Rule Score</code></bdi> הוא ציון שקוף שמסכם את הראיות הטכניות
-והפונדמנטליות לפי נוסחה קבועה. <bdi dir="ltr"><code>Model Probability</code></bdi>
-היא הסתברות מכוילת להגיע ליעד הראשון לפני מחיר העצירה, והיא מוצגת רק כאשר
-קיים מודל מאומן שעבר בדיקות מחוץ למדגם. <bdi dir="ltr"><code>Data Confidence</code></bdi>
-מתאר את איכות המקור, הכיסוי והטריות. הוא אינו סיכוי לרווח.
+<bdi dir="ltr"><code>Rule Score</code></bdi> הוא ציון שקוף שמסכם את הראיות
+הטכניות והפונדמנטליות לפי נוסחה קבועה.
 
-### <bdi dir="ltr"><code>Walk-Forward Validation</code></bdi>
+<bdi dir="ltr"><code>Model Probability</code></bdi> היא הסתברות מכוילת להגיע ליעד
+הראשון לפני מחיר העצירה. היא מוצגת רק כאשר קיים מודל מאומן שעבר בדיקות מחוץ למדגם.
+
+<bdi dir="ltr"><code>Data Confidence</code></bdi> מתאר את איכות המקור, הכיסוי
+והטריות. הוא אינו סיכוי לרווח.
+
+<h3 dir="ltr" align="right"><bdi dir="ltr"><code>Walk-Forward Validation</code></bdi></h3>
 
 בדיקה כרונולוגית שבה מאמנים רק על העבר ובודקים על תקופה מאוחרת יותר. לאחר
 כל חלון מזיזים את נקודת הזמן קדימה. כך מדמים שימוש אמיתי ונמנעים מערבוב
 אקראי שמאפשר למודל ללמוד מידע מהעתיד.
 
-### <bdi dir="ltr"><code>FALLBACK</code></bdi>
+<h3 dir="ltr" align="right"><bdi dir="ltr"><code>FALLBACK</code></bdi></h3>
 
 מצב בטוח שבו שכבת המודל אינה זמינה או טרם הוכחה, ולכן המערכת חוזרת לכללי
 <bdi dir="ltr"><code>v1</code></bdi> השקופים. במקרה זה לא מוצגת הסתברות ישנה או
