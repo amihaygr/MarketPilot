@@ -29,10 +29,16 @@ database, Scheduler, API Server and DAG Processor. The UI is exposed locally at
   from Alpaca, archives source pages, sends canonical events through a dedicated
   Kafka topic, waits for exact Bronze offsets, maps the existing certification
   chain by session, and finally runs the historical backtest.
+  `scripts/queue_historical_backfill.py` may queue adjacent deterministic runs to
+  satisfy the 24-month Phase 15 requirement without expanding any individual DAG
+  run beyond this boundary.
 
 `spark_batch_pool`, `sec_api_pool`, and `alpaca_api_pool` each have one slot. All mutating DAGs use
 `max_active_runs=1`; SEC polling also uses `catchup=False`. This serializes local
 publication work and prevents overlapping SEC requests.
+The local Compose profile also caps Airflow task parallelism and API workers so a
+Spark driver cannot exhaust the Docker Desktop memory budget during long mapped
+backfills.
 
 ## Synthetic weekend verification
 

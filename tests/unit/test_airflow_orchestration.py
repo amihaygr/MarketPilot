@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from pathlib import Path
 
 import pytest
@@ -9,6 +10,10 @@ from marketpilot.orchestration.batch_scope import (
     prepare_daily_scope,
 )
 from marketpilot.orchestration.historical_scope import prepare_historical_backfill_plan
+from marketpilot.orchestration.history_bootstrap import (
+    plan_historical_windows,
+    rolling_month_start,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 CONFIGURED = ("AAPL", "MSFT", "SPY")
@@ -191,3 +196,41 @@ def test_historical_dag_is_manual_serial_and_uses_bronze_barrier() -> None:
     assert 'task_id="calculate_market_analytics"' in source
     assert ">> calculate_market_analytics" in source
     assert ">> run_backtest" in source
+
+
+def test_phase15_history_bootstrap_uses_complete_non_overlapping_bounded_windows() -> None:
+    windows = plan_historical_windows(
+        date.fromisoformat("2024-09-01"),
+        date.fromisoformat("2026-09-16"),
+    )
+
+    assert windows[0].start_date == date.fromisoformat("2024-09-01")
+    assert windows[-1].end_date == date.fromisoformat("2026-09-16")
+    assert all((window.end_date - window.start_date).days < 31 for window in windows)
+    assert all(
+        current.end_date + timedelta(days=1) == following.start_date
+        for current, following in zip(windows, windows[1:], strict=False)
+    )
+    assert len({window.run_id for window in windows}) == len(windows)
+
+
+def test_phase15_history_bootstrap_rejects_invalid_scope() -> None:
+    with pytest.raises(ValueError, match="on or after"):
+        plan_historical_windows(
+            date.fromisoformat("2026-09-17"),
+            date.fromisoformat("2026-09-16"),
+        )
+    with pytest.raises(ValueError, match=r"\[1, 31\]"):
+        plan_historical_windows(
+            date.fromisoformat("2026-09-01"),
+            date.fromisoformat("2026-09-16"),
+            maximum_calendar_days=32,
+        )
+
+
+def test_phase15_history_bootstrap_uses_a_true_rolling_24_month_interval() -> None:
+    end_date = date.fromisoformat("2026-09-16")
+
+    assert rolling_month_start(end_date, 24) == date.fromisoformat("2024-09-17")
+    with pytest.raises(ValueError, match="months"):
+        rolling_month_start(end_date, 0)

@@ -32,6 +32,30 @@ adjacent, non-overlapping monthly windows and include all configured symbols plu
 history. The workflow is idempotent, so retrying the same successful scope does
 not create duplicate business rows.
 
+### Queue the complete Phase 15 history
+
+The repository includes a resumable controller that plans 24 months as adjacent
+windows of no more than 31 calendar days and queues each window as a normal
+`historical_market_backfill` DAG run:
+
+```powershell
+docker compose run --rm --no-deps history-controller --months 24 --queue --airflow-url http://airflow-api-server:8080
+```
+
+Run without `--queue` first to inspect the exact plan. The controller never prints
+credentials, skips deterministic run IDs that are already queued, running or
+successful, and leaves failed windows visible for investigation. After fixing a
+failed window, queue a new attempt with:
+
+```powershell
+docker compose run --rm --no-deps history-controller --months 24 --queue --retry-failed --airflow-url http://airflow-api-server:8080
+```
+
+`historical_market_backfill` keeps `max_active_runs=1`, so queued windows execute
+one at a time and survive closing the terminal. Progress remains visible in
+Airflow. Do not start model training until every window is successful and Gold
+coverage proves that all configured symbols have the required certified history.
+
 ## Evidence to inspect
 
 - Kafka UI: `market.bars.1m.backfill.v1` contains canonical events.
@@ -48,4 +72,7 @@ not create duplicate business rows.
 - Rate limits or transient 5xx: retries use bounded exponential backoff.
 - Bronze barrier timeout: inspect `raw-archive-sink` health and logs; do not bypass the barrier.
 - Coverage failure: verify the feed and symbol. Lowering the gate requires a reviewed data-quality decision.
+- `Cannot allocate memory`: keep the repository's bounded Airflow concurrency
+  settings, confirm only one Spark batch occupies `spark_batch_pool`, and retry
+  the failed deterministic window.
 - Retry after a completed acquisition: the immutable completion manifest prevents duplicate publication.

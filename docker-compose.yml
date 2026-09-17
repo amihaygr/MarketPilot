@@ -25,10 +25,17 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__FERNET_KEY: ${AIRFLOW_FERNET_KEY}
     AIRFLOW__CORE__INTERNAL_API_SECRET_KEY: ${AIRFLOW_SECRET_KEY}
     AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    # The local platform has one Spark batch slot. Matching Airflow concurrency
+    # to that bounded workload prevents mapped backfills from exhausting the
+    # Docker Desktop memory budget while Spark drivers run in the scheduler.
+    AIRFLOW__CORE__PARALLELISM: "4"
+    AIRFLOW__CORE__MAX_ACTIVE_TASKS_PER_DAG: "4"
     AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_PASSWORDS_FILE: /opt/airflow/auth/simple_auth_manager_passwords.json
     AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_USERS: ${AIRFLOW_ADMIN_USERNAME}:admin
     AIRFLOW__API__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
     AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW_SECRET_KEY}
+    AIRFLOW__API__WORKERS: "1"
+    AIRFLOW__SCHEDULER__MAX_TIS_PER_QUERY: "4"
     AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
   volumes:
     - ./airflow/dags:/opt/airflow/dags:ro
@@ -47,6 +54,20 @@ services:
     command: python -m pytest -q
     network_mode: none
     restart: "no"
+
+  history-controller:
+    profiles: [tools]
+    image: marketpilot-python:0.1.0
+    env_file: .env
+    entrypoint: ["python", "/opt/marketpilot/scripts/queue_historical_backfill.py"]
+    command: ["--months", "24", "--airflow-url", "http://airflow-api-server:8080"]
+    volumes:
+      - ./scripts:/opt/marketpilot/scripts:ro
+      - ./src:/opt/marketpilot/src:ro
+    restart: "no"
+    depends_on:
+      airflow-api-server: {condition: service_healthy}
+    networks: [serving-plane]
 
   kafka:
     image: apache/kafka:3.9.0

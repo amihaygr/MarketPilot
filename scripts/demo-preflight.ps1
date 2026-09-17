@@ -156,11 +156,15 @@ try {
         username = $localEnv["AIRFLOW_ADMIN_USERNAME"]
         password = $localEnv["AIRFLOW_ADMIN_PASSWORD"]
     } | ConvertTo-Json -Compress
-    $tokenResponse = & curl.exe --silent --show-error --max-time 12 `
-        --request POST --header "Content-Type: application/json" `
-        --data-raw $authPayload "http://localhost:8080/auth/token"
-    if ($LASTEXITCODE -ne 0) { throw "Airflow token request returned $LASTEXITCODE" }
-    $airflowToken = ($tokenResponse | ConvertFrom-Json).access_token
+    # Invoke-RestMethod preserves JSON quoting and special characters in local
+    # credentials. curl.exe on Windows may reinterpret --data-raw and produce a
+    # malformed request body even when the credentials themselves are valid.
+    $tokenResponse = Invoke-RestMethod -Method Post `
+        -Uri "http://localhost:8080/auth/token" `
+        -ContentType "application/json" `
+        -Body $authPayload `
+        -TimeoutSec 12
+    $airflowToken = $tokenResponse.access_token
     if (-not $airflowToken) { throw "Airflow did not return an access token" }
 
     $authorization = "Authorization: Bearer $airflowToken"

@@ -22,7 +22,19 @@ SPARK_CONF = {
     "spark.driver.port": "39601",
     "spark.blockManager.port": "39602",
 }
-DEFAULT_SYMBOLS = ["AAPL", "MSFT", "SPY"]
+DEFAULT_SYMBOLS = [
+    "AAPL",
+    "MSFT",
+    "AMZN",
+    "NVDA",
+    "GOOGL",
+    "META",
+    "TSLA",
+    "JPM",
+    "UNH",
+    "XOM",
+    "SPY",
+]
 
 
 @task(task_id="validate_historical_scope")
