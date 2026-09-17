@@ -24,6 +24,10 @@ DIRECTIONAL_INLINE_CODE_WITHOUT_OVERRIDE = re.compile(
 MISALIGNED_ENGLISH_HEADING = re.compile(
     r'<h[1-6]\b[^>]*dir="ltr"[^>]*align="right"', re.IGNORECASE
 )
+MARKDOWN_TABLE_ROW = re.compile(r"^\s*\|.*\|\s*$")
+LTR_HEADING = re.compile(
+    r'<h(?P<level>[1-6])\b[^>]*dir="ltr"[^>]*>.*</h(?P=level)>', re.IGNORECASE
+)
 
 
 def test_hebrew_presentation_markdown_has_complete_rtl_isolation() -> None:
@@ -53,10 +57,20 @@ def test_hebrew_presentation_markdown_has_complete_rtl_isolation() -> None:
         ltr_block_depth = 0
         in_fenced_code = False
         for line_number, line in enumerate(text.splitlines(), start=1):
+            assert not (HEBREW.search(line) and MARKDOWN_TABLE_ROW.match(line)), (
+                f"{path.name}:{line_number} contains Hebrew inside a Markdown table. "
+                "GitHub strips inline direction wrappers from GFM table cells; use "
+                "an RTL list or a direction-safe HTML structure instead"
+            )
             if line.lstrip().startswith("```"):
                 in_fenced_code = not in_fenced_code
                 continue
             if in_fenced_code:
+                continue
+            if LTR_HEADING.fullmatch(line.strip()):
+                assert not HEBREW.search(line), (
+                    f"{path.name}:{line_number} contains Hebrew inside an LTR heading"
+                )
                 continue
             if re.search(r'<(?:div|ol)\b[^>]*dir="ltr"', line):
                 ltr_block_depth += 1

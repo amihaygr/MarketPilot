@@ -59,13 +59,11 @@ docker compose up -d
 
 ## ניהול הזמן
 
-| זמן | חלק | מטרה |
-|---:|---|---|
-| <bdi dir="ltr"><bdo dir="ltr"><code>00:00–02:00</code></bdo></bdi> | שקפים <bdi dir="ltr"><bdo dir="ltr"><code>1–3</code></bdo></bdi> | הבעיה והערך לסוחר |
-| <bdi dir="ltr"><bdo dir="ltr"><code>02:00–05:05</code></bdo></bdi> | שקפים <bdi dir="ltr"><bdo dir="ltr"><code>4–6</code></bdo></bdi> | ארכיטקטורה ובחירות טכנולוגיות |
-| <bdi dir="ltr"><bdo dir="ltr"><code>05:05–08:55</code></bdo></bdi> | שקפים <bdi dir="ltr"><bdo dir="ltr"><code>7–11</code></bdo></bdi> | המוצר, האתגרים והמשך הדרך |
-| <bdi dir="ltr"><bdo dir="ltr"><code>08:55–09:10</code></bdo></bdi> | שקף <bdi dir="ltr"><bdo dir="ltr"><code>12</code></bdo></bdi> | מעבר לדמו |
-| <bdi dir="ltr"><bdo dir="ltr"><code>09:10–15:00</code></bdo></bdi> | דמו חי | הוכחה מקצה לקצה |
+- <bdi dir="ltr"><bdo dir="ltr"><code>00:00–02:00</code></bdo></bdi> — שקפים <bdi dir="ltr"><bdo dir="ltr"><code>1–3</code></bdo></bdi>: הבעיה והערך לסוחר.
+- <bdi dir="ltr"><bdo dir="ltr"><code>02:00–05:05</code></bdo></bdi> — שקפים <bdi dir="ltr"><bdo dir="ltr"><code>4–6</code></bdo></bdi>: הארכיטקטורה ובחירות הטכנולוגיה.
+- <bdi dir="ltr"><bdo dir="ltr"><code>05:05–08:55</code></bdo></bdi> — שקפים <bdi dir="ltr"><bdo dir="ltr"><code>7–11</code></bdo></bdi>: המוצר, האתגרים והמשך הדרך.
+- <bdi dir="ltr"><bdo dir="ltr"><code>08:55–09:10</code></bdo></bdi> — שקף <bdi dir="ltr"><bdo dir="ltr"><code>12</code></bdo></bdi>: מעבר לדמו.
+- <bdi dir="ltr"><bdo dir="ltr"><code>09:10–15:00</code></bdo></bdi> — דמו חי: הוכחה מקצה לקצה.
 
 אם הזמן מתקצר, אל תוותר על הבעיה, הארכיטקטורה והדמו. קצר את פירוט הטכנולוגיות
 ואת מפת הדרכים.

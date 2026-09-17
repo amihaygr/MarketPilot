@@ -26,16 +26,14 @@
 
 ## תמונת המצב שאומתה
 
-| מדד | ערך |
-|---|---:|
-| נכסים במעקב | 11 |
-| רשומות שוק ב־<bdi dir="ltr"><code>Gold</code></bdi> | <bdi dir="ltr"><bdo dir="ltr"><code>162,743</code></bdo></bdi> |
-| נרות מאושרים | <bdi dir="ltr"><bdo dir="ltr"><code>154,206</code></bdo></bdi> |
-| רשומות <bdi dir="ltr"><code>SEC</code></bdi> | 937 |
-| ימי מסחר היסטוריים מאושרים | <bdi dir="ltr"><bdo dir="ltr"><code>76</code></bdo></bdi> |
-| ריצות <bdi dir="ltr"><code>Backtest</code></bdi> מפורסמות | <bdi dir="ltr"><bdo dir="ltr"><code>12</code></bdo></bdi> |
-| שער <bdi dir="ltr"><code>Shadow Mode</code></bdi> של <bdi dir="ltr"><bdo dir="ltr"><code>v1</code></bdo></bdi> | <bdi dir="ltr"><bdo dir="ltr"><code>2/20</code></bdo></bdi> |
-| מצב המודל ההיברידי <bdi dir="ltr"><bdo dir="ltr"><code>v2</code></bdo></bdi> | <bdi dir="ltr"><code>FALLBACK</code></bdi> |
+- **נכסים במעקב:** <bdi dir="ltr"><bdo dir="ltr"><code>11</code></bdo></bdi>.
+- **רשומות שוק ב־<bdi dir="ltr"><code>Gold</code></bdi>:** <bdi dir="ltr"><bdo dir="ltr"><code>162,743</code></bdo></bdi>.
+- **נרות מאושרים:** <bdi dir="ltr"><bdo dir="ltr"><code>154,206</code></bdo></bdi>.
+- **רשומות <bdi dir="ltr"><code>SEC</code></bdi>:** <bdi dir="ltr"><bdo dir="ltr"><code>937</code></bdo></bdi>.
+- **ימי מסחר היסטוריים מאושרים:** <bdi dir="ltr"><bdo dir="ltr"><code>76</code></bdo></bdi>.
+- **ריצות <bdi dir="ltr"><code>Backtest</code></bdi> מפורסמות:** <bdi dir="ltr"><bdo dir="ltr"><code>12</code></bdo></bdi>.
+- **שער <bdi dir="ltr"><code>Shadow Mode</code></bdi> של <bdi dir="ltr"><bdo dir="ltr"><code>v1</code></bdo></bdi>:** <bdi dir="ltr"><bdo dir="ltr"><code>2/20</code></bdo></bdi>.
+- **מצב המודל ההיברידי <bdi dir="ltr"><bdo dir="ltr"><code>v2</code></bdo></bdi>:** <bdi dir="ltr"><code>FALLBACK</code></bdi>.
 
 מצב <bdi dir="ltr"><code>FALLBACK</code></bdi> הוא מצב הבטיחות הנכון: כללי
 <bdi dir="ltr"><bdo dir="ltr"><code>v1</code></bdo></bdi> ממשיכים לייצר רמות מחיר וסיכון, אך המערכת
