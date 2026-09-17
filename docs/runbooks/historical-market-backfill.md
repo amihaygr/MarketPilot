@@ -20,8 +20,10 @@ Never paste credentials into Airflow parameters, logs, screenshots, or Git.
 1. Open Airflow at <http://localhost:8080>.
 2. Select `historical_market_backfill` and choose **Trigger DAG w/ config**.
 3. Start with `AAPL`, `MSFT`, and `SPY` over two to ten closed trading sessions.
-4. Keep `minimum_coverage_pct=80` for IEX. This is a minimum observed-bar gate, not
-   permission to fabricate missing minutes.
+4. For IEX, keep `minimum_coverage_pct=35` and
+   `minimum_aggregate_coverage_pct=80`. The first is a blocking floor for every
+   symbol; the second protects the completeness of the whole universe. Neither
+   threshold fills or interpolates a missing minute. See ADR-010.
 5. Keep the default SMA, cost, and slippage values for the first run.
 6. Trigger once and follow tasks in order: acquisition, Bronze-to-Silver, quality,
    Gold Certified, then backtest.
@@ -53,8 +55,9 @@ docker compose run --rm --no-deps history-controller --months 24 --queue --retry
 
 `historical_market_backfill` keeps `max_active_runs=1`, so queued windows execute
 one at a time and survive closing the terminal. Progress remains visible in
-Airflow. Do not start model training until every window is successful and Gold
-coverage proves that all configured symbols have the required certified history.
+Airflow. Do not start model training until every window is successful and the two
+coverage checks prove that every configured symbol is represented and the complete
+universe has enough certified evidence.
 
 ## Evidence to inspect
 

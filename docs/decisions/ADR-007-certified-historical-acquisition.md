@@ -26,7 +26,9 @@ the continuously running Structured Streaming service process backfill traffic.
 - The existing Bronze-to-Silver, quality, and Silver-to-Gold jobs remain the only
   historical publication route. A backtest runs only after all mapped Gold tasks succeed.
 - IEX coverage is explicit and configurable because IEX represents one exchange;
-  missing minutes are not synthesized. The default blocking minimum is 80 percent.
+  missing minutes are not synthesized. ADR-010 refines the blocking rule into
+  separate per-symbol and aggregate thresholds after the 24-month bootstrap exposed
+  legitimate symbol-level sparsity in this partial feed.
 - Completion manifests and deterministic run IDs make Airflow retries idempotent.
 
 ## Consequences

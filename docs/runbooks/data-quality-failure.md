@@ -5,8 +5,9 @@
 The local free Alpaca IEX feed is partial and does not guarantee one observation
 for every XNYS minute. `daily_market_close` therefore requires at least the
 configured `DAILY_MINIMUM_COVERAGE_PCT` of expected exchange minutes per symbol;
-the default is 80 percent. This threshold does not fabricate missing bars and
-does not weaken the other blocking checks.
+the default is 80 percent. Historical IEX runs use ADR-010's explicit 35-percent
+per-symbol floor plus an 80-percent aggregate-universe gate. These thresholds do
+not fabricate missing bars and do not weaken the other blocking checks.
 
 Do not lower the threshold to rescue a demo. A session still fails when a symbol
 is missing, ingestion is stale, required fields are null, business keys are

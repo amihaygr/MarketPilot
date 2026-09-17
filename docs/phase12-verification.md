@@ -5,7 +5,10 @@
 - Scope: 2026-08-24 through 2026-08-28
 - Symbols: AAPL, MSFT, SPY
 - Feed: Alpaca IEX
-- Minimum per-session coverage gate: 80 percent
+- Minimum per-session coverage gate at verification time: 80 percent per symbol.
+  ADR-010 later replaced this IEX-specific rule with a 35-percent per-symbol floor
+  plus an 80-percent aggregate-universe gate after governed 24-month acquisition
+  exposed legitimate single-exchange sparsity.
 
 ## Result
 

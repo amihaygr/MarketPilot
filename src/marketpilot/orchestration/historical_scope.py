@@ -17,6 +17,7 @@ def prepare_historical_backfill_plan(
     configured_symbols: tuple[str, ...],
     airflow_run_id: str,
     minimum_coverage_pct: int,
+    minimum_aggregate_coverage_pct: int,
     maximum_ingestion_lag_seconds: int,
     short_window: int,
     long_window: int,
@@ -36,6 +37,7 @@ def prepare_historical_backfill_plan(
         configured_symbols=configured_symbols,
         airflow_run_id=airflow_run_id,
         minimum_coverage_pct=int(minimum_coverage_pct),
+        minimum_aggregate_coverage_pct=int(minimum_aggregate_coverage_pct),
         maximum_ingestion_lag_seconds=int(maximum_ingestion_lag_seconds),
     )
     for bronze_args in mapped["bronze"]:

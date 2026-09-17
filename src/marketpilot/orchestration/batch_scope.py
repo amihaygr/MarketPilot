@@ -43,6 +43,7 @@ def prepare_backfill_arguments(
     airflow_run_id: str,
     expected_bars_override: int | None = None,
     minimum_coverage_pct: int = 100,
+    minimum_aggregate_coverage_pct: int | None = None,
     maximum_ingestion_lag_seconds: int | None = None,
 ) -> dict[str, list[list[str]]]:
     """Build mapped Spark arguments for a validated, finite replay scope."""
@@ -55,6 +56,11 @@ def prepare_backfill_arguments(
         raise ValueError(f"backfill scope cannot exceed {MAX_BACKFILL_DAYS} calendar days")
     if not 1 <= int(minimum_coverage_pct) <= 100:
         raise ValueError("minimum_coverage_pct must be in [1, 100]")
+    if (
+        minimum_aggregate_coverage_pct is not None
+        and not 1 <= int(minimum_aggregate_coverage_pct) <= 100
+    ):
+        raise ValueError("minimum_aggregate_coverage_pct must be in [1, 100]")
     if maximum_ingestion_lag_seconds is not None and maximum_ingestion_lag_seconds < 1:
         raise ValueError("maximum_ingestion_lag_seconds must be positive")
 
@@ -69,9 +75,10 @@ def prepare_backfill_arguments(
     arguments: dict[str, list[list[str]]] = {"bronze": [], "quality": [], "gold": []}
     for day_offset in range(inclusive_days):
         logical_date = start_date + timedelta(days=day_offset)
-        expected_bars = _expected_bars(logical_date, expected_bars_override)
-        if expected_bars == 0:
+        full_session_bars = _expected_bars(logical_date, expected_bars_override)
+        if full_session_bars == 0:
             continue
+        expected_bars = full_session_bars
         if expected_bars_override is None:
             expected_bars = math.ceil(expected_bars * int(minimum_coverage_pct) / 100)
         date_value = logical_date.isoformat()
@@ -88,6 +95,11 @@ def prepare_backfill_arguments(
             "--partition-key",
             partition_key,
         ]
+        if minimum_aggregate_coverage_pct is not None:
+            expected_total_bars = math.ceil(
+                full_session_bars * len(requested) * int(minimum_aggregate_coverage_pct) / 100
+            )
+            quality.extend(["--expected-total-bars", str(expected_total_bars)])
         if maximum_ingestion_lag_seconds is not None:
             quality.extend(["--maximum-ingestion-lag-seconds", str(maximum_ingestion_lag_seconds)])
         arguments["quality"].append(quality)

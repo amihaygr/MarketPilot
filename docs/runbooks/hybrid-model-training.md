@@ -9,7 +9,8 @@ gates, 20 new live certified v2 sessions and a recorded human review.
 ## Prerequisites
 
 1. Acquire 24 months through `historical_market_backfill` in windows of at most 31 calendar days.
-2. Confirm every requested session passed the 80% coverage gate and is `CERTIFIED` in Gold.
+2. Confirm every requested session passed the ADR-010 IEX gates (35% per symbol,
+   80% across the universe) and is `CERTIFIED` in Gold.
 3. Run the daily Decision Intelligence calculation and label evaluation for the eligible snapshots.
 4. Verify that SEC facts used by each snapshot were filed no later than its `as_of_utc` timestamp.
 

@@ -41,6 +41,7 @@ def main() -> None:
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--expected-symbols-json")
     parser.add_argument("--expected-bars-per-symbol", type=int)
+    parser.add_argument("--expected-total-bars", type=int)
     parser.add_argument("--partition-key")
     parser.add_argument(
         "--maximum-ingestion-lag-seconds",
@@ -145,6 +146,7 @@ def main() -> None:
             QualityPolicy(
                 expected_symbols=expected_symbols,
                 expected_bars_per_symbol=expected_bars_per_symbol,
+                expected_total_bars=args.expected_total_bars,
                 maximum_ingestion_lag_seconds=args.maximum_ingestion_lag_seconds,
             ),
         )

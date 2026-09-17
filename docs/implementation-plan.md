@@ -323,7 +323,9 @@ XNYS trading sessions. Runtime evidence is recorded in
 - Airflow runs only bounded work and does not own any long-running service lifecycle.
 - API credentials remain in the ignored `.env` and never enter manifests or logs.
 - Pagination is complete and upstream source payloads are retained by SHA-256.
-- Publication is blocked when the minimum per-symbol IEX coverage is not met.
+- Publication is blocked unless the ADR-010 IEX profile passes both gates: every
+  symbol is present with at least 35% session coverage and the complete universe
+  reaches at least 80% aggregate coverage.
 - Repeating an Airflow run reuses completed session manifests without duplicating Gold rows.
 - The final backtest reads Certified Gold only.
 - Non-session rows are excluded explicitly and counted in the immutable run manifest.

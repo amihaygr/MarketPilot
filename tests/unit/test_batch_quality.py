@@ -29,6 +29,7 @@ def test_all_quality_checks_pass_for_complete_canonical_partition() -> None:
         QualityPolicy(
             expected_symbols=("AAPL", "SPY"),
             expected_bars_per_symbol=3,
+            expected_total_bars=6,
             maximum_ingestion_lag_seconds=5,
         ),
     )
@@ -55,6 +56,7 @@ def test_quality_gate_reports_every_blocking_failure() -> None:
         QualityPolicy(
             expected_symbols=("AAPL", "SPY"),
             expected_bars_per_symbol=3,
+            expected_total_bars=6,
             maximum_ingestion_lag_seconds=5,
         ),
     )
@@ -76,5 +78,64 @@ def test_quality_policy_rejects_invalid_thresholds(
         QualityPolicy(
             expected_symbols=("AAPL",),
             expected_bars_per_symbol=expected_bars,
+            expected_total_bars=1,
             maximum_ingestion_lag_seconds=maximum_lag,
         )
+
+
+def test_quality_gate_blocks_weak_aggregate_coverage_even_when_each_symbol_floor_passes() -> None:
+    metrics = healthy_metrics()
+    results = evaluate_quality_gate(
+        metrics,
+        QualityPolicy(
+            expected_symbols=("AAPL", "SPY"),
+            expected_bars_per_symbol=2,
+            expected_total_bars=7,
+            maximum_ingestion_lag_seconds=5,
+        ),
+    )
+
+    status = {result.check_name: result.status for result in results}
+    assert status["expected_market_bars"] == "PASS"
+    assert status["aggregate_market_bars"] == "FAIL"
+    assert not quality_gate_passed(results)
+
+
+def test_feed_aware_iex_policy_accepts_sparse_symbol_with_strong_universe_coverage() -> None:
+    rows_by_symbol = {
+        "AAPL": 388,
+        "AMZN": 389,
+        "GOOGL": 360,
+        "JPM": 339,
+        "META": 327,
+        "MSFT": 356,
+        "NVDA": 390,
+        "SPY": 380,
+        "TSLA": 384,
+        "UNH": 177,
+        "XOM": 343,
+    }
+    total_rows = sum(rows_by_symbol.values())
+    metrics = QualityMetrics(
+        total_rows=total_rows,
+        distinct_business_keys=total_rows,
+        required_null_rows=0,
+        invalid_ohlc_rows=0,
+        wrong_logical_date_rows=0,
+        invalid_schema_rows=0,
+        event_after_ingestion_rows=0,
+        maximum_ingestion_lag_seconds=1,
+        rows_by_symbol=rows_by_symbol,
+    )
+
+    results = evaluate_quality_gate(
+        metrics,
+        QualityPolicy(
+            expected_symbols=tuple(sorted(rows_by_symbol)),
+            expected_bars_per_symbol=137,
+            expected_total_bars=3432,
+            maximum_ingestion_lag_seconds=5,
+        ),
+    )
+
+    assert quality_gate_passed(results)

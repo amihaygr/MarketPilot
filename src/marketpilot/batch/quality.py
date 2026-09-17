@@ -6,6 +6,7 @@ QUALITY_CHECK_NAMES = (
     "non_empty",
     "expected_symbols",
     "expected_market_bars",
+    "aggregate_market_bars",
     "required_fields",
     "business_key_duplicates",
     "ohlc_consistency",
@@ -34,12 +35,15 @@ class QualityPolicy:
     expected_symbols: tuple[str, ...]
     expected_bars_per_symbol: int
     maximum_ingestion_lag_seconds: int
+    expected_total_bars: int | None = None
 
     def __post_init__(self) -> None:
         if not self.expected_symbols:
             raise ValueError("expected_symbols must not be empty")
         if self.expected_bars_per_symbol < 1:
             raise ValueError("expected_bars_per_symbol must be positive")
+        if self.expected_total_bars is not None and self.expected_total_bars < 1:
+            raise ValueError("expected_total_bars must be positive")
         if self.maximum_ingestion_lag_seconds < 0:
             raise ValueError("maximum_ingestion_lag_seconds must be non-negative")
 
@@ -68,6 +72,9 @@ def evaluate_quality_gate(
         default=0,
     )
     lag = metrics.maximum_ingestion_lag_seconds
+    expected_total_bars = policy.expected_total_bars
+    if expected_total_bars is None:
+        expected_total_bars = policy.expected_bars_per_symbol * len(expected_symbols)
 
     checks = (
         _result("non_empty", metrics.total_rows > 0, metrics.total_rows, ">0"),
@@ -82,6 +89,12 @@ def evaluate_quality_gate(
             minimum_symbol_rows >= policy.expected_bars_per_symbol,
             minimum_symbol_rows,
             f">={policy.expected_bars_per_symbol} per symbol",
+        ),
+        _result(
+            "aggregate_market_bars",
+            metrics.total_rows >= expected_total_bars,
+            metrics.total_rows,
+            f">={expected_total_bars} across expected symbols",
         ),
         _result("required_fields", metrics.required_null_rows == 0, metrics.required_null_rows, 0),
         _result(

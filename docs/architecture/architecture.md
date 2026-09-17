@@ -192,7 +192,7 @@ Partition-mutating DAGs use `max_active_runs=1`. Shared external and compute cap
 
 ## 13. Data quality and publication
 
-Quality checks cover freshness, completeness, duplicates, nulls, OHLC consistency, expected exchange-session bars, schema versions, and lineage. A session requires at least 80% historical coverage to enter model-training evidence. The daily close pipeline is intentionally stricter and may fail when a partial IEX feed misses expected bars.
+Quality checks cover freshness, completeness, duplicates, nulls, OHLC consistency, expected exchange-session bars, schema versions, and lineage. Historical IEX certification uses the feed-aware policy in ADR-010: every requested symbol must be present with at least 35% of expected regular-session minutes, while the complete universe must reach at least 80% aggregate coverage. Missing minutes are never synthesized. The daily close pipeline is intentionally stricter and may fail when a partial IEX feed misses expected bars.
 
 Failure is visible and recoverable. A failed daily run is retained as audit evidence; a bounded historical repair can reacquire the same date through the governed path and publish a certified replacement without erasing the failed run.
 
@@ -276,8 +276,10 @@ The accepted ADRs are the binding rationale for storage, orchestration, lifecycl
 - ADR-003 — streaming lifecycle
 - ADR-004 — provisional and certified publication
 - ADR-005 — historical backtesting
+- ADR-006 — optional local observability
 - ADR-007 — certified historical acquisition
 - ADR-008 — decision intelligence
 - ADR-009 — hybrid decision intelligence
+- ADR-010 — feed-aware IEX historical coverage
 
 The Mermaid sources under `docs/architecture/diagrams/` remain the diagram source of truth. This document and its PDF are presentation views of the same implemented architecture.

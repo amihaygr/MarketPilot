@@ -60,6 +60,7 @@ FONT, FONT_BOLD, FONT_MONO = register_fonts()
 
 def inline_markdown(value: str) -> str:
     escaped = html.escape(value.strip())
+    escaped = escaped.replace("&lt;br&gt;", "<br/>").replace("&lt;br/&gt;", "<br/>")
     escaped = re.sub(r"`([^`]+)`", rf'<font name="{FONT_MONO}" color="#117C70">\1</font>', escaped)
     escaped = re.sub(r"\*\*([^*]+)\*\*", r"<b>\1</b>", escaped)
     return escaped
@@ -112,6 +113,8 @@ styles.add(
         leading=14,
         textColor=INK,
         spaceAfter=6,
+        allowWidows=0,
+        allowOrphans=0,
     )
 )
 styles.add(

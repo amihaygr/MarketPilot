@@ -156,6 +156,7 @@ def test_historical_plan_is_bounded_coverage_aware_and_retry_stable() -> None:
         "configured_symbols": CONFIGURED,
         "airflow_run_id": "manual__historical",
         "minimum_coverage_pct": 80,
+        "minimum_aggregate_coverage_pct": 80,
         "maximum_ingestion_lag_seconds": 60_000_000,
         "short_window": 20,
         "long_window": 50,
@@ -169,6 +170,8 @@ def test_historical_plan_is_bounded_coverage_aware_and_retry_stable() -> None:
     assert plan["ingestion"][0]["session_date"] == "2026-08-21"
     assert "logical_date" not in plan["ingestion"][0]
     assert "312" in plan["quality"][0]
+    assert "624" in plan["quality"][0]
+    assert "--expected-total-bars" in plan["quality"][0]
     assert "--maximum-ingestion-lag-seconds" in plan["quality"][0]
     assert plan["ingestion"][0]["run_id"] == plan["bronze"][0][3]
     assert plan["bronze"][0][-2:] == ["--source-name", "alpaca"]
