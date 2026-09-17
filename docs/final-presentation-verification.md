@@ -71,9 +71,9 @@ Airflow DAG imports     -> 0 errors
   שירות האתחול התחום <bdi dir="ltr"><code>airflow-init</code></bdi>.
 - 12 ממשקי ההצגה החזירו <bdi dir="ltr"><code>HTTP 200</code></bdi>: האפליקציה,
   מרכז ההזדמנויות, מעבדת הבדיקות ההיסטוריות, סיפור הפרויקט, מסך המציג,
-  <bdi dir="ltr"><code>Kafka UI</code></bdi>, ‏<bdi dir="ltr"><code>MinIO</code></bdi>,
-  ‏<bdi dir="ltr"><code>Airflow</code></bdi>, שני מסכי
-  <bdi dir="ltr"><code>Spark</code></bdi>, ‏<bdi dir="ltr"><code>Adminer</code></bdi>
+  <bdi dir="ltr"><code>Kafka UI</code></bdi>, <bdi dir="ltr"><code>MinIO</code></bdi>,
+  <bdi dir="ltr"><code>Airflow</code></bdi>, שני מסכי
+  <bdi dir="ltr"><code>Spark</code></bdi>, <bdi dir="ltr"><code>Adminer</code></bdi>
   ותיעוד ה־<bdi dir="ltr"><code>API</code></bdi>.
 - נתיבי הבריאות, הטריות, הנכסים, ההזדמנויות, מצב
   <bdi dir="ltr"><code>Shadow Mode</code></bdi>, מצב המודל וריצות הבדיקה
@@ -83,8 +83,8 @@ Airflow DAG imports     -> 0 errors
 - ריצת התיקון
   <bdi dir="ltr"><code>repair__2026-09-16__20260917</code></bdi> השלימה את
   המסלול ההיסטורי דרך <bdi dir="ltr"><code>Kafka</code></bdi>,
-  ‏<bdi dir="ltr"><code>Bronze</code></bdi>, ‏<bdi dir="ltr"><code>Silver</code></bdi>,
-  בדיקות איכות, ‏<bdi dir="ltr"><code>Gold</code></bdi> ו־<bdi dir="ltr"><code>Backtest</code></bdi>.
+  <bdi dir="ltr"><code>Bronze</code></bdi>, <bdi dir="ltr"><code>Silver</code></bdi>,
+  בדיקות איכות, <bdi dir="ltr"><code>Gold</code></bdi> ו־<bdi dir="ltr"><code>Backtest</code></bdi>.
   הריצה היומית המקורית שנכשלה נשמרה
   כראיית תפעול ולא נמחקה.
 
@@ -104,13 +104,13 @@ Airflow DAG imports     -> 0 errors
 
 - המערכת היא סביבת מחקר ותמיכה בהחלטה; היא אינה שולחת פקודות מסחר ואינה
   מבטיחה תשואה.
-- ‏<bdi dir="ltr"><code>IEX</code></bdi> הוא פיד חינמי וחלקי, ולכן איכות המקור
+- <bdi dir="ltr"><code>IEX</code></bdi> הוא פיד חינמי וחלקי, ולכן איכות המקור
   מופיעה בנפרד מהסתברות הצלחה.
-- ‏<bdi dir="ltr"><code>Rule Score</code></bdi> הוא ציון ראיות לפי כללים;
-  ‏<bdi dir="ltr"><code>Data Confidence</code></bdi> הוא ציון טריות וכיסוי;
-  ‏<bdi dir="ltr"><code>Model Probability</code></bdi> תופיע רק אחרי אימון
+- <bdi dir="ltr"><code>Rule Score</code></bdi> הוא ציון ראיות לפי כללים;
+  <bdi dir="ltr"><code>Data Confidence</code></bdi> הוא ציון טריות וכיסוי;
+  <bdi dir="ltr"><code>Model Probability</code></bdi> תופיע רק אחרי אימון
   ואימות. אסור להחליף ביניהם.
-- ‏<bdi dir="ltr"><code>v2</code></bdi> דורש 24 חודשי נתונים, לפחות 300 תרחישים
+- <bdi dir="ltr"><code>v2</code></bdi> דורש 24 חודשי נתונים, לפחות 300 תרחישים
   שנכנסו בפועל, בדיקת <bdi dir="ltr"><code>Walk-Forward</code></bdi>, כיול,
   20 ימים חיים חדשים ואישור אנושי. זהו שער מוצרי מכוון, לא חור במסירה.
 - אין לפתוח קובץ <bdi dir="ltr"><code>.env</code></bdi> או להציג מפתחות וסיסמאות

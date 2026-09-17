@@ -52,7 +52,7 @@ docker compose up -d
 3. <bdi dir="ltr"><code>Kafka UI</code></bdi> — הודעת <bdi dir="ltr"><code>MarketBarV1</code></bdi> אחת והמיקום שלה.
 4. <bdi dir="ltr"><code>MinIO Bronze</code></bdi> — אותו אירוע גולמי עם <bdi dir="ltr"><code>topic / partition / offset</code></bdi> בנתיב.
 5. <bdi dir="ltr"><code>Airflow</code></bdi> — ריצת התיקון הירוקה <bdi dir="ltr"><code>repair__2026-09-16__20260917</code></bdi>.
-6. <bdi dir="ltr"><code>Opportunity Center</code></bdi> — <bdi dir="ltr"><code>META BUY ZONE</code></bdi>, ‏<bdi dir="ltr"><code>AAPL WATCH BREAKOUT</code></bdi>, שלוש שכבות הראיה ומצב המודל.
+6. <bdi dir="ltr"><code>Opportunity Center</code></bdi> — <bdi dir="ltr"><code>META BUY ZONE</code></bdi>, <bdi dir="ltr"><code>AAPL WATCH BREAKOUT</code></bdi>, שלוש שכבות הראיה ומצב המודל.
 7. <bdi dir="ltr"><code>Backtesting Lab</code></bdi> — ריצה מפורסמת, מדדים, עקומת הון, מדד ייחוס ו־<bdi dir="ltr"><code>Lineage</code></bdi>.
 
 הדמו הוא לקריאה בלבד. אין להפעיל <bdi dir="ltr"><code>Backfill</code></bdi>, לשנות נתונים או להציג את קובץ <bdi dir="ltr"><code>.env</code></bdi> מול הקהל.

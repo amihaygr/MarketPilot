@@ -55,7 +55,7 @@
 - [ ] מונה <bdi dir="ltr"><code>Shadow Mode</code></bdi> נקרא מהמסך בזמן אמת; אין לשנן מספר ישן.
 - [ ] שני <bdi dir="ltr"><code>Kafka Topics</code></bdi>, אובייקט <bdi dir="ltr"><code>Bronze</code></bdi> וריצת <bdi dir="ltr"><code>Airflow</code></bdi> ירוקה פתוחים מראש.
 - [ ] <bdi dir="ltr"><code>Backtesting Lab</code></bdi> מציג ריצה במצב <bdi dir="ltr"><code>Published</code></bdi>, טווח של כמה שבועות ו־<bdi dir="ltr"><code>Lineage</code></bdi> מלא.
-- [ ] <bdi dir="ltr"><code>Opportunity Center</code></bdi> מציג <bdi dir="ltr"><code>53 sessions</code></bdi>, ‏<bdi dir="ltr"><code>2/20</code></bdi> ו־<bdi dir="ltr"><code>RULES ACTIVE · MODEL FALLBACK</code></bdi>.
+- [ ] <bdi dir="ltr"><code>Opportunity Center</code></bdi> מציג <bdi dir="ltr"><code>53 sessions</code></bdi>, <bdi dir="ltr"><code>2/20</code></bdi> ו־<bdi dir="ltr"><code>RULES ACTIVE · MODEL FALLBACK</code></bdi>.
 - [ ] ריצת <bdi dir="ltr"><code>repair__2026-09-16__20260917</code></bdi> ב־<bdi dir="ltr"><code>Airflow</code></bdi> ירוקה.
 - [ ] זום הדפדפן ו־<bdi dir="ltr">resolution</bdi> מאפשרים קריאה מרחוק.
 - [ ] התראות, <bdi dir="ltr">Teams</bdi>, <bdi dir="ltr">WhatsApp</bdi> ודואר מושתקים.

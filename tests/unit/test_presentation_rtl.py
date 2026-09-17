@@ -13,11 +13,11 @@ NUMERIC_DIRECTIONAL_RUN = re.compile(
 ASCII_DIGIT = re.compile(r"\d")
 ORDERED_LIST_MARKER = re.compile(r"^\s*(?:>\s*)?\d+\.\s+")
 PROTECTED_FRAGMENT = re.compile(
-    r"\u2066.*?\u2069|"
     r"<bdi\b[^>]*>.*?</bdi>|<bdo\b[^>]*>.*?</bdo>|"
     r"<a\b[^>]*>.*?</a>|<[^>]+>|https?://[^)\s>]+|"
     r"\[[^\]]+\]\([^)]+\)"
 )
+RAW_BIDI_CONTROL = re.compile(r"[\u200e\u200f\u202a-\u202e\u2066-\u2069]")
 
 
 def test_hebrew_presentation_markdown_has_complete_rtl_isolation() -> None:
@@ -32,6 +32,10 @@ def test_hebrew_presentation_markdown_has_complete_rtl_isolation() -> None:
         assert text.rstrip().endswith("</div>")
         assert text.count('<bdi dir="ltr">') == text.count("</bdi>")
         assert text.count('<bdo dir="ltr">') == text.count("</bdo>")
+        assert not RAW_BIDI_CONTROL.search(text), (
+            f"{path.name} contains hidden bidi control characters; "
+            "use explicit RTL/LTR HTML wrappers instead"
+        )
 
         ltr_block_depth = 0
         in_fenced_code = False
@@ -55,10 +59,6 @@ def test_hebrew_presentation_markdown_has_complete_rtl_isolation() -> None:
                 f"{path.name}:{line_number} contains an unisolated numeric run: {unisolated}"
             )
             if path.name == "demo-day-step-by-step-he.md":
-                assert "<bdi" not in text, (
-                    "GitHub strips inline bdi elements; use Unicode LTR isolates instead"
-                )
-                assert text.count("\u2066") == text.count("\u2069")
                 prose = ORDERED_LIST_MARKER.sub("", unisolated)
                 assert not ASCII_DIGIT.search(prose), (
                     f"{path.name}:{line_number} contains an unisolated digit: {prose}"

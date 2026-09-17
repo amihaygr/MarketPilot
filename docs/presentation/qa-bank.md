@@ -158,18 +158,18 @@
 <bdi dir="ltr"><code>Model Probability</code></bdi> ו־<bdi dir="ltr"><code>Expected R</code></bdi>
 נשארים ריקים. זהו <bdi dir="ltr"><code>fail closed</code></bdi> מכוון.
 
-### מה ההבדל בין <bdi dir="ltr"><code>Rule Score</code></bdi>, ‏<bdi dir="ltr"><code>Data Confidence</code></bdi> ו־<bdi dir="ltr"><code>Model Probability</code></bdi>?
+### מה ההבדל בין <bdi dir="ltr"><code>Rule Score</code></bdi>, <bdi dir="ltr"><code>Data Confidence</code></bdi> ו־<bdi dir="ltr"><code>Model Probability</code></bdi>?
 
 <bdi dir="ltr"><code>Rule Score</code></bdi> מסכם את הראיות הטכניות והפונדמנטליות
-לפי נוסחה שקופה. ‏<bdi dir="ltr"><code>Data Confidence</code></bdi> מודד איכות,
-כיסוי וטריות. ‏<bdi dir="ltr"><code>Model Probability</code></bdi> היא הסתברות
+לפי נוסחה שקופה. <bdi dir="ltr"><code>Data Confidence</code></bdi> מודד איכות,
+כיסוי וטריות. <bdi dir="ltr"><code>Model Probability</code></bdi> היא הסתברות
 מכוילת לתוצאה מוגדרת. שני הראשונים אינם הסתברות לרווח.
 
 ### כיצד מונעים מהמודל ללמוד את העתיד?
 
 כל צילום מצב כולל רק נתוני שוק ודוחות <bdi dir="ltr"><code>SEC</code></bdi> שהיו
 ידועים בזמן הצילום. האימון והבדיקה נעשים ב־<bdi dir="ltr"><code>Walk-Forward</code></bdi>
-כרונולוגי: מאמנים על העבר ובודקים על תקופה מאוחרת יותר. ‏<bdi dir="ltr"><code>NO_ENTRY</code></bdi>
+כרונולוגי: מאמנים על העבר ובודקים על תקופה מאוחרת יותר. <bdi dir="ltr"><code>NO_ENTRY</code></bdi>
 נמדד בנפרד ואינו מסומן בטעות כהפסד.
 
 ### למה המודל ההיברידי אינו ממציא מחיר יעד?

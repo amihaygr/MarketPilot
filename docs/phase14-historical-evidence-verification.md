@@ -10,7 +10,7 @@
 
 ## התוצאה
 
-- קיימים **41 ימי מסחר מאושרים** לכל אחת מהמניות <bdi dir="ltr"><code>AAPL</code></bdi>, ‏<bdi dir="ltr"><code>MSFT</code></bdi> ו־<bdi dir="ltr"><code>SPY</code></bdi>.
+- קיימים **41 ימי מסחר מאושרים** לכל אחת מהמניות <bdi dir="ltr"><code>AAPL</code></bdi>, <bdi dir="ltr"><code>MSFT</code></bdi> ו־<bdi dir="ltr"><code>SPY</code></bdi>.
 - טווח הנתונים הוא **6 ביולי עד 28 באוגוסט 2026**.
 - נרות מאושרים:
   - <bdi dir="ltr"><code>AAPL — 15,769</code></bdi>
