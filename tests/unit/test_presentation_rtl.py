@@ -22,13 +22,9 @@ DIRECTIONAL_INLINE_CODE_WITHOUT_OVERRIDE = re.compile(
     r'<bdi dir="ltr"><code>[^<]*[0-9_./:%=–—-][^<]*</code></bdi>'
 )
 INLINE_CODE_WITHOUT_DIRECTION = re.compile(r'<code(?!\s+dir="ltr")>')
-MISALIGNED_ENGLISH_HEADING = re.compile(
-    r'<h[1-6]\b[^>]*dir="ltr"[^>]*align="right"', re.IGNORECASE
-)
+MISALIGNED_ENGLISH_HEADING = re.compile(r'<h[1-6]\b[^>]*dir="ltr"[^>]*align="right"', re.IGNORECASE)
 MARKDOWN_TABLE_ROW = re.compile(r"^\s*\|.*\|\s*$")
-LTR_HEADING = re.compile(
-    r'<h(?P<level>[1-6])\b[^>]*dir="ltr"[^>]*>.*</h(?P=level)>', re.IGNORECASE
-)
+LTR_HEADING = re.compile(r'<h(?P<level>[1-6])\b[^>]*dir="ltr"[^>]*>.*</h(?P=level)>', re.IGNORECASE)
 
 
 def test_hebrew_presentation_markdown_has_complete_rtl_isolation() -> None:
