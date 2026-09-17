@@ -1,9 +1,9 @@
 <div dir="rtl" align="right">
 
-# אימות הרחבת הראיות ההיסטוריות — <bdi dir="ltr"><code>Phase 14</code></bdi>
+# אימות הרחבת הראיות ההיסטוריות — <bdi dir="ltr"><bdo dir="ltr"><code>Phase 14</code></bdo></bdi>
 
 > זהו צילום מצב היסטורי מ־14 בספטמבר. מצב ההגשה העדכני מתועד בקובץ
-> <bdi dir="ltr"><code>docs/final-presentation-verification.md</code></bdi>; המסמך נשמר
+> <bdi dir="ltr"><bdo dir="ltr"><code>docs/final-presentation-verification.md</code></bdo></bdi>; המסמך נשמר
 > כדי לא למחוק ראיות ריצה קודמות.
 
 **תאריך אימות:** 14 בספטמבר 2026
@@ -13,12 +13,12 @@
 - קיימים **41 ימי מסחר מאושרים** לכל אחת מהמניות <bdi dir="ltr"><code>AAPL</code></bdi>, <bdi dir="ltr"><code>MSFT</code></bdi> ו־<bdi dir="ltr"><code>SPY</code></bdi>.
 - טווח הנתונים הוא **6 ביולי עד 28 באוגוסט 2026**.
 - נרות מאושרים:
-  - <bdi dir="ltr"><code>AAPL — 15,769</code></bdi>
-  - <bdi dir="ltr"><code>MSFT — 15,734</code></bdi>
-  - <bdi dir="ltr"><code>SPY — 15,768</code></bdi>
-- ריצת ההשלמה ההיסטורית <bdi dir="ltr"><code>phase14_historical_evidence_20260914</code></bdi> הסתיימה בהצלחה.
-- ריצת הבדיקה ההיסטורית <bdi dir="ltr"><code>phase14_full_history_backtest_20260914</code></bdi> הסתיימה בהצלחה.
-- מזהה התוצאה הוא <bdi dir="ltr"><code>2bf99281-ec93-5fec-9ce2-d72539021bea</code></bdi>.
+  - <bdi dir="ltr"><bdo dir="ltr"><code>AAPL — 15,769</code></bdo></bdi>
+  - <bdi dir="ltr"><bdo dir="ltr"><code>MSFT — 15,734</code></bdo></bdi>
+  - <bdi dir="ltr"><bdo dir="ltr"><code>SPY — 15,768</code></bdo></bdi>
+- ריצת ההשלמה ההיסטורית <bdi dir="ltr"><bdo dir="ltr"><code>phase14_historical_evidence_20260914</code></bdo></bdi> הסתיימה בהצלחה.
+- ריצת הבדיקה ההיסטורית <bdi dir="ltr"><bdo dir="ltr"><code>phase14_full_history_backtest_20260914</code></bdo></bdi> הסתיימה בהצלחה.
+- מזהה התוצאה הוא <bdi dir="ltr"><bdo dir="ltr"><code>2bf99281-ec93-5fec-9ce2-d72539021bea</code></bdo></bdi>.
 
 ## המסלול שעבר כל יום חדש
 

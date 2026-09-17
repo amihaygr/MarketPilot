@@ -15,7 +15,7 @@
   גרסת ההגשה.
 - [מסמך הארכיטקטורה להעלאה](architecture/output/MarketPilot.pdf) — קובץ
   <bdi dir="ltr"><code>PDF</code></bdi> בן 12 עמודי
-  <bdi dir="ltr"><code>A4</code></bdi> לרוחב.
+  <bdi dir="ltr"><bdo dir="ltr"><code>A4</code></bdo></bdi> לרוחב.
 - [מדריך ההצגה](presentation/demo-day-step-by-step-he.md) — סדר הפעולות,
   המשפטים המומלצים, הסברים למושגים, תרחיש הדמו ותוכנית התאוששות.
 - [מסך המציג](http://localhost:3000/presenter.html) — טיימר, תחנות, משפטי מעבר
@@ -29,16 +29,16 @@
 | מדד | ערך |
 |---|---:|
 | נכסים במעקב | 11 |
-| רשומות שוק ב־<bdi dir="ltr"><code>Gold</code></bdi> | <bdi dir="ltr"><code>162,743</code></bdi> |
-| נרות מאושרים | <bdi dir="ltr"><code>154,206</code></bdi> |
+| רשומות שוק ב־<bdi dir="ltr"><code>Gold</code></bdi> | <bdi dir="ltr"><bdo dir="ltr"><code>162,743</code></bdo></bdi> |
+| נרות מאושרים | <bdi dir="ltr"><bdo dir="ltr"><code>154,206</code></bdo></bdi> |
 | רשומות <bdi dir="ltr"><code>SEC</code></bdi> | 937 |
-| ימי מסחר היסטוריים מאושרים | <bdi dir="ltr"><code>76</code></bdi> |
-| ריצות <bdi dir="ltr"><code>Backtest</code></bdi> מפורסמות | <bdi dir="ltr"><code>12</code></bdi> |
-| שער <bdi dir="ltr"><code>Shadow Mode</code></bdi> של <bdi dir="ltr"><code>v1</code></bdi> | <bdi dir="ltr"><code>2/20</code></bdi> |
-| מצב המודל ההיברידי <bdi dir="ltr"><code>v2</code></bdi> | <bdi dir="ltr"><code>FALLBACK</code></bdi> |
+| ימי מסחר היסטוריים מאושרים | <bdi dir="ltr"><bdo dir="ltr"><code>76</code></bdo></bdi> |
+| ריצות <bdi dir="ltr"><code>Backtest</code></bdi> מפורסמות | <bdi dir="ltr"><bdo dir="ltr"><code>12</code></bdo></bdi> |
+| שער <bdi dir="ltr"><code>Shadow Mode</code></bdi> של <bdi dir="ltr"><bdo dir="ltr"><code>v1</code></bdo></bdi> | <bdi dir="ltr"><bdo dir="ltr"><code>2/20</code></bdo></bdi> |
+| מצב המודל ההיברידי <bdi dir="ltr"><bdo dir="ltr"><code>v2</code></bdo></bdi> | <bdi dir="ltr"><code>FALLBACK</code></bdi> |
 
 מצב <bdi dir="ltr"><code>FALLBACK</code></bdi> הוא מצב הבטיחות הנכון: כללי
-<bdi dir="ltr"><code>v1</code></bdi> ממשיכים לייצר רמות מחיר וסיכון, אך המערכת
+<bdi dir="ltr"><bdo dir="ltr"><code>v1</code></bdo></bdi> ממשיכים לייצר רמות מחיר וסיכון, אך המערכת
 אינה מציגה הסתברות הצלחה עד שקיים מודל מאומן, מכויל ומאושר. נתונים היסטוריים
 אינם מקדמים את שער 20 הימים החיים.
 
@@ -68,8 +68,8 @@ Airflow DAG imports     -> 0 errors
 
 - 18 שירותי הריצה הנדרשים פועלים ובריאים. בקובץ
   <bdi dir="ltr"><code>Compose</code></bdi> מוגדרים 19 שירותים בסך הכול, כולל
-  שירות האתחול התחום <bdi dir="ltr"><code>airflow-init</code></bdi>.
-- 12 ממשקי ההצגה החזירו <bdi dir="ltr"><code>HTTP 200</code></bdi>: האפליקציה,
+  שירות האתחול התחום <bdi dir="ltr"><bdo dir="ltr"><code>airflow-init</code></bdo></bdi>.
+- 12 ממשקי ההצגה החזירו <bdi dir="ltr"><bdo dir="ltr"><code>HTTP 200</code></bdo></bdi>: האפליקציה,
   מרכז ההזדמנויות, מעבדת הבדיקות ההיסטוריות, סיפור הפרויקט, מסך המציג,
   <bdi dir="ltr"><code>Kafka UI</code></bdi>, <bdi dir="ltr"><code>MinIO</code></bdi>,
   <bdi dir="ltr"><code>Airflow</code></bdi>, שני מסכי
@@ -78,10 +78,10 @@ Airflow DAG imports     -> 0 errors
 - נתיבי הבריאות, הטריות, הנכסים, ההזדמנויות, מצב
   <bdi dir="ltr"><code>Shadow Mode</code></bdi>, מצב המודל וריצות הבדיקה
   ההיסטורית החזירו נתונים תקינים.
-- ה־<bdi dir="ltr"><code>daily_market_close</code></bdi> פעיל וזמין למתזמן;
+- ה־<bdi dir="ltr"><bdo dir="ltr"><code>daily_market_close</code></bdo></bdi> פעיל וזמין למתזמן;
   אין שגיאות טעינת <bdi dir="ltr"><code>DAG</code></bdi>.
 - ריצת התיקון
-  <bdi dir="ltr"><code>repair__2026-09-16__20260917</code></bdi> השלימה את
+  <bdi dir="ltr"><bdo dir="ltr"><code>repair__2026-09-16__20260917</code></bdo></bdi> השלימה את
   המסלול ההיסטורי דרך <bdi dir="ltr"><code>Kafka</code></bdi>,
   <bdi dir="ltr"><code>Bronze</code></bdi>, <bdi dir="ltr"><code>Silver</code></bdi>,
   בדיקות איכות, <bdi dir="ltr"><code>Gold</code></bdi> ו־<bdi dir="ltr"><code>Backtest</code></bdi>.
@@ -94,7 +94,7 @@ Airflow DAG imports     -> 0 errors
 - שלמות חבילת המצגת, גאומטריה, התאמת כותרות ומדיניות הגופנים עברו ללא ממצאים
   או אזהרות.
 - כל 12 עמודי ה־<bdi dir="ltr"><code>PDF</code></bdi> רונדרו; הקובץ ניתן
-  לקריאה ולחיפוש ומכיל את פרק <bdi dir="ltr"><code>Phase 15</code></bdi>.
+  לקריאה ולחיפוש ומכיל את פרק <bdi dir="ltr"><bdo dir="ltr"><code>Phase 15</code></bdo></bdi>.
 - חמשת מסכי המוצר נבדקו ברוחב מחשב וברוחב טלפון. לא נמצאה גלישה אופקית של
   הדף, שגיאת <bdi dir="ltr"><code>JavaScript</code></bdi>, שגיאת קונסולה או
   משאב שהחזיר שגיאת <bdi dir="ltr"><code>HTTP</code></bdi>.
@@ -110,10 +110,10 @@ Airflow DAG imports     -> 0 errors
   <bdi dir="ltr"><code>Data Confidence</code></bdi> הוא ציון טריות וכיסוי;
   <bdi dir="ltr"><code>Model Probability</code></bdi> תופיע רק אחרי אימון
   ואימות. אסור להחליף ביניהם.
-- <bdi dir="ltr"><code>v2</code></bdi> דורש 24 חודשי נתונים, לפחות 300 תרחישים
-  שנכנסו בפועל, בדיקת <bdi dir="ltr"><code>Walk-Forward</code></bdi>, כיול,
+- <bdi dir="ltr"><bdo dir="ltr"><code>v2</code></bdo></bdi> דורש 24 חודשי נתונים, לפחות 300 תרחישים
+  שנכנסו בפועל, בדיקת <bdi dir="ltr"><bdo dir="ltr"><code>Walk-Forward</code></bdo></bdi>, כיול,
   20 ימים חיים חדשים ואישור אנושי. זהו שער מוצרי מכוון, לא חור במסירה.
-- אין לפתוח קובץ <bdi dir="ltr"><code>.env</code></bdi> או להציג מפתחות וסיסמאות
+- אין לפתוח קובץ <bdi dir="ltr"><bdo dir="ltr"><code>.env</code></bdo></bdi> או להציג מפתחות וסיסמאות
   בזמן ההצגה.
 
 </div>

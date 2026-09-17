@@ -42,7 +42,7 @@
 | <bdi dir="ltr"><code>IEX</code></bdi> | מקור נתוני השוק החינמי של הפרויקט; הוא מייצג בורסה אחת ולכן חלקי |
 | <bdi dir="ltr"><code>SIP</code></bdi> | הזנת השוק המאוחדת הרשמית של הבורסות האמריקאיות; מלאה יותר ובדרך כלל דורשת הרשאה בתשלום |
 | <bdi dir="ltr"><code>SEC EDGAR</code></bdi> | המקור הרשמי לדיווחי חברות ציבוריות בארצות הברית |
-| <bdi dir="ltr"><code>Company Facts / XBRL</code></bdi> | נתונים חשבונאיים מובנים מתוך דיווחי החברה, למשל הכנסות, רווח, מזומן וחוב |
+| <bdi dir="ltr"><bdo dir="ltr"><code>Company Facts / XBRL</code></bdo></bdi> | נתונים חשבונאיים מובנים מתוך דיווחי החברה, למשל הכנסות, רווח, מזומן וחוב |
 | <bdi dir="ltr"><code>Corporate Action</code></bdi> | אירוע כמו פיצול מניה או דיבידנד שמשפיע על ניתוח היסטורי |
 | <bdi dir="ltr"><code>XNYS session</code></bdi> | יום מסחר תקף לפי לוח הבורסה של ניו יורק, כולל חגים וסגירות מוקדמות |
 
@@ -50,15 +50,15 @@
 
 | מונח | הסבר פשוט |
 |---|---|
-| <bdi dir="ltr"><code>SMA 20</code></bdi> | ממוצע פשוט של עשרים מחירי הסגירה האחרונים; מחליק רעש אך מפגר אחרי המחיר |
-| <bdi dir="ltr"><code>EMA 20 / 50</code></bdi> | ממוצע שנותן משקל גדול יותר למחירים חדשים ולכן מגיב מהר יותר |
-| <bdi dir="ltr"><code>RSI</code></bdi> | מדד מומנטום בסולם <bdi dir="ltr"><code>0–100</code></bdi>; ערך קיצוני הוא אות לבדיקה, לא פקודה |
+| <bdi dir="ltr"><bdo dir="ltr"><code>SMA 20</code></bdo></bdi> | ממוצע פשוט של עשרים מחירי הסגירה האחרונים; מחליק רעש אך מפגר אחרי המחיר |
+| <bdi dir="ltr"><bdo dir="ltr"><code>EMA 20 / 50</code></bdo></bdi> | ממוצע שנותן משקל גדול יותר למחירים חדשים ולכן מגיב מהר יותר |
+| <bdi dir="ltr"><code>RSI</code></bdi> | מדד מומנטום בסולם <bdi dir="ltr"><bdo dir="ltr"><code>0–100</code></bdo></bdi>; ערך קיצוני הוא אות לבדיקה, לא פקודה |
 | <bdi dir="ltr"><code>MACD</code></bdi> | מדד מגמה ומומנטום שמבוסס על הפער בין ממוצעים מעריכיים |
 | <bdi dir="ltr"><code>ATR</code></bdi> | מדד תנודתיות שמעריך כמה המחיר נע בדרך כלל; אינו מנבא כיוון |
 | <bdi dir="ltr"><code>Buy Zone</code></bdi> | טווח כניסה אפשרי המבוסס על תמיכה, ממוצעים ותנודתיות; אינו מחיר קסם |
 | <bdi dir="ltr"><code>Stop</code></bdi> | מחיר שמבטל את התזה ומגדיר את הסיכון מראש |
-| <bdi dir="ltr"><code>Target 1 / 2</code></bdi> | יעדי מימוש המבוססים על התנגדות ומכפלות סיכון |
-| <bdi dir="ltr"><code>Risk/Reward</code></bdi> | היחס בין הרווח המתוכנן להפסד המתוכנן; אינו הסתברות הצלחה |
+| <bdi dir="ltr"><bdo dir="ltr"><code>Target 1 / 2</code></bdo></bdi> | יעדי מימוש המבוססים על התנגדות ומכפלות סיכון |
+| <bdi dir="ltr"><bdo dir="ltr"><code>Risk/Reward</code></bdo></bdi> | היחס בין הרווח המתוכנן להפסד המתוכנן; אינו הסתברות הצלחה |
 | <bdi dir="ltr"><code>Position Sizing</code></bdi> | חישוב מספר המניות לפי גודל התיק, מחיר העצירה ומגבלות החשיפה |
 
 ## בדיקה היסטורית ומודל
@@ -67,19 +67,19 @@
 |---|---|
 | <bdi dir="ltr"><code>Backtest</code></bdi> | ניסוי של כללי אסטרטגיה על נתוני עבר מאושרים |
 | <bdi dir="ltr"><code>Benchmark</code></bdi> | נקודת ייחוס; בפרויקט משתמשים ב־<bdi dir="ltr"><code>SPY</code></bdi> |
-| <bdi dir="ltr"><code>Look-ahead Bias</code></bdi> | טעות שבה המודל משתמש במידע שלא היה ידוע בזמן ההחלטה |
+| <bdi dir="ltr"><bdo dir="ltr"><code>Look-ahead Bias</code></bdo></bdi> | טעות שבה המודל משתמש במידע שלא היה ידוע בזמן ההחלטה |
 | <bdi dir="ltr"><code>Slippage</code></bdi> | פער בין מחיר הביצוע המתוכנן למחיר שהיה אפשר לקבל בפועל |
 | <bdi dir="ltr"><code>Drawdown</code></bdi> | הירידה משיא לשפל שבא אחריו |
 | <bdi dir="ltr"><code>Rule Score</code></bdi> | ציון שקוף של הראיות הטכניות והפונדמנטליות; הוא אינו סיכוי לרווח |
 | <bdi dir="ltr"><code>Data Confidence</code></bdi> | ציון איכות, כיסוי, טריות ומקור הנתונים; גם הוא אינו סיכוי לרווח |
-| <bdi dir="ltr"><code>Model Probability</code></bdi> | הסתברות מכוילת להגיע ל־<bdi dir="ltr"><code>Target 1</code></bdi> לפני <bdi dir="ltr"><code>Stop</code></bdi>, רק לאחר כניסה תקפה |
+| <bdi dir="ltr"><code>Model Probability</code></bdi> | הסתברות מכוילת להגיע ל־<bdi dir="ltr"><bdo dir="ltr"><code>Target 1</code></bdo></bdi> לפני <bdi dir="ltr"><code>Stop</code></bdi>, רק לאחר כניסה תקפה |
 | <bdi dir="ltr"><code>Expected R</code></bdi> | תוחלת מתמטית ביחידות סיכון לאחר הסתברות, רווח, הפסד ועלויות |
-| <bdi dir="ltr"><code>Calibration</code></bdi> | בדיקה האם תחזיות של, למשל, <bdi dir="ltr"><code>60%</code></bdi> מצליחות בערך בשישה מכל עשרה מקרים דומים |
-| <bdi dir="ltr"><code>Walk-Forward Validation</code></bdi> | אימון על העבר ובדיקה על תקופה מאוחרת יותר, שוב ושוב בסדר כרונולוגי |
-| <bdi dir="ltr"><code>NO_ENTRY</code></bdi> | התרחיש פורסם, אך המחיר לא נכנס לטווח בזמן התוקף; אינו הפסד מסחר |
-| <bdi dir="ltr"><code>PREVIEW</code></bdi> | תחזית מודל שמוצגת למחקר אך אינה משנה את פעולת <bdi dir="ltr"><code>v1</code></bdi> |
+| <bdi dir="ltr"><code>Calibration</code></bdi> | בדיקה האם תחזיות של, למשל, <bdi dir="ltr"><bdo dir="ltr"><code>60%</code></bdo></bdi> מצליחות בערך בשישה מכל עשרה מקרים דומים |
+| <bdi dir="ltr"><bdo dir="ltr"><code>Walk-Forward Validation</code></bdo></bdi> | אימון על העבר ובדיקה על תקופה מאוחרת יותר, שוב ושוב בסדר כרונולוגי |
+| <bdi dir="ltr"><bdo dir="ltr"><code>NO_ENTRY</code></bdo></bdi> | התרחיש פורסם, אך המחיר לא נכנס לטווח בזמן התוקף; אינו הפסד מסחר |
+| <bdi dir="ltr"><code>PREVIEW</code></bdi> | תחזית מודל שמוצגת למחקר אך אינה משנה את פעולת <bdi dir="ltr"><bdo dir="ltr"><code>v1</code></bdo></bdi> |
 | <bdi dir="ltr"><code>ACTIVE</code></bdi> | מודל שעבר שערים, תקופת צל ואישור אנושי, ולכן רשאי להשפיע על הדירוג |
-| <bdi dir="ltr"><code>FALLBACK</code></bdi> | מצב בטוח שבו אין מודל תקף; כללי <bdi dir="ltr"><code>v1</code></bdi> נשארים פעילים ולא מוצגת הסתברות ישנה או מומצאת |
+| <bdi dir="ltr"><code>FALLBACK</code></bdi> | מצב בטוח שבו אין מודל תקף; כללי <bdi dir="ltr"><bdo dir="ltr"><code>v1</code></bdo></bdi> נשארים פעילים ולא מוצגת הסתברות ישנה או מומצאת |
 
 ## ארבע הבחנות שכדאי לזכור
 

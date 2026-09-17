@@ -18,6 +18,12 @@ PROTECTED_FRAGMENT = re.compile(
     r"\[[^\]]+\]\([^)]+\)"
 )
 RAW_BIDI_CONTROL = re.compile(r"[\u200e\u200f\u202a-\u202e\u2066-\u2069]")
+DIRECTIONAL_INLINE_CODE_WITHOUT_OVERRIDE = re.compile(
+    r'<bdi dir="ltr"><code>[^<]*[0-9_./:%=–—-][^<]*</code></bdi>'
+)
+MISALIGNED_ENGLISH_HEADING = re.compile(
+    r'<h[1-6]\b[^>]*dir="ltr"[^>]*align="right"', re.IGNORECASE
+)
 
 
 def test_hebrew_presentation_markdown_has_complete_rtl_isolation() -> None:
@@ -35,6 +41,13 @@ def test_hebrew_presentation_markdown_has_complete_rtl_isolation() -> None:
         assert not RAW_BIDI_CONTROL.search(text), (
             f"{path.name} contains hidden bidi control characters; "
             "use explicit RTL/LTR HTML wrappers instead"
+        )
+        assert not DIRECTIONAL_INLINE_CODE_WITHOUT_OVERRIDE.search(text), (
+            f"{path.name} contains an LTR identifier or numeric range without an explicit "
+            "character-order override; nest bdo[dir=ltr] inside the bdi isolation"
+        )
+        assert not MISALIGNED_ENGLISH_HEADING.search(text), (
+            f"{path.name} contains an English-only heading aligned to the RTL edge"
         )
 
         ltr_block_depth = 0

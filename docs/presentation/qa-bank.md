@@ -12,9 +12,9 @@
 בזמן אמת. הוא ראיה טובה ל־<bdi dir="ltr">Backtesting</bdi>, אך שער ה־<bdi dir="ltr">Shadow</bdi> דורש 20 ימים עוקבים
 שבהם ההמלצה נוצרה לפני שהתוצאה הייתה ידועה. ההפרדה מוצגת במפורש בדשבורד.
 
-נכון לבדיקת <bdi dir="ltr"><code>2026-09-17</code></bdi>, קיימים <bdi dir="ltr"><code>76</code></bdi> ימי מסחר
-היסטוריים מאושרים ו־<bdi dir="ltr"><code>12</code></bdi> ריצות <bdi dir="ltr"><code>Backtest</code></bdi>, אך המונה החי
-עומד על <bdi dir="ltr"><code>2/20</code></bdi>. יום נכנס למונה רק לאחר שרשרת אישור
+נכון לבדיקת <bdi dir="ltr"><bdo dir="ltr"><code>2026-09-17</code></bdo></bdi>, קיימים <bdi dir="ltr"><bdo dir="ltr"><code>76</code></bdo></bdi> ימי מסחר
+היסטוריים מאושרים ו־<bdi dir="ltr"><bdo dir="ltr"><code>12</code></bdo></bdi> ריצות <bdi dir="ltr"><code>Backtest</code></bdi>, אך המונה החי
+עומד על <bdi dir="ltr"><bdo dir="ltr"><code>2/20</code></bdo></bdi>. יום נכנס למונה רק לאחר שרשרת אישור
 יומית מוצלחת. זו התנהגות
 <bdi dir="ltr"><code>fail closed</code></bdi>, לא ניסיון להציג התקדמות מלאכותית.
 
@@ -81,11 +81,11 @@
 ### למה יש <bdi dir="ltr">Topic</bdi> היסטורי נפרד?
 
 כדי ש־<bdi dir="ltr">burst</bdi> של אלפי <bdi dir="ltr">bars</bdi> היסטוריים לא ייכנס ל־<bdi dir="ltr">Spark Streaming</bdi> שמיועד ל־<bdi dir="ltr">Live</bdi>.
-<bdi dir="ltr"><code>market.bars.1m.backfill.v1</code></bdi> נשמר ב־<bdi dir="ltr">Bronze</bdi> אך אינו נצרך ב־<bdi dir="ltr">live application</bdi>.
+<bdi dir="ltr"><bdo dir="ltr"><code>market.bars.1m.backfill.v1</code></bdo></bdi> נשמר ב־<bdi dir="ltr">Bronze</bdi> אך אינו נצרך ב־<bdi dir="ltr">live application</bdi>.
 
 ### כיצד מנעת <bdi dir="ltr">Look-ahead bias</bdi>?
 
-ה־<bdi dir="ltr">position</bdi> שנובע מ־<bdi dir="ltr">bar</bdi> <bdi dir="ltr"><code>t</code></bdi> מוחל רק על תשואת <bdi dir="ltr"><code>t+1</code></bdi>. בנוסף רק <bdi dir="ltr">Certified Gold</bdi>
+ה־<bdi dir="ltr">position</bdi> שנובע מ־<bdi dir="ltr">bar</bdi> <bdi dir="ltr"><code>t</code></bdi> מוחל רק על תשואת <bdi dir="ltr"><bdo dir="ltr"><code>t+1</code></bdo></bdi>. בנוסף רק <bdi dir="ltr">Certified Gold</bdi>
 נכנס לריצה, והפרמטרים, <bdi dir="ltr">costs</bdi>, <bdi dir="ltr">slippage</bdi> ו־<bdi dir="ltr">code version</bdi> נשמרים עם ה־<bdi dir="ltr">run</bdi>.
 
 ### למה תוצאת ה־<bdi dir="ltr">Backtest</bdi> אינה מרשימה פיננסית?
@@ -97,7 +97,7 @@
 ### מה למדת מהתקלה של 513 הרשומות?
 
 למדתי ש־<bdi dir="ltr">filter</bdi> לפי תאריך בלבד אינו מספיק. הרשומות נשמרו ל־<bdi dir="ltr">audit</bdi>, אבל <bdi dir="ltr">Spark</bdi>
-מצרף <bdi dir="ltr">input</bdi> לחלונות <bdi dir="ltr">XNYS</bdi> חוקיים ומבודד <bdi dir="ltr"><code>source=alpaca</code></bdi> ב־<bdi dir="ltr">certification</bdi> ההיסטורי.
+מצרף <bdi dir="ltr">input</bdi> לחלונות <bdi dir="ltr">XNYS</bdi> חוקיים ומבודד <bdi dir="ltr"><bdo dir="ltr"><code>source=alpaca</code></bdo></bdi> ב־<bdi dir="ltr">certification</bdi> ההיסטורי.
 הבדיקה הוסיפה כלל ארכיטקטוני שניתן לאימות ולא תיקון ידני חד-פעמי.
 
 ### למה <bdi dir="ltr">KRaft</bdi> ולא <bdi dir="ltr">ZooKeeper</bdi>?
@@ -122,13 +122,13 @@
 
 ### כיצד מטופלים חגים וסגירה מוקדמת?
 
-המערכת שומרת <bdi dir="ltr">UTC</bdi> אך משתמשת ב־<bdi dir="ltr"><code>America/New_York</code></bdi> וב־<bdi dir="ltr">exchange calendar</bdi> של <bdi dir="ltr">XNYS</bdi>
+המערכת שומרת <bdi dir="ltr">UTC</bdi> אך משתמשת ב־<bdi dir="ltr"><bdo dir="ltr"><code>America/New_York</code></bdo></bdi> וב־<bdi dir="ltr">exchange calendar</bdi> של <bdi dir="ltr">XNYS</bdi>
 כדי לחשב <bdi dir="ltr">session</bdi>, <bdi dir="ltr">holidays</bdi> ו־<bdi dir="ltr">early close. Offset UTC</bdi> קבוע אינו מספיק בגלל <bdi dir="ltr">DST</bdi>.
 
 ### למה <bdi dir="ltr">Backfill</bdi> ידני ולא <bdi dir="ltr">catchup</bdi> של <bdi dir="ltr">Airflow</bdi>?
 
 <bdi dir="ltr">Backfill</bdi> דורש טווח וסמלים מפורשים ובדוקים. <bdi dir="ltr">Catchup</bdi> אוטומטי עלול ליצור ריצות רבות
-או חופפות. לכן יש <bdi dir="ltr">DAG</bdi> פרמטרי עם <bdi dir="ltr"><code>max_active_runs=1</code></bdi>.
+או חופפות. לכן יש <bdi dir="ltr">DAG</bdi> פרמטרי עם <bdi dir="ltr"><bdo dir="ltr"><code>max_active_runs=1</code></bdo></bdi>.
 
 ### איך <bdi dir="ltr">SEC</bdi> נשאר <bdi dir="ltr">idempotent</bdi>?
 
@@ -150,11 +150,11 @@
 <bdi dir="ltr">MinIO</bdi> מוחלף ב־<bdi dir="ltr">S3</bdi>, <bdi dir="ltr">Docker services</bdi> יכולים לעבור לשירותים מנוהלים, וה־<bdi dir="ltr">API</bdi> יכול להיפרס
 מאחורי <bdi dir="ltr">TLS</bdi> ואימות. החוזים, הנתיבים הלוגיים, <bdi dir="ltr">lineage</bdi> והפרדת <bdi dir="ltr">lifecycle</bdi> נשארים.
 
-### למה מודל <bdi dir="ltr"><code>v2</code></bdi> נמצא ב־<bdi dir="ltr"><code>FALLBACK</code></bdi>?
+### למה מודל <bdi dir="ltr"><bdo dir="ltr"><code>v2</code></bdo></bdi> נמצא ב־<bdi dir="ltr"><code>FALLBACK</code></bdi>?
 
 כי אין עדיין 24 חודשי נתונים, 300 כניסות תקפות ו־50 הצלחות שנדרשים לשער
 האימון. המערכת אינה מאמנת על מדגם קטן רק כדי להציג מספר. כללי
-<bdi dir="ltr"><code>v1</code></bdi> ממשיכים לקבוע טווחי מחיר וסיכון, והשדות
+<bdi dir="ltr"><bdo dir="ltr"><code>v1</code></bdo></bdi> ממשיכים לקבוע טווחי מחיר וסיכון, והשדות
 <bdi dir="ltr"><code>Model Probability</code></bdi> ו־<bdi dir="ltr"><code>Expected R</code></bdi>
 נשארים ריקים. זהו <bdi dir="ltr"><code>fail closed</code></bdi> מכוון.
 
@@ -168,15 +168,15 @@
 ### כיצד מונעים מהמודל ללמוד את העתיד?
 
 כל צילום מצב כולל רק נתוני שוק ודוחות <bdi dir="ltr"><code>SEC</code></bdi> שהיו
-ידועים בזמן הצילום. האימון והבדיקה נעשים ב־<bdi dir="ltr"><code>Walk-Forward</code></bdi>
-כרונולוגי: מאמנים על העבר ובודקים על תקופה מאוחרת יותר. <bdi dir="ltr"><code>NO_ENTRY</code></bdi>
+ידועים בזמן הצילום. האימון והבדיקה נעשים ב־<bdi dir="ltr"><bdo dir="ltr"><code>Walk-Forward</code></bdo></bdi>
+כרונולוגי: מאמנים על העבר ובודקים על תקופה מאוחרת יותר. <bdi dir="ltr"><bdo dir="ltr"><code>NO_ENTRY</code></bdo></bdi>
 נמדד בנפרד ואינו מסומן בטעות כהפסד.
 
 ### למה המודל ההיברידי אינו ממציא מחיר יעד?
 
 רמות המחיר נשארות דטרמיניסטיות ומוסברות באמצעות תמיכה, התנגדות,
 <bdi dir="ltr"><code>EMA</code></bdi> ו־<bdi dir="ltr"><code>ATR</code></bdi>. תפקיד המודל
-הוא רק להעריך את הסיכוי להגיע ל־<bdi dir="ltr"><code>Target 1</code></bdi> לפני
+הוא רק להעריך את הסיכוי להגיע ל־<bdi dir="ltr"><bdo dir="ltr"><code>Target 1</code></bdo></bdi> לפני
 <bdi dir="ltr"><code>Stop</code></bdi> ולסייע בדירוג. כך אפשר לבקר בנפרד את המחיר ואת ההסתברות.
 
 ## שאלות עליך ועל תהליך העבודה
