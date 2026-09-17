@@ -55,6 +55,10 @@ def test_hebrew_presentation_markdown_has_complete_rtl_isolation() -> None:
                 f"{path.name}:{line_number} contains an unisolated numeric run: {unisolated}"
             )
             if path.name == "demo-day-step-by-step-he.md":
+                assert "<bdi" not in text, (
+                    "GitHub strips inline bdi elements; use Unicode LTR isolates instead"
+                )
+                assert text.count("\u2066") == text.count("\u2069")
                 prose = ORDERED_LIST_MARKER.sub("", unisolated)
                 assert not ASCII_DIGIT.search(prose), (
                     f"{path.name}:{line_number} contains an unisolated digit: {prose}"
